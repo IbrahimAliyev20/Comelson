@@ -1,0 +1,105 @@
+{
+    "home": {
+        "title": "HR-vakansiyaları",
+        "description": "HR-vakansiyaları",
+        "heroTitle": "Biznesinizi Doğru İnsanlarla Birləşdirin",
+        "heroSubtitle": "Comelson şirkətləri bir araya gətirərək əməkdaşlıq, tərəfdaşlıq və yeni imkanlar üçün güclü bir biznes şəbəkəsi yaradır.",
+        "heroCta": "Tender sorğusu",
+        "partnersLabel": "Formlarımızla tanış olsun:",
+        "aboutTitlePrefix": "Comelson – Əlaqələrin İmkanlara",
+        "aboutTitleAccent": "Çevrildiyi Yer",
+        "aboutBody": "Comelson şirkətləri və sahibkarları bir araya gətirən biznes şəbəkəsidir. Platforma biznes əlaqələrinin qurulmasını və inkişafını dəstəkləmək məqsədi ilə yaradılmışdır. Burada müxtəlif sahələrdən olan şirkətlər və peşəkarlar bir-biri ilə tanış ola və əməkdaşlıq imkanlarını araşdıra bilirlər. Comelson üzvlərə öz fəaliyyətlərini təqdim etmək və yeni tərəfdaşlar tapmaq üçün mühit yaradır. Platformada həmçinin tenderlər və biznes imkanları paylaşılır. İstifadəçilər sektorda baş verən yeniliklər və xəbərlərlə də tanış ola bilirlər. Bu, biznes mühitində məlumatlı qərarlar verməyə kömək edir. Comelson əlaqələrin daha səmərəli və məqsədyönlü qurulmasını hədəfləyir. Məqsədimiz biznes icmasını bir araya gətirərək qarşılıqlı faydalı əməkdaşlıqların yaranmasına töhfə verməkdir.",
+        "aboutCta": "Ətraflı bax",
+        "membersTitleMain": "Üzvlərimizlə",
+        "membersTitleAccent": "tanış olun",
+        "membersCta": "Hamısına bax",
+        "statsTitlePrefix": "Comelson-un Böyüyən",
+        "statsTitleAccent": "Biznes",
+        "statsTitleSuffix": "Şəbəkəsi",
+        "statsBody": "Comelson platformasında yüzlərlə üzv və tərəfdaş müxtəlif sektorlar üzrə bir araya gəlir. Bu göstəricilər platformanın aktiv və davamlı böyüyən biznes icmasını əks etdirir.",
+        "statsItems": {
+            "membersLabel": "Üzv",
+            "membersValue": "200+",
+            "eventsLabel": "Keçirilmiş tədbirlər",
+            "eventsValue": "100+",
+            "sectorsLabel": "Sektor",
+            "sectorsValue": "100+",
+            "partnersLabel": "Tərəfdaş",
+            "partnersValue": "200+"
+        },
+        "blogTitleBlack": "Comelson İcmasından ",
+        "blogTitleGray": "Son Yeniliklər",
+        "blogCta": "Hamısına bax",
+        "blogReadTime": "{minutes} dəqiqəlik oxuma",
+        "blogPosts": {
+            "opportunities": {
+                "title": "Comelson üzvləri üçün yeni əməkdaşlıq imkanları",
+                "excerpt": "Platformada fəaliyyət göstərən şirkətlər üçün yeni tərəfdaşlıq imkanları təqdim edildi. Bu təşəbbüs bizneslər arasında əlaqələrin daha da güclənməsinə dəstək olacaq."
+            },
+            "sectorNews": {
+                "title": "Sektor üzrə yeniliklər və tədbirlər",
+                "excerpt": "Comelson icması üçün seçilmiş xəbərlər, tədbir elanları və biznes mühitində baş verən əsas dəyişikliklər haqqında qısa icmal."
+            },
+            "networking": {
+                "title": "Şəbəkələşmə və yeni əlaqələr",
+                "excerpt": "Platformada peşəkarlar və şirkətlər bir araya gələrək əməkdaşlıq imkanlarını müzakirə edir və yeni tərəfdaşlıqlar qurur."
+            }
+        },
+        "successStoriesTitleBlack": "Uğur",
+        "successStoriesTitleMid": " Hekayələrimizi ",
+        "successStoriesTitleGray": "Dinləyin",
+        "successStoriesCta": "Hamısına bax",
+        "successStoriesSliderLabel": "Uğur hekayələri slayderi",
+        "successStoriesItems": {
+            "cubekit": {
+                "company": "Cubekit",
+                "quote": "“Comelson-da qurulan hər əlaqə yeni bir imkan deməkdir. Platformamızda tanış olan sahibkarlar və şirkətlər birgə layihələr və uğurlu tərəfdaşlıqlar yaradırlar”",
+                "author": "Ayaz Əfəndi",
+                "role": "İcraçı direktor"
+            },
+            "ventureOne": {
+                "company": "Venture One",
+                "quote": "“Comelson bizə yeni tərəfdaşlar və real biznes imkanları qazandırdı. Şəbəkə üzərindən qurulan əlaqələr layihələrimizin böyüməsinə birbaşa təsir etdi.”",
+                "author": "Leyla Məmmədova",
+                "role": "Biznes inkişafı üzrə menecer"
+            },
+            "biznet": {
+                "company": "BizNet Group",
+                "quote": "“Platformada təqdim olunan tenderlər və xəbərlər sayəsində qərarlarımızı daha sürətli və düzgün veririk. Comelson icması ilə əməkdaşlıq davamlıdır.”",
+                "author": "Rəşad Hüseynov",
+                "role": "Əməliyyat direktoru"
+            }
+        },
+        "pricePackages": {
+            "titleLine1": "Tərəfdaşlıq Paketlərimizlə",
+            "titleLine2": "Tanış Olun",
+            "headerCta": "Tərəfdaşlarımız",
+            "period": "/aylıq",
+            "badge": "Ən çox seçilən",
+            "tagline": "Yeni başlayan sahibkarlar üçün üzvlük",
+            "button": "Üzv ol",
+            "featureItem": "Comelson tədbirlərinə standart giriş",
+            "names": {
+                "basic": "Basic",
+                "business": "Business",
+                "premium": "Premium"
+            }
+        }
+    },
+    "navigation": {
+        "jobs": "Vakansiyalar",
+        "companies": "Şirkətlər",
+        "categories": "Kateqoriyalar",
+        "cvs": "CVlər",
+        "about": "Haqqımızda",
+        "heroNav": {
+            "home": "Ana səhifə",
+            "about": "Haqqımızda",
+            "services": "Xidmətlər",
+            "tender": "Tender",
+            "members": "Üzvlər",
+            "news": "Xəbərlər"
+        },
+        "headerCta": "Tender sorğusu"
+    }
+}
