@@ -5,8 +5,8 @@ import Container from '@/components/shared/container'
 import { Link } from '@/i18n/navigation'
 import type { PricePackageKey } from '@/utils/price-packages-data'
 import { pricePackagesList } from '@/utils/price-packages-data'
+import { PricingCheckIcon, PricingManatIcon } from './home/pricing-icons'
 
-import { PricingCheckIcon, PricingManatIcon } from './pricing-icons'
 
 function packageNameKey(key: PricePackageKey) {
   switch (key) {
@@ -28,8 +28,8 @@ export default async function PricePackagesSection() {
         <div className="flex flex-col gap-12">
           <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-end">
             <h2 className="flex max-w-[575px] flex-col text-3xl font-semibold leading-tight md:text-[40px] md:leading-[56px]">
-              <span className="text-black">{t('pricePackages.titleLine1')}</span>
               <span className="text-[#6b6e71]">{t('pricePackages.titleLine2')}</span>
+              <span className="text-black">{t('pricePackages.titleLine1')}</span>
             </h2>
 
             <Link

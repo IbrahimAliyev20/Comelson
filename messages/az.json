@@ -4,7 +4,7 @@
         "description": "HR-vakansiyaları",
         "heroTitle": "Biznesinizi Doğru İnsanlarla Birləşdirin",
         "heroSubtitle": "Comelson şirkətləri bir araya gətirərək əməkdaşlıq, tərəfdaşlıq və yeni imkanlar üçün güclü bir biznes şəbəkəsi yaradır.",
-        "heroCta": "Tender sorğusu",
+        "heroCta": "Bizimlə əlaqə",
         "partnersLabel": "Formlarımızla tanış olsun:",
         "aboutTitlePrefix": "Comelson – Əlaqələrin İmkanlara",
         "aboutTitleAccent": "Çevrildiyi Yer",
@@ -71,8 +71,8 @@
             }
         },
         "pricePackages": {
-            "titleLine1": "Tərəfdaşlıq Paketlərimizlə",
-            "titleLine2": "Tanış Olun",
+            "titleLine1": "Planı Kəşf Edin",
+            "titleLine2": "Sizin üçün Ən Uyğun ",
             "headerCta": "Tərəfdaşlarımız",
             "period": "/aylıq",
             "badge": "Ən çox seçilən",
@@ -83,6 +83,100 @@
                 "basic": "Basic",
                 "business": "Business",
                 "premium": "Premium"
+            }
+        },
+        "tenders": {
+            "titleBlack": "Tenderlərlə",
+            "titleGray": " tanış olun",
+            "cta": "Hamısına bax",
+            "columns": {
+                "no": "№",
+                "buyer": "Satınalan təşkilatın adı",
+                "subject": "Satınalma predmeti",
+                "start": "Başlama tarixi",
+                "end": "Bitmə tarixi"
+            },
+            "rowCta": "Ətraflı bax"
+        },
+        "ctaBanner": {
+            "titlePart1": "Bizimlə ",
+            "titlePart2": "Tərəfdaş Olmaq ",
+            "titlePart3": "İstəyirsiniz ?",
+            "body": "Comelson platformasında tərəfdaşlıq imkanlarından yararlanmaq və tenderlərə çıxış əldə etmək üçün müraciət edin",
+            "button": "Üzvlük üçün müraciət"
+        },
+        "aboutPage": {
+            "whoTitle": "Biz kimik?",
+            "whoBody": "Comelson Networking biznesləri bir araya gətirən və onların arasında əlaqələri gücləndirən platformadır. Bizim əsas məqsədimiz şirkətlərin bir-birini daha asan tapmasına və əməkdaşlıq qurmasına kömək etməkdir. Fərqli sahələrdə fəaliyyət göstərən şirkətləri eyni məkanda birləşdirərək yeni imkanlar yaradırıq. Platformamız vasitəsilə istifadəçilər öz bizneslərini təqdim edə və daha geniş auditoriyaya çıxara bilirlər.\n\nBiz yalnız bir kataloq deyil, aktiv biznes mühiti formalaşdırmağa çalışırıq. Burada şirkətlər yeni tərəfdaşlar tapır, əlaqələr qurur və real iş imkanları əldə edir. Eyni zamanda tender bölməsi vasitəsilə əməkdaşlıq proseslərini daha əlçatan edirik. Məqsədimiz şirkətlərin vaxt itirmədən doğru insanlara və imkanlara çatmasını təmin etməkdir.\n\nComelson daim inkişaf edən və yenilənən platformadır. İstifadəçi ehtiyaclarına uyğun olaraq yeni funksiyalar əlavə edilir və sistem təkmilləşdirilir. Biz sadəlik və rahat istifadəni əsas prioritet kimi qəbul edirik. Hər bir detal şirkətlər üçün maksimum fayda yaratmaq məqsədilə düşünülüb."
+        },
+        "news": {
+            "tabs": {
+                "all": "Hamısı",
+                "networking": "Networking",
+                "tender": "Tender",
+                "events": "Tədbirlərin təşkili",
+                "updates": "Xəbərlər & Yeniliklər"
+            },
+            "searchPlaceholder": "Axtarın..",
+            "filterDate": "Tarix",
+            "loadMore": "Daha çox"
+        },
+        "newsDetail": {
+            "breadcrumbBase": "Xəbərlər",
+            "readTime": "{minutes} dəq. oxuma vaxtı",
+            "publishedLabel": "Dərc edildi:",
+            "shareLabel": "Paylaş:",
+            "pickedTitlePart1": "Sizin üçün ",
+            "pickedTitlePart2": "Seçdiklərimiz",
+            "sections": {
+                "opportunities": {
+                    "s1Title": "Əməkdaşlıq imkanları",
+                    "s1Body": "Comelson platformasında fəaliyyət göstərən şirkətlər üçün yeni əməkdaşlıq imkanları təqdim edildi. Bu təşəbbüs üzvlərin bir-biri ilə daha sıx əlaqə qurmasına şərait yaradır. Yeni imkanlar vasitəsilə şirkətlər öz təkliflərini daha geniş auditoriyaya çatdıra bilərlər. Əməkdaşlıq proqramı, biznes şəbəkələrinin inkişafına yönəlib. Platformada iştirak edən hər bir üzv, yeni layihələr üçün tərəfdaş tapa bilər. Bu təşəbbüs həm kiçik, həm də böyük şirkətlər üçün açıqdır. Üzvlərin təcrübələrini bölüşməsi və qarşılıqlı dəstək göstərməsi təşviq olunur. Yeni imkanlar üzvlərə müxtəlif sahələrdə tərəfdaşlıq etməyə şərait yaradır. Platforma qarşılıqlı fayda prinsipi ilə əməkdaşlıqları gücləndirir. Bu addım Comelson icmasının daha aktiv və interaktiv olmasına kömək edir.",
+                    "s2Title": "Tərəfdaşlıq imkanlarının faydaları",
+                    "s2Body": "Tərəfdaşlıq imkanları üzvlərə işlərini genişləndirmək imkanı verir. Hər bir şirkət digər üzvlərlə əlaqə quraraq yeni layihələrə başlayır. Platforma üzvlərin məlumat mübadiləsini asanlaşdırır. Bu imkanlar vasitəsilə üzvlər resurslarını daha səmərəli istifadə edə bilirlər. Comelson fərqli sektorlar arasında körpü rolunu oynayır. Yeni tərəfdaşlıqlar şirkətlərin bazarda mövqelərini gücləndirir. Üzvlər üçün təqdim olunan imkanlar onların biznes strategiyasını dəstəkləyir. Platforma üzvlərə yeni ideyalar və layihələr üçün ilham verir. Tərəfdaşlıq imkanları sayəsində yeni əməkdaşlıqlar daha asan həyata keçirilir. Sistem üzvlərin bir-biri ilə davamlı əlaqədə olmasını təmin edir.",
+                    "s3Title": "Platforma üzvlərinin aktivliyi",
+                    "s3Body": "Comelson üzvləri platformada aktiv iştirak etməyə təşviq olunur. Aktivlik yeni əməkdaşlıq imkanlarını artırır və nəticələri sürətləndirir. Üzvlər forumlarda və tədbirlərdə bir-biri ilə fikir mübadiləsi aparır. İcma ruhu şirkətlər arasında qarşılıqlı dəstəyi gücləndirir. Platforma üzvlərə həmçinin təlim və seminar imkanları təqdim edir. Aktiv iştirak edən üzvlər daha çox tərəfdaşlıq imkanına malik olur. İcma daxilində yeni layihələr üçün ideya paylaşımı edilir. Platforma üzvlərə öz sahələrində lider olmaq üçün şərait yaradır. İcma üzvləri arasında əlaqələr uzunmüddətli əməkdaşlıqlara çevrilir. Bu təşəbbüs Comelson platformasının uğurunu və üzvlərin faydasını artırır."
+                },
+                "sectorNews": {
+                    "s1Title": "Yeniliklərə baxış",
+                    "s1Body": "Sektor üzrə seçilmiş yeniliklər, tədbirlər və əsas dəyişikliklər haqqında qısa icmal. Bu bölmə biznes mühitində məlumatlı qərar verməyə kömək edir.",
+                    "s2Title": "Tədbirlər və elanlar",
+                    "s2Body": "Comelson icması üçün tədbir elanları, vacib tarixlər və əməkdaşlıq imkanlarını izləyin. Yeniliklər mütəmadi yenilənir.",
+                    "s3Title": "Nəticə",
+                    "s3Body": "Ən son xəbərləri izləyərək şəbəkənizi gücləndirin və yeni imkanları vaxtında dəyərləndirin."
+                },
+                "networking": {
+                    "s1Title": "Şəbəkələşmə",
+                    "s1Body": "Platformada peşəkarlar və şirkətlər tanış olur, əməkdaşlıq imkanlarını müzakirə edir və yeni tərəfdaşlıqlar qurur.",
+                    "s2Title": "Yeni əlaqələr",
+                    "s2Body": "Doğru insanlarla doğru zamanda əlaqə qurmaq biznesinizi sürətləndirir. Comelson bu prosesi daha əlçatan edir.",
+                    "s3Title": "Davamlı inkişaf",
+                    "s3Body": "Şəbəkə üzərində qurulan əlaqələr uzunmüddətli əməkdaşlıqlara çevrilir və real nəticələr yaradır."
+                }
+            }
+        },
+        "contact": {
+            "methodsTitle": "Əlaqə vasitələri",
+            "phoneLabel": "Telefon nömrəsi",
+            "phoneValue": "994 70 777 77 77",
+            "emailLabel": "Email",
+            "emailValue": "info@comelson.az",
+            "addressLabel": "Ünvan",
+            "addressValue": "Bakı, Azərbaycan, Əhmədli",
+            "formTitle": "Sualınız var? Bizə yazın",
+            "nameLabel": "Ad,soyad",
+            "namePlaceholder": "Ad və soyadınızı daxil edin",
+            "emailPlaceholder": "Email adresinizi daxil edin",
+            "topicLabel": "Müraciət mövzusu",
+            "topicPlaceholder": "Müraciət mövzusunu seçin",
+            "messageLabel": "Mesaj",
+            "messagePlaceholder": "Mesajınız..",
+            "submit": "Göndərin",
+            "topics": {
+                "membership": "Üzvlük",
+                "tender": "Tender",
+                "partnership": "Tərəfdaşlıq",
+                "support": "Dəstək"
             }
         }
     },
@@ -98,7 +192,8 @@
             "services": "Xidmətlər",
             "tender": "Tender",
             "members": "Üzvlər",
-            "news": "Xəbərlər"
+            "news": "Xəbərlər",
+            "contact": "Əlaqə"
         },
         "headerCta": "Tender sorğusu"
     }

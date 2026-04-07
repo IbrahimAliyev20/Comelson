@@ -84,6 +84,100 @@
                 "business": "Business",
                 "premium": "Premium"
             }
+        },
+        "tenders": {
+            "titleBlack": "Explore",
+            "titleGray": " tenders",
+            "cta": "View all",
+            "columns": {
+                "no": "#",
+                "buyer": "Buyer organization",
+                "subject": "Subject",
+                "start": "Start date",
+                "end": "End date"
+            },
+            "rowCta": "View details"
+        },
+        "ctaBanner": {
+            "titlePart1": "Want to ",
+            "titlePart2": "Partner ",
+            "titlePart3": "with us?",
+            "body": "Apply to benefit from partnership opportunities on Comelson and get access to tenders.",
+            "button": "Apply for membership"
+        },
+        "aboutPage": {
+            "whoTitle": "Who are we?",
+            "whoBody": "Comelson Networking is a platform that brings businesses together and strengthens connections between them. Our main goal is to help companies find each other more easily and build collaboration. By bringing companies from different industries into one place, we create new opportunities. Through our platform, users can present their business and reach a wider audience.\n\nWe are not just a directory—we aim to build an active business environment. Here, companies discover new partners, build relationships, and access real business opportunities. At the same time, we make collaboration processes more accessible through the tender section. Our mission is to ensure companies can reach the right people and opportunities without wasting time.\n\nComelson is a constantly evolving and improving platform. New features are added based on user needs and the system is continuously refined. We prioritize simplicity and ease of use. Every detail is designed to create maximum value for companies."
+        },
+        "news": {
+            "tabs": {
+                "all": "All",
+                "networking": "Networking",
+                "tender": "Tender",
+                "events": "Event management",
+                "updates": "News & Updates"
+            },
+            "searchPlaceholder": "Search..",
+            "filterDate": "Date",
+            "loadMore": "Load more"
+        },
+        "newsDetail": {
+            "breadcrumbBase": "News",
+            "readTime": "{minutes} min read",
+            "publishedLabel": "Published:",
+            "shareLabel": "Share:",
+            "pickedTitlePart1": "Picked ",
+            "pickedTitlePart2": "for you",
+            "sections": {
+                "opportunities": {
+                    "s1Title": "Collaboration opportunities",
+                    "s1Body": "New collaboration opportunities have been introduced for companies active on the Comelson platform. This initiative helps members build closer connections and present their offerings to a wider audience. The program is designed to grow business networks and enable members to find partners for new projects.",
+                    "s2Title": "Benefits of partnerships",
+                    "s2Body": "Partnership opportunities help members scale their work. By connecting with other members, companies can start new projects, exchange information more easily, and use resources more efficiently across sectors.",
+                    "s3Title": "Member activity",
+                    "s3Body": "Comelson encourages active participation across the community. Higher activity increases opportunities, accelerates outcomes, and helps relationships turn into long-term collaborations with real results."
+                },
+                "sectorNews": {
+                    "s1Title": "Overview",
+                    "s1Body": "A short overview of curated sector news, events, and key changes that help you make better-informed decisions.",
+                    "s2Title": "Events and announcements",
+                    "s2Body": "Follow event announcements, important dates, and collaboration opportunities for the Comelson community. Updates are refreshed regularly.",
+                    "s3Title": "Wrap-up",
+                    "s3Body": "Stay up to date to strengthen your network and act on opportunities in time."
+                },
+                "networking": {
+                    "s1Title": "Networking",
+                    "s1Body": "Professionals and companies meet on the platform to discuss collaboration opportunities and build new partnerships.",
+                    "s2Title": "New connections",
+                    "s2Body": "Connecting with the right people at the right time accelerates growth. Comelson makes this process more accessible.",
+                    "s3Title": "Continuous growth",
+                    "s3Body": "Relationships built through the network turn into long-term collaborations and tangible outcomes."
+                }
+            }
+        },
+        "contact": {
+            "methodsTitle": "Contact methods",
+            "phoneLabel": "Phone number",
+            "phoneValue": "+994 70 777 77 77",
+            "emailLabel": "Email",
+            "emailValue": "info@comelson.az",
+            "addressLabel": "Address",
+            "addressValue": "Baku, Azerbaijan, Ahmadli",
+            "formTitle": "Have a question? Write to us",
+            "nameLabel": "Full name",
+            "namePlaceholder": "Enter your full name",
+            "emailPlaceholder": "Enter your email address",
+            "topicLabel": "Subject",
+            "topicPlaceholder": "Select a subject",
+            "messageLabel": "Message",
+            "messagePlaceholder": "Your message..",
+            "submit": "Send",
+            "topics": {
+                "membership": "Membership",
+                "tender": "Tender",
+                "partnership": "Partnership",
+                "support": "Support"
+            }
         }
     },
     "navigation": {
@@ -98,7 +192,8 @@
             "services": "Services",
             "tender": "Tender",
             "members": "Members",
-            "news": "News"
+            "news": "News",
+            "contact": "Contact"
         },
         "headerCta": "Tender query"
     }

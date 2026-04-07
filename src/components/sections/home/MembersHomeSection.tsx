@@ -16,7 +16,7 @@ const MEMBER_LOGOS = [
   { src: '/images/abouthome2.jpg'},
 ] as const
 
-export default async function MembersSection() {
+export default async function MembersHomeSection() {
   const t = await getTranslations('home')
 
   return (
