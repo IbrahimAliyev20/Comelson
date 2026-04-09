@@ -3,24 +3,28 @@ import { getTranslations } from 'next-intl/server'
 
 import Container from '@/components/shared/container'
 import { Link } from '@/i18n/navigation'
-import type { PricePackageKey } from '@/utils/price-packages-data'
-import { pricePackagesList } from '@/utils/price-packages-data'
-import { PricingCheckIcon, PricingManatIcon } from './home/pricing-icons'
+import { PartnershipsResponse } from '@/types/types'
+import { PricingCheckIcon } from './home/pricing-icons'
 
+function extractListItems(description: string) {
+  if (!description) return []
 
-function packageNameKey(key: PricePackageKey) {
-  switch (key) {
-    case 'basic':
-      return 'pricePackages.names.basic' as const
-    case 'business':
-      return 'pricePackages.names.business' as const
-    case 'premium':
-      return 'pricePackages.names.premium' as const
-  }
+  const matches = Array.from(description.matchAll(/<li[^>]*>(.*?)<\/li>/g))
+
+  return matches
+    .map((match) =>
+      match[1]
+        .replace(/<[^>]+>/g, ' ')
+        .replace(/&nbsp;/gi, ' ')
+        .replace(/\s+/g, ' ')
+        .trim()
+    )
+    .filter(Boolean)
 }
 
-export default async function PricePackagesSection() {
+export default async function PricePackagesSection({ partnerships }: { partnerships: PartnershipsResponse[] | undefined }) {
   const t = await getTranslations('home')
+  const packages = partnerships ?? []
 
   return (
     <section className="bg-[#f4f6fa] py-20 md:py-[100px]">
@@ -42,13 +46,13 @@ export default async function PricePackagesSection() {
           </div>
 
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 lg:items-stretch lg:gap-6">
-            {pricePackagesList.map((pkg) => {
-              const isFeatured = pkg.variant === 'featured'
-              const nameKey = packageNameKey(pkg.key)
+            {packages.map((pkg, index) => {
+              const isFeatured = pkg.most_popular === 1
+              const features = extractListItems(pkg.description)
 
               return (
                 <article
-                  key={pkg.key}
+                  key={`${pkg.plan}-${index}`}
                   className={`flex w-full flex-col justify-between rounded-2xl p-6 shadow-sm ${
                     isFeatured
                       ? 'bg-[#0f477d] text-white ring-1 ring-[#175585] lg:min-h-[560px]'
@@ -61,7 +65,7 @@ export default async function PricePackagesSection() {
                         {isFeatured ? (
                           <div className="flex items-start justify-between gap-3">
                             <p className="text-2xl font-semibold leading-8 text-white">
-                              {t(nameKey)}
+                              {pkg.plan}
                             </p>
                             <span className="shrink-0 rounded-lg bg-[#3cc3f1] px-3.5 py-1.5 text-base font-medium leading-6 text-white">
                               {t('pricePackages.badge')}
@@ -69,7 +73,7 @@ export default async function PricePackagesSection() {
                           </div>
                         ) : (
                           <p className="text-2xl font-semibold leading-8 text-black">
-                            {t(nameKey)}
+                            {pkg.plan}
                           </p>
                         )}
                         <p
@@ -79,7 +83,7 @@ export default async function PricePackagesSection() {
                               : 'text-base leading-6 text-[#64717c]'
                           }
                         >
-                          {t('pricePackages.tagline')}
+                          {pkg.title}
                         </p>
                       </div>
 
@@ -95,22 +99,6 @@ export default async function PricePackagesSection() {
                         >
                           {pkg.price}
                         </span>
-                        <div className="flex items-center pb-0.5">
-                          <PricingManatIcon
-                            className={
-                              isFeatured
-                                ? 'h-8 w-8 text-white'
-                                : 'h-8 w-8 text-black'
-                            }
-                          />
-                          <span
-                            className={`text-2xl font-medium leading-8 ${
-                              isFeatured ? 'text-white' : 'text-black'
-                            }`}
-                          >
-                            {t('pricePackages.period')}
-                          </span>
-                        </div>
                       </div>
                     </div>
 
@@ -127,8 +115,8 @@ export default async function PricePackagesSection() {
                   </div>
 
                   <ul className="mt-9 flex flex-col gap-4">
-                    {Array.from({ length: pkg.featureCount }).map((_, i) => (
-                      <li key={i} className="flex gap-2.5">
+                    {features.map((feature, i) => (
+                      <li key={`${pkg.plan}-${i}`} className="flex gap-2.5">
                         <PricingCheckIcon
                           className={`mt-0.5 size-6 shrink-0 ${
                             isFeatured ? 'text-[#3cc3f1]' : 'text-[#1577d5]'
@@ -141,7 +129,7 @@ export default async function PricePackagesSection() {
                               : 'text-base leading-6 text-[#64717c]'
                           }
                         >
-                          {t('pricePackages.featureItem')}
+                          {feature}
                         </span>
                       </li>
                     ))}

@@ -4,8 +4,9 @@ import { getTranslations } from "next-intl/server";
 
 import Container from "@/components/shared/container";
 import { Link } from "@/i18n/navigation";
+import { AboutResponse } from "@/types/types";
 
-export default async function AboutHomeSection() {
+export default async function AboutHomeSection({ about }: { about: AboutResponse | undefined }) {
   const t = await getTranslations("home");
 
   return (
@@ -14,12 +15,11 @@ export default async function AboutHomeSection() {
         <div className="flex flex-col items-start justify-between gap-10 md:gap-12 lg:flex-row lg:gap-8 xl:gap-16">
           <div className="flex w-full max-w-[585px] flex-col gap-6 md:gap-8">
             <h2 className="max-w-[14ch] text-balance text-[32px] font-semibold leading-[1.1] tracking-[-0.03em] text-[#14171a] md:max-w-[12ch] md:text-[40px] md:leading-[48px] lg:max-w-none lg:leading-[56px]">
-              <span>{t("aboutTitlePrefix")} </span>
-              <span className="text-[#6b6e71]">{t("aboutTitleAccent")}</span>
+              {about?.title}
             </h2>
             <div className="flex flex-col gap-4">
               <p className="max-w-[557px]  line-clamp-4 lg:line-clamp-none text-sm font-normal leading-6 text-[#64717c] md:text-base">
-                {t("aboutBody")}
+                {about?.short_desciption}
               </p>
               <Link
                 href="/about"
@@ -35,8 +35,8 @@ export default async function AboutHomeSection() {
             <div className="order-2 grid w-full grid-cols-2 gap-4 sm:gap-5 lg:order-1 lg:flex lg:w-full lg:max-w-[360px] lg:flex-col lg:items-end">
               <div className="relative h-[168px] w-full overflow-hidden rounded-xl sm:h-[220px] md:h-[240px]">
                 <Image
-                  src="/images/abouthome1.jpg"
-                  alt=""
+                  src={about?.image_1 ?? ""}
+                  alt="Comelson – Əlaqələrin İmkanlara Çevrildiyi Yer"
                   width={360}
                   height={240}
                   className="h-full w-full object-cover"
@@ -45,8 +45,8 @@ export default async function AboutHomeSection() {
               </div>
               <div className="relative h-[168px] w-full overflow-hidden rounded-xl sm:h-[200px] md:h-[208px] lg:max-w-[312px]">
                 <Image
-                  src="/images/abouthome3.jpg"
-                  alt=""
+                  src={about?.image_3 ?? ""}
+                  alt="Comelson – Əlaqələrin İmkanlara Çevrildiyi Yer"
                   width={312}
                   height={208}
                   className="h-full w-full object-cover"
@@ -56,8 +56,8 @@ export default async function AboutHomeSection() {
             </div>
             <div className="order-1 relative h-[220px] w-full overflow-hidden rounded-xl sm:h-[300px] md:h-[334px] lg:order-2 lg:max-w-[262px]">
               <Image
-                src="/images/abouthome2.jpg"
-                alt=""
+                src={about?.image_2 ?? ""}
+                alt="Comelson – Əlaqələrin İmkanlara Çevrildiyi Yer"
                 width={262}
                 height={334}
                 className="h-full w-full object-cover"

@@ -6,17 +6,43 @@ import NewsHomeSection from "@/components/sections/home/NewsHomeSection";
   import StatisticsSection from "@/components/sections/home/StatisticsSection";
 import SuccessHomeStories from "@/components/sections/home/SuccessHomeStories";
 import TendersHomeSection from "@/components/sections/home/TendersHomeSection";
+import { getServerLocale } from "@/lib/utils";
+import { getServerQueryClient } from "@/providers/server";
+import { getAboutQuery } from "@/services/about/queries";
+import { getFormLogoQuery } from "@/services/form-logo/queries";
+import { getSlidersQuery } from "@/services/sliders/queries";
+import { getStatisticsQuery } from "@/services/statistics/queries";
+import { getSuccessStoriesQuery } from "@/services/success-stories/queries";
 
-export default function Home() {
+export default async function Home() {
+  const locale = await getServerLocale();
+  const queryClient = getServerQueryClient();
+
+
+  await Promise.all([
+
+     queryClient.prefetchQuery(getStatisticsQuery(locale)),
+     queryClient.prefetchQuery(getAboutQuery(locale)),
+     queryClient.prefetchQuery(getSlidersQuery(locale)),
+     queryClient.prefetchQuery(getFormLogoQuery(locale)),
+     queryClient.prefetchQuery(getSuccessStoriesQuery(locale)),
+    
+    ]);
+
+  const formLogo = queryClient.getQueryData(getFormLogoQuery(locale).queryKey)?.data;
+  const statistics = queryClient.getQueryData(getStatisticsQuery(locale).queryKey)?.data;
+  const sliders = queryClient.getQueryData(getSlidersQuery(locale).queryKey)?.data;
+  const about = queryClient.getQueryData(getAboutQuery(locale).queryKey)?.data;
+  const successStories = queryClient.getQueryData(getSuccessStoriesQuery(locale).queryKey)?.data;
   return (
     <div className="flex flex-col ">
-      <HeroHomeSection />
-      <AboutHomeSection />
+      <HeroHomeSection sliders={sliders} formLogo={formLogo} />
+      <AboutHomeSection about={about} />
       <MembersHomeSection />
-      <StatisticsSection />
+      <StatisticsSection statistics={statistics} />
       <TendersHomeSection />
       <NewsHomeSection />
-      <SuccessHomeStories />
+      <SuccessHomeStories successStories={successStories} />
       <CtaBanner />
     </div>
   );

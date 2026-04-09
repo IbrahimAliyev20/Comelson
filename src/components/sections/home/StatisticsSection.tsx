@@ -2,35 +2,25 @@ import Image from 'next/image'
 import { getTranslations } from 'next-intl/server'
 
 import Container from '@/components/shared/container'
+import { StatisticsResponse } from '@/types/types'
 
-const STATS = [
-  {
-    iconSrc: '/icons/users-group.svg',
-    labelKey: 'statsItems.membersLabel',
-    valueKey: 'statsItems.membersValue'
-  },
-  {
-    iconSrc: '/icons/calendar-event.svg',
-    labelKey: 'statsItems.eventsLabel',
-    valueKey: 'statsItems.eventsValue'
-  },
-  {
-    iconSrc: '/icons/stack.svg',
-    labelKey: 'statsItems.sectorsLabel',
-    valueKey: 'statsItems.sectorsValue'
-  },
-  {
-    iconSrc: '/icons/handshake-icon.svg',
-    labelKey: 'statsItems.partnersLabel',
-    valueKey: 'statsItems.partnersValue'
-  }
-] as const
 
-const STATS_COL_LEFT = STATS.slice(0, 2)
-const STATS_COL_RIGHT = STATS.slice(2, 4)
 
-export default async function StatisticsSection() {
+
+export default async function StatisticsSection({ statistics }: { statistics: StatisticsResponse[] | undefined }) {
+  
+  const STATS = [
+    { iconSrc: '/icons/users-group.svg', labelKey: statistics?.[0]?.title, valueKey: statistics?.[0]?.number },
+    { iconSrc: '/icons/calendar-event.svg', labelKey: statistics?.[1]?.title, valueKey: statistics?.[1]?.number },
+    { iconSrc: '/icons/stack.svg', labelKey: statistics?.[2]?.title, valueKey: statistics?.[2]?.number },
+    { iconSrc: '/icons/handshake-icon.svg', labelKey: statistics?.[3]?.title, valueKey: statistics?.[3]?.number }
+  ] as const
+
+  const STATS_COL_LEFT = STATS.slice(0, 2)
+  const STATS_COL_RIGHT = STATS.slice(2, 4)
+
   const t = await getTranslations('home')
+  console.log(statistics)
 
   return (
     <section className="relative overflow-hidden bg-[#0f477d] py-18 md:py-[100px]">
@@ -76,10 +66,10 @@ export default async function StatisticsSection() {
 
                   <div className="flex w-[178px] min-w-0 shrink-0 flex-col gap-[14px]">
                     <p className="text-base font-medium leading-6 text-[#636d73]">
-                      {t(item.labelKey)}
+                      {item.labelKey}
                     </p>
                     <p className="text-[40px] font-semibold leading-[56px] text-black">
-                      {t(item.valueKey)}
+                      {item.valueKey}
                     </p>
                   </div>
                 </div>
@@ -105,10 +95,10 @@ export default async function StatisticsSection() {
 
                   <div className="flex w-[178px] min-w-0 shrink-0 flex-col gap-[14px]">
                     <p className="text-base font-medium leading-6 text-[#636d73]">
-                      {t(item.labelKey)}
+                      {item.labelKey}
                     </p>
                     <p className="text-[40px] font-semibold leading-[56px] text-black">
-                      {t(item.valueKey)}
+                      {item.valueKey}
                     </p>
                   </div>
                 </div>

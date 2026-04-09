@@ -1,16 +1,34 @@
 import PricePackagesSection from '@/components/sections/PricePackagesSection'
 import GenericPageHeroSection from '@/components/shared/GenericPageHeroSection'
-import React from 'react'
+import { getServerLocale } from '@/lib/utils';
+import { getServerQueryClient } from '@/providers/server';
+import { getBreadcrumbsQuery } from '@/services/hero/queries';
+import { getPartnershipsQuery } from '@/services/partnerships/queries';
 
-export default function PartnershipPage() {
+export default async  function PartnershipPage() {
+  const locale = await getServerLocale();
+  const queryClient = getServerQueryClient();
+  await Promise.all([
+
+    queryClient.prefetchQuery(getBreadcrumbsQuery(locale)),
+    queryClient.prefetchQuery(getPartnershipsQuery(locale)),
+  
+  ]);
+
+  const partnerships = queryClient.getQueryData(getPartnershipsQuery(locale).queryKey)?.data;
+  const heroData = queryClient.getQueryData(getBreadcrumbsQuery(locale).queryKey);
+  const hero = heroData?.data?.find((x) => x.name?.toLowerCase?.() === 'partnership');
+  const title = hero?.title || 'Tərəfdaşlıq Paketlərimiz';
+  const description = hero?.desciption || 'Comelson şirkətləri bir araya gətirərək əməkdaşlıq, tərəfdaşlıq və yeni imkanlar üçün güclü bir biznes şəbəkəsi yaradır.';
+  const image = hero?.image || '/images/genericherobg.png';
   return (
     <div>
         <GenericPageHeroSection
-        image="/images/genericherobg.png"
-        title="Tərəfdaşlıq Paketlərimiz"
-        description="Comelson şirkətləri bir araya gətirərək əməkdaşlıq, tərəfdaşlıq və yeni imkanlar üçün güclü bir biznes şəbəkəsi yaradır."
+        image={image}
+        title={title}
+        description={description}
       />
-      <PricePackagesSection />
+      <PricePackagesSection partnerships={partnerships} />
     </div>
   )
 }

@@ -3,49 +3,60 @@
 import { ArrowRight } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useState } from 'react'
+import Image from 'next/image'
 
 import Container from '@/components/shared/container'
 import { Link } from '@/i18n/navigation'
-import type { SuccessStoryKey } from '@/utils/success-stories-data'
-import { successStoriesSlides, youtubeEmbedSrc } from '@/utils/success-stories-data'
-import Image from 'next/image'
+import { SuccessStoriesResponse } from '@/types/types'
 
-function storyMessageKeys(key: SuccessStoryKey) {
-  switch (key) {
-    case 'cubekit':
-      return {
-        logo: '/images/Logo.svg',
-        company: 'successStoriesItems.cubekit.company' as const,
-        quote: 'successStoriesItems.cubekit.quote' as const,
-        author: 'successStoriesItems.cubekit.author' as const,
-        role: 'successStoriesItems.cubekit.role' as const
-      }
-    case 'ventureOne':
-      return {
-        logo: '/images/Logo.svg',
-        company: 'successStoriesItems.ventureOne.company' as const,
-        quote: 'successStoriesItems.ventureOne.quote' as const,
-        author: 'successStoriesItems.ventureOne.author' as const,
-        role: 'successStoriesItems.ventureOne.role' as const
-      }
-    case 'biznet':
-      return {
-        logo: '/images/Logo.svg',
-        company: 'successStoriesItems.biznet.company' as const,
-        quote: 'successStoriesItems.biznet.quote' as const,
-        author: 'successStoriesItems.biznet.author' as const,
-        role: 'successStoriesItems.biznet.role' as const
-      }
-  }
+function normalizeExternalUrl(url: string) {
+  if (!url) return ''
+  if (url.startsWith('http://') || url.startsWith('https://')) return url
+  return `https://${url}`
 }
 
-export default function SuccessHomeStories() {
+function getEmbedSrc(url: string) {
+  const normalized = normalizeExternalUrl(url)
+  if (!normalized) return null
+
+  try {
+    const parsed = new URL(normalized)
+
+    if (parsed.hostname.includes('youtu.be')) {
+      const id = parsed.pathname.replace('/', '').trim()
+      return id ? `https://www.youtube.com/embed/${id}` : normalized
+    }
+
+    if (parsed.hostname.includes('youtube.com')) {
+      const id = parsed.searchParams.get('v')
+      if (id) return `https://www.youtube.com/embed/${id}`
+
+      const parts = parsed.pathname.split('/').filter(Boolean)
+      const embedIndex = parts.findIndex((part) => part === 'embed')
+      if (embedIndex >= 0 && parts[embedIndex + 1]) {
+        return `https://www.youtube.com/embed/${parts[embedIndex + 1]}`
+      }
+    }
+  } catch {
+    return null
+  }
+
+  return normalized
+}
+
+export default function SuccessHomeStories({
+  successStories
+}: {
+  successStories: SuccessStoriesResponse[] | undefined
+}) {
   const t = useTranslations('home')
   const [active, setActive] = useState(0)
+  const stories = successStories ?? []
 
-  const slide = successStoriesSlides[active]
-  const keys = storyMessageKeys(slide.key)
-  const embedSrc = youtubeEmbedSrc(slide.youtubeVideoId)
+  if (stories.length === 0) return null
+
+  const slide = stories[active]
+  const embedSrc = getEmbedSrc(slide.link)
 
   return (
     <section className="bg-white pb-[72px] pt-20 md:pt-[100px]">
@@ -70,33 +81,46 @@ export default function SuccessHomeStories() {
           <div className="flex flex-col items-center gap-8 overflow-hidden rounded-2xl">
             <div className="flex w-full flex-col gap-8 lg:flex-row lg:items-stretch lg:gap-12">
               <div className="relative aspect-video w-full flex-1 overflow-hidden rounded-xl lg:aspect-auto lg:h-[426px] lg:min-h-[426px]">
-                <iframe
-                  key={slide.key}
-                  src={embedSrc}
-                  title={t(keys.company)}
-                  className="absolute inset-0 h-full w-full rounded-xl border-0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
-                  loading="lazy"
-                  referrerPolicy="strict-origin-when-cross-origin"
-                />
+                {embedSrc ? (
+                  <iframe
+                    key={slide.slug}
+                    src={embedSrc}
+                    title={slide.name}
+                    className="absolute inset-0 h-full w-full rounded-xl border-0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="strict-origin-when-cross-origin"
+                  />
+                ) : null}
               </div>
 
               <div className="flex w-full shrink-0 flex-col rounded-[14px] bg-[#f4f6fa] p-6 sm:p-8 lg:h-[426px] lg:w-[min(100%,680px)] lg:max-w-[680px]">
                 <div className="flex min-h-0 flex-1 flex-col justify-between gap-8">
                   <div className="flex flex-col gap-8">
-                    <div className="flex items-center gap-2.5">
-                <Image src={keys.logo} alt={t(keys.company)} width={100} height={100} />
+                    <div className="flex items-center gap-4">
+                      <div className="relative size-16 overflow-hidden rounded-full">
+                        <Image
+                          src={slide.image}
+                          alt={slide.name}
+                          width={64}
+                          height={64}
+                          className="h-16 w-16 object-cover"
+                        />
+                      </div>
+                      <p className="text-xl font-medium leading-6 text-[#0f477d]">
+                        {slide.name}
+                      </p>
                     </div>
                     <blockquote className="text-xl font-normal leading-8 text-[#1d212a] sm:text-[28px] sm:leading-9">
-                      {t(keys.quote)}
+                      {slide.comment}
                     </blockquote>
                   </div>
                   <div className="flex flex-col gap-1">
                     <p className="text-lg font-medium leading-7 text-[#1d212a] sm:text-xl sm:leading-7">
-                      {t(keys.author)}
+                      {slide.name}
                     </p>
-                    <p className="text-base leading-6 text-[#64717c]">{t(keys.role)}</p>
+                    <p className="text-base leading-6 text-[#64717c]">{slide.profession}</p>
                   </div>
                 </div>
               </div>
@@ -107,7 +131,7 @@ export default function SuccessHomeStories() {
               role="tablist"
               aria-label={t('successStoriesSliderLabel')}
             >
-              {successStoriesSlides.map((_, index) => (
+              {stories.map((_, index) => (
                 <button
                   key={index}
                   type="button"
@@ -115,9 +139,7 @@ export default function SuccessHomeStories() {
                   aria-selected={active === index}
                   onClick={() => setActive(index)}
                   className={`h-[3px] w-10 rounded-[1px] transition-colors ${
-                    active === index
-                      ? 'bg-[#0f477d]'
-                      : 'bg-[#0f477d]/32'
+                    active === index ? 'bg-[#0f477d]' : 'bg-[#0f477d]/32'
                   }`}
                 />
               ))}
