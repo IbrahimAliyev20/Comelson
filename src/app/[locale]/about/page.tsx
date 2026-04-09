@@ -1,15 +1,28 @@
 import GenericPageHeroSection from '@/components/shared/GenericPageHeroSection'
 import AboutSection from '@/components/sections/AboutSection'
 import StatisticsSection from '@/components/sections/home/StatisticsSection'
+import { getServerQueryClient } from '@/providers/server'
+import { getBreadcrumbsQuery } from '@/services/hero/queries'
+import { getServerLocale } from '@/lib/utils'
+  
+export default async function AboutPage() {
+  const locale = await getServerLocale()
+  const queryClient = getServerQueryClient()
 
-export default function AboutPage() {
+  await Promise.all([queryClient.prefetchQuery(getBreadcrumbsQuery(locale))])
+
+  const heroData = queryClient.getQueryData(getBreadcrumbsQuery(locale).queryKey)
+  const hero = heroData?.data?.find((x) => x.name?.toLowerCase?.() === 'about')
+
+  const image = hero?.image || '/images/genericherobg.png'
+  const title = hero?.title || 'Haqqımızda'
+  const description =
+    hero?.desciption ||
+    'Comelson şirkətləri bir araya gətirən, tərəfdaşlıqları gücləndirən və tender proseslərini daha əlçatan edən networking platformasıdır'
+
   return (
     <div className="flex flex-col gap-10">
-      <GenericPageHeroSection
-        image="/images/genericherobg.png"
-        title="Haqqımızda"
-        description="Comelson şirkətləri bir araya gətirən, tərəfdaşlıqları gücləndirən və tender proseslərini daha əlçatan edən networking platformasıdır"
-      />
+      <GenericPageHeroSection image={image} title={title} description={description} />
       <AboutSection />
       <StatisticsSection />
     </div>

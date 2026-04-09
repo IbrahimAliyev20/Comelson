@@ -189,12 +189,20 @@
         "heroNav": {
             "home": "Home",
             "about": "About",
-            "services": "Services",
-            "tender": "Tender",
+            "tenders": "Tenders",
             "members": "Members",
             "news": "News",
-            "contact": "Contact"
+            "contact": "Contact",
+            "events": "Events"
+        },
+        "aboutDropdown": {
+            "about": "About",
+            "successStories": "Success stories",
+            "partnership": "Partnership"
         },
         "headerCta": "Tender query"
+    },
+    "common": {
+        "loading": "Loading..."
     }
 }

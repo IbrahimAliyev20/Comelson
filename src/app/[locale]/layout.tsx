@@ -9,6 +9,7 @@ import { QueryProvider } from "@/providers/QueryProvider";
 import { Toaster } from "sonner";
 import { Header } from "@/components/navigation/header";
 import { Footer } from "@/components/navigation/footer";
+import { RouteTransitionBoundary } from "@/components/navigation/RouteTransitionBoundary";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,6 +25,7 @@ export const metadata: Metadata = {
   title: "Comelson",
   description: "Comelson",
 };
+
 
 export default async function RootLayout({
   children,
@@ -43,6 +45,7 @@ export default async function RootLayout({
         <QueryProvider>
           <NextIntlClientProvider messages={messages}>
             <div className="min-h-screen">
+              <RouteTransitionBoundary />
               <Header />
               {children}
               <Footer />

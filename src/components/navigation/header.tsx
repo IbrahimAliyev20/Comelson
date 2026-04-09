@@ -3,11 +3,13 @@
 import { ChevronDown, Menu, X } from 'lucide-react'
 import Image from 'next/image'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { useLocale, useTranslations } from 'next-intl'
 
 import { Link, usePathname } from '@/i18n/navigation'
 import { routing } from '@/i18n/routing'
 import { cn } from '@/lib/utils'
+import { getSettingsQuery } from '@/services/settings/queries'
 import { heroNavigationItems } from '@/utils/static'
 
 import Container from '../shared/container'
@@ -19,14 +21,21 @@ export function Header() {
   const locale = useLocale()
   const isHero = pathname === '/'
   const headerRef = useRef<HTMLElement | null>(null)
+  const aboutDropdownRef = useRef<HTMLDivElement | null>(null)
   const [heroScrolled, setHeroScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isAboutDropdownOpen, setIsAboutDropdownOpen] = useState(false)
+  const [isMobileAboutOpen, setIsMobileAboutOpen] = useState(false)
   const [hasTopHero, setHasTopHero] = useState(false)
   const [headerHeight, setHeaderHeight] = useState(0)
+  const aboutCloseTimeoutRef = useRef<number | null>(null)
 
   const isGlassMode = hasTopHero || isHero
   const showHeroGlass = isGlassMode && !heroScrolled
   const showSpacer = !isGlassMode
+
+  const { data: settingsResponse } = useQuery(getSettingsQuery(locale))
+  const siteLogoSrc = settingsResponse?.siteLogo || '/images/Logo.svg'
 
   const spacerStyle = useMemo(() => {
     if (!showSpacer) return undefined
@@ -72,7 +81,73 @@ export function Header() {
 
   useEffect(() => {
     setIsMobileMenuOpen(false)
+    setIsMobileAboutOpen(false)
+    setIsAboutDropdownOpen(false)
   }, [pathname, locale])
+
+  useEffect(() => {
+    if (!isAboutDropdownOpen) return
+
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') setIsAboutDropdownOpen(false)
+    }
+
+    function handlePointerDown(e: PointerEvent) {
+      const el = aboutDropdownRef.current
+      if (!el) return
+      if (e.target instanceof Node && el.contains(e.target)) return
+      setIsAboutDropdownOpen(false)
+    }
+
+    function handleScroll() {
+      setIsAboutDropdownOpen(false)
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    document.addEventListener('pointerdown', handlePointerDown)
+    window.addEventListener('scroll', handleScroll, { passive: true })
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+      document.removeEventListener('pointerdown', handlePointerDown)
+      window.removeEventListener('scroll', handleScroll)
+    }
+  }, [isAboutDropdownOpen])
+
+  useEffect(() => {
+    return () => {
+      if (aboutCloseTimeoutRef.current) {
+        window.clearTimeout(aboutCloseTimeoutRef.current)
+      }
+    }
+  }, [])
+
+  const aboutDropdownItems = useMemo(() => {
+    return [
+      { key: 'about', href: '/about' },
+      { key: 'successStories', href: '/success-stories' },
+      { key: 'partnership', href: '/partnership' }
+    ] as const
+  }, [])
+
+  function openAboutDropdown() {
+    if (aboutCloseTimeoutRef.current) {
+      window.clearTimeout(aboutCloseTimeoutRef.current)
+      aboutCloseTimeoutRef.current = null
+    }
+    setIsAboutDropdownOpen(true)
+  }
+
+  function closeAboutDropdownSoon() {
+    if (aboutCloseTimeoutRef.current) {
+      window.clearTimeout(aboutCloseTimeoutRef.current)
+    }
+
+    aboutCloseTimeoutRef.current = window.setTimeout(() => {
+      setIsAboutDropdownOpen(false)
+      aboutCloseTimeoutRef.current = null
+    }, 120)
+  }
 
   useEffect(() => {
     const el = headerRef.current
@@ -119,7 +194,7 @@ export function Header() {
             <div className="flex min-w-0 items-center gap-8 lg:gap-[90px]">
               <Link href="/" className="shrink-0">
                 <Image
-                  src="/images/Logo.svg"
+                  src={siteLogoSrc}
                   alt="Comelson"
                   width={158}
                   height={52}
@@ -129,24 +204,93 @@ export function Header() {
               </Link>
 
               <nav className="hidden lg:flex items-center gap-5" aria-label="Primary">
-                {heroNavigationItems.map((item) => (
-                  <Link
-                    key={item.key}
-                    href={item.href}
-                    className={cn(
-                      'inline-flex items-center gap-1 px-2 py-1 text-sm font-normal leading-5 transition-colors hover:opacity-80',
-                      showHeroGlass ? 'text-white' : 'text-[#14171A] hover:text-[#14171A]'
-                    )}
-                  >
-                    {t(`heroNav.${item.key}`)}
-                    {item.hasDropdown ? (
-                      <ChevronDown
-                        className={cn('size-4', showHeroGlass ? 'opacity-90' : 'opacity-80')}
-                        aria-hidden
-                      />
-                    ) : null}
-                  </Link>
-                ))}
+                {heroNavigationItems.map((item) => {
+                  if (item.key !== 'about' || !item.hasDropdown) {
+                    return (
+                      <Link
+                        key={item.key}
+                        href={item.href}
+                        className={cn(
+                          'inline-flex items-center gap-1 px-2 py-1 text-sm font-normal leading-5 transition-colors hover:opacity-80',
+                          showHeroGlass ? 'text-white' : 'text-[#14171A] hover:text-[#14171A]'
+                        )}
+                      >
+                        {t(`heroNav.${item.key}`)}
+                      </Link>
+                    )
+                  }
+
+                  return (
+                    <div
+                      key={item.key}
+                      ref={aboutDropdownRef}
+                      className="relative"
+                      onMouseEnter={openAboutDropdown}
+                      onMouseLeave={closeAboutDropdownSoon}
+                    >
+                      <button
+                        type="button"
+                        aria-haspopup="menu"
+                        aria-expanded={isAboutDropdownOpen}
+                        onClick={() => setIsAboutDropdownOpen((v) => !v)}
+                        className={cn(
+                          'inline-flex items-center gap-1 px-2 py-1 text-sm font-normal leading-5 transition-colors hover:opacity-80',
+                          showHeroGlass ? 'text-white' : 'text-[#14171A] hover:text-[#14171A]'
+                        )}
+                      >
+                        {t('heroNav.about')}
+                        <ChevronDown
+                          className={cn(
+                            'size-4 transition-transform',
+                            isAboutDropdownOpen ? 'rotate-180' : 'rotate-0',
+                            showHeroGlass ? 'opacity-90' : 'opacity-80'
+                          )}
+                          aria-hidden
+                        />
+                      </button>
+
+                      {isAboutDropdownOpen ? (
+                        <>
+                          <div
+                            aria-hidden
+                            className="absolute left-0 top-full z-40 h-4 w-[320px]"
+                          />
+                          <div
+                            role="menu"
+                            className={cn(
+                              'absolute left-0 top-full z-50 w-[320px] pt-3',
+                              'animate-in fade-in-0 slide-in-from-top-2 duration-200',
+                            )}
+                          >
+                            <div
+                              className={cn(
+                                'rounded-2xl border p-3 shadow-xl',
+                                showHeroGlass ? 'border-white/10 bg-[#0D2C4A]/95 backdrop-blur-xl' : 'border-[#EAF1FA] bg-white'
+                              )}
+                            >
+                              {aboutDropdownItems.map((dd) => (
+                                <Link
+                                  key={dd.key}
+                                  href={dd.href}
+                                  role="menuitem"
+                                  className={cn(
+                                    'flex w-full cursor-pointer items-center rounded-xl px-4 py-3 text-sm transition-colors',
+                                    showHeroGlass
+                                      ? 'text-white/90 hover:bg-white/10'
+                                      : 'text-[#14171A]/80 hover:bg-black/5 hover:text-[#14171A]'
+                                  )}
+                                  onClick={() => setIsAboutDropdownOpen(false)}
+                                >
+                                  {t(`aboutDropdown.${dd.key}`)}
+                                </Link>
+                              ))}
+                            </div>
+                          </div>
+                        </>
+                      ) : null}
+                    </div>
+                  )
+                })}
               </nav>
             </div>
 
@@ -210,6 +354,55 @@ export function Header() {
                     const isActive = item.href === '/'
                       ? pathname === '/'
                       : pathname.startsWith(item.href)
+
+                    if (item.key === 'about' && item.hasDropdown) {
+                      return (
+                        <div key={item.key} className="flex flex-col">
+                          <button
+                            type="button"
+                            onClick={() => setIsMobileAboutOpen((v) => !v)}
+                            className={cn(
+                              'flex items-center justify-between rounded-2xl px-3 py-3 text-sm leading-5 transition-colors',
+                              showHeroGlass
+                                ? isActive
+                                  ? 'bg-white/12 font-medium text-white'
+                                  : 'text-white/90 hover:bg-white/8'
+                                : isActive
+                                  ? 'bg-black/5 font-medium text-[#14171A]'
+                                  : 'text-[#14171A]/80 hover:bg-black/5 hover:text-[#14171A]'
+                            )}
+                          >
+                            <span>{label}</span>
+                            <ChevronDown
+                              className={cn(
+                                'h-4 w-4 transition-transform',
+                                isMobileAboutOpen ? 'rotate-180' : 'rotate-0',
+                                showHeroGlass ? 'opacity-80' : 'opacity-70'
+                              )}
+                            />
+                          </button>
+
+                          {isMobileAboutOpen ? (
+                            <div className="mt-2 flex flex-col gap-1 rounded-2xl p-2">
+                              {aboutDropdownItems.map((dd) => (
+                                <Link
+                                  key={dd.key}
+                                  href={dd.href}
+                                  className={cn(
+                                    'rounded-xl px-3 py-2 text-sm transition-colors',
+                                    showHeroGlass
+                                      ? 'text-white/90 hover:bg-white/10'
+                                      : 'text-[#14171A]/80 hover:bg-black/5 hover:text-[#14171A]'
+                                  )}
+                                >
+                                  {t(`aboutDropdown.${dd.key}`)}
+                                </Link>
+                              ))}
+                            </div>
+                          ) : null}
+                        </div>
+                      )
+                    }
 
                     return (
                       <Link

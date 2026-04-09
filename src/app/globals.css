@@ -131,4 +131,41 @@
     min-width: 300px;
     overflow-x: clip;
   }
+
+  body::selection {
+    background: rgba(15, 71, 125, 0.16);
+  }
+}
+
+@layer utilities {
+  .route-spinner {
+    animation: route-spinner 0.9s linear infinite;
+    will-change: transform;
+  }
+
+  .route-spinner-soft {
+    animation: route-spinner-soft 1.35s linear infinite;
+    will-change: transform;
+  }
+}
+
+@keyframes route-spinner {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes route-spinner-soft {
+  from {
+    transform: rotate(360deg) scale(1);
+  }
+  50% {
+    transform: rotate(180deg) scale(0.96);
+  }
+  to {
+    transform: rotate(0deg) scale(1);
+  }
 }

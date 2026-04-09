@@ -1,7 +1,10 @@
+'use client'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Instagram, Linkedin, Send, X } from 'lucide-react'
-
+import { useQuery } from '@tanstack/react-query'
+import { useLocale } from 'next-intl'
+import { getSettingsQuery } from '@/services/settings/queries'
 import Container from '../shared/container'
 
 const NAV_LINKS = [
@@ -16,13 +19,16 @@ const NAV_LINKS = [
 ] as const
 
 export function Footer() {
+  const locale = useLocale()
+  const { data: settingsResponse } = useQuery(getSettingsQuery(locale))
+  const siteFooterLogoSrc = settingsResponse?.siteFooterLogo || '/images/Logo.svg'
   return (
     <footer className="bg-white pt-14">
       <Container>
         <div className="flex flex-col gap-10 md:flex-row md:items-start md:justify-between">
           <div className="flex flex-col gap-8">
             <Link href="/" className="inline-flex items-center">
-              <Image src="/images/Logo.svg" alt="Comelson" width={158} height={52} priority />
+              <Image src={siteFooterLogoSrc} alt="Comelson" width={158} height={52} priority />
             </Link>
 
             <div className="flex flex-col gap-4">

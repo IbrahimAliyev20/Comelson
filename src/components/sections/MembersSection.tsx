@@ -150,7 +150,7 @@ export default function MembersSection() {
                   </div>
 
                   <Link
-                    href={company.profileHref}
+                    href={`/members/${company.slug}`}
                     className="inline-flex h-12 w-full items-center justify-center gap-4 rounded-2xl bg-[#e6eff6] px-6 py-3 text-base font-medium leading-6 text-[#0f477d] transition-opacity hover:opacity-90"
                   >
                     <span className={cn('inline-flex items-center gap-2')}>

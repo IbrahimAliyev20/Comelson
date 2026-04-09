@@ -6,7 +6,7 @@ import { Link } from '@/i18n/navigation'
 import { tendersHomeRows } from '@/utils/tenders-data'
 import Image from 'next/image'
 
-export default async function TendersSection() {
+export default async function TendersHomeSection() {
   const t = await getTranslations('home')
 
   return (
@@ -72,7 +72,7 @@ export default async function TendersSection() {
                       </td>
                       <td className="px-4 py-5 align-middle">
                         <Link
-                          href={row.href}
+                          href={`/tenders/${row.slug}`}
                           className="inline-flex items-center gap-2 text-sm leading-5 text-[#0f477d] transition-opacity hover:opacity-80"
                         >
                           {t('tenders.rowCta')}

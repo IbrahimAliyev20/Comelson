@@ -39,7 +39,7 @@ function storyMessageKeys(key: SuccessStoryKey) {
   }
 }
 
-export default function SuccesStories() {
+export default function SuccessHomeStories() {
   const t = useTranslations('home')
   const [active, setActive] = useState(0)
 

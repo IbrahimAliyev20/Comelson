@@ -18,7 +18,7 @@ export default function GenericPageHeroSection({
       id="page-hero"
       className="relative w-full overflow-hidden bg-[#061c34]"
     >
-      <div className="relative h-[360px] w-full sm:h-[420px] md:h-[520px]">
+      <div className="relative h-[300px] w-full sm:h-[320px] md:h-[420px]">
         <Image
           src={image}
           alt=""

@@ -9,9 +9,9 @@ export const navigationItems = [
 export const heroNavigationItems = [
   { key: "home" as const, href: "/", hasDropdown: false },
   { key: "about" as const, href: "/about", hasDropdown: true },
-  { key: "services" as const, href: "/services", hasDropdown: false },
-  { key: "tender" as const, href: "/tender", hasDropdown: false },
+  { key: "tenders" as const, href: "/tenders", hasDropdown: false },
   { key: "members" as const, href: "/members", hasDropdown: false },
-  { key: "news" as const, href: "/news", hasDropdown: true },
+  { key: "events" as const, href: "/events", hasDropdown: false },
+  { key: "news" as const, href: "/news", hasDropdown: false },
   { key: "contact" as const, href: "/contact", hasDropdown: false },
 ]

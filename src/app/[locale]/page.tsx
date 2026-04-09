@@ -4,8 +4,8 @@ import HeroHomeSection from "@/components/sections/home/HeroHomeSection";
 import MembersHomeSection from "@/components/sections/home/MembersHomeSection";
 import NewsHomeSection from "@/components/sections/home/NewsHomeSection";
   import StatisticsSection from "@/components/sections/home/StatisticsSection";
-import SuccesStories from "@/components/sections/home/SuccesStories";
-import TendersSection from "@/components/sections/home/TendersSection";
+import SuccessHomeStories from "@/components/sections/home/SuccessHomeStories";
+import TendersHomeSection from "@/components/sections/home/TendersHomeSection";
 
 export default function Home() {
   return (
@@ -14,9 +14,9 @@ export default function Home() {
       <AboutHomeSection />
       <MembersHomeSection />
       <StatisticsSection />
-      <TendersSection />
+      <TendersHomeSection />
       <NewsHomeSection />
-      <SuccesStories />
+      <SuccessHomeStories />
       <CtaBanner />
     </div>
   );

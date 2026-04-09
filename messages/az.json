@@ -189,12 +189,20 @@
         "heroNav": {
             "home": "Ana səhifə",
             "about": "Haqqımızda",
-            "services": "Xidmətlər",
-            "tender": "Tender",
+            "tenders": "Tenderlər",
             "members": "Üzvlər",
             "news": "Xəbərlər",
-            "contact": "Əlaqə"
+            "contact": "Əlaqə",
+            "events": "Tədbirlər"
+        },
+        "aboutDropdown": {
+            "about": "Haqqımızda",
+            "successStories": "Uğur hekayələri",
+            "partnership": "Tərəfdaşlıq"
         },
         "headerCta": "Tender sorğusu"
+    },
+    "common": {
+        "loading": "Yüklənir..."
     }
 }

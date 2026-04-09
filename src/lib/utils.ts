@@ -35,3 +35,11 @@ export function getAcceptLanguageHeader(locale?: string): string {
   
   return localeMap[currentLocale] || localeMap['az']
 }
+export async function getServerLocale(): Promise<string> {
+  try {
+    const { getLocale } = await import('next-intl/server')
+    return await getLocale()
+  } catch {
+    return 'az'
+  }
+}
