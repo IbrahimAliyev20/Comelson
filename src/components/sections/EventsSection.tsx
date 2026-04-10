@@ -2,36 +2,72 @@
 
 import Image from 'next/image'
 import { Calendar, ChevronDown } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { useLocale } from 'next-intl'
+import { useQuery } from '@tanstack/react-query'
 
 import Container from '@/components/shared/container'
 import { Link } from '@/i18n/navigation'
 import { cn } from '@/lib/utils'
-import type { EventCategory } from '@/utils/events-data'
-import { eventsList } from '@/utils/events-data'
+import { getEventsQuery } from '@/services/events/queries'
+import { EventCategoriesResponse, EventResponse } from '@/types/types'
 
-type TabId = 'events' | 'forums' | 'exhibitions'
-
-const tabs: Array<{ id: TabId; label: string }> = [
-  { id: 'events', label: 'Tədbirlər' },
-  { id: 'forums', label: 'Forumlar' },
-  { id: 'exhibitions', label: 'Sərgilər' }
-]
-
-function isCategory(tab: TabId, category: EventCategory) {
-  return tab === category
+function formatEventDate(value: string, locale: string) {
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return value
+  return new Intl.DateTimeFormat(locale, { year: 'numeric', month: '2-digit', day: '2-digit' }).format(date)
 }
 
-export default function EventsSection() {
-  const [tab, setTab] = useState<TabId>('events')
+export default function EventsSection({
+  eventCategories,
+  events
+}: {
+  eventCategories: EventCategoriesResponse[] | undefined
+  events: EventResponse[] | undefined
+}) {
+  const locale = useLocale()
+  const categories = useMemo(() => eventCategories ?? [], [eventCategories])
+  const initialEvents = useMemo(() => events ?? [], [events])
+
+  const tabs = useMemo(() => {
+    return categories.map((category, index) => {
+      return {
+        key: category.slug || `${category.name}-${index}`,
+        label: category.name,
+        categoryId: category.id ?? index + 1
+      }
+    })
+  }, [categories])
+
+  const initialTabKey = tabs[0]?.key ?? 'default-tab'
+  const [activeTabKey, setActiveTabKey] = useState<string>(() => initialTabKey)
   const [visible, setVisible] = useState(9)
 
-  const filtered = useMemo(() => {
-    return eventsList.filter((x) => isCategory(tab, x.category))
-  }, [tab])
+  const activeTab = useMemo(() => {
+    return tabs.find((tab) => tab.key === activeTabKey) ?? tabs[0]
+  }, [activeTabKey, tabs])
 
-  const shown = filtered.slice(0, visible)
-  const canLoadMore = visible < filtered.length
+  const categoryId = activeTab?.categoryId ?? 1
+  
+  useEffect(() => {
+    if (!tabs.some((tab) => tab.key === activeTabKey)) {
+      setActiveTabKey(initialTabKey)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tabs.length, initialTabKey, activeTabKey])
+
+  const eventsQuery = useQuery({
+    ...getEventsQuery(locale, categoryId),
+    initialData: activeTabKey === initialTabKey ? { status: true, message: '', data: initialEvents } : undefined,
+    enabled: Number.isFinite(categoryId)
+  })
+
+  const list = eventsQuery.data?.data ?? []
+  const shown = list.slice(0, visible)
+  const canLoadMore = visible < list.length
+
+  const isLoading = eventsQuery.isLoading
+  const isError = eventsQuery.isError
 
   return (
     <section className="bg-[#f8fafc] pb-16 pt-6 sm:pb-24">
@@ -40,20 +76,20 @@ export default function EventsSection() {
           <div className="w-full border-b border-[#dadee2]">
             <div className="flex items-center">
               {tabs.map((x) => {
-                const isActive = tab === x.id
+                const isActive = activeTabKey === x.key
                 return (
                   <button
-                    key={x.id}
+                    key={x.key}
                     type="button"
                     onClick={() => {
-                      setTab(x.id)
+                      setActiveTabKey(x.key)
                       setVisible(9)
                     }}
                     className={cn(
-                      'inline-flex items-center justify-center px-5 pb-3 pt-2 text-base font-medium leading-6',
+                      'inline-flex items-center justify-center border-b-2 px-5 pb-3 pt-2 text-base font-medium leading-6 transition-colors',
                       isActive
-                        ? 'border-b-2 border-[#0f477d] text-[#0f477d]'
-                        : 'border-b border-transparent text-[#6b6e71]'
+                        ? 'border-[#0f477d] text-[#0f477d]'
+                        : 'border-transparent text-[#6b6e71]'
                     )}
                   >
                     {x.label}
@@ -64,33 +100,41 @@ export default function EventsSection() {
           </div>
 
           <div className="grid w-full grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {shown.map((item) => (
-              <Link
-                key={item.id}
-                href={`/events/${item.slug}`}
-                className="flex w-full flex-col gap-4 rounded-2xl border border-[#eaf1fa] bg-white px-2 pb-5 pt-2"
-              >
-                <div className="relative h-[240px] w-full overflow-hidden rounded-xl sm:h-[280px] md:h-[320px]">
-                  <Image
-                    src={item.imageSrc}
-                    alt=""
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 1024px) 100vw, 421px"
-                  />
-                </div>
-
-                <div className="flex flex-col gap-3 px-2">
-                  <div className="flex items-center gap-[5px] text-[#6b6e71]">
-                    <Calendar className="size-5 shrink-0" aria-hidden />
-                    <span className="text-base leading-6">{item.date}</span>
+            {isLoading ? (
+              <div className="col-span-full py-10 text-center text-sm text-[#6b6e71]">Loading...</div>
+            ) : isError ? (
+              <div className="col-span-full py-10 text-center text-sm text-red-600">Failed to load events</div>
+            ) : shown.length === 0 ? (
+              <div className="col-span-full py-10 text-center text-sm text-[#6b6e71]">No events found</div>
+            ) : (
+              shown.map((item) => (
+                <Link
+                  key={item.slug}
+                  href={`/${locale}/events/${item.slug}`}
+                  className="flex w-full flex-col gap-4 rounded-2xl border border-[#eaf1fa] bg-white px-2 pb-5 pt-2"
+                >
+                  <div className="relative h-[240px] w-full overflow-hidden rounded-xl sm:h-[280px] md:h-[320px]">
+                    <Image
+                      src={item.image}
+                      alt={item.name}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 1024px) 100vw, 421px"
+                    />
                   </div>
-                  <p className="line-clamp-2 text-xl font-semibold leading-7 text-[#14171a]">
-                    {item.title}
-                  </p>
-                </div>
-              </Link>
-            ))}
+
+                  <div className="flex flex-col gap-3 px-2">
+                    <div className="flex items-center gap-[5px] text-[#6b6e71]">
+                      <Calendar className="size-5 shrink-0" aria-hidden />
+                      <span className="text-base leading-6">{formatEventDate(item.created_at, locale)}</span>
+                    </div>
+                    <p className="line-clamp-2 text-xl font-semibold leading-7 text-[#14171a]">
+                      {item.name}
+                    </p>
+                  </div>
+                </Link>
+              ))
+            )}
           </div>
 
           {canLoadMore ? (

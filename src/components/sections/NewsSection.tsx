@@ -3,57 +3,78 @@
 import Image from 'next/image'
 import { Calendar, ChevronDown, Clock, Search } from 'lucide-react'
 import { useMemo, useState } from 'react'
+import { useLocale, useTranslations } from 'next-intl'
+import { useQuery } from '@tanstack/react-query'
 
 import Container from '@/components/shared/container'
 import { Input } from '@/components/ui/input'
 import { Link } from '@/i18n/navigation'
-import type { BlogHomePost } from '@/utils/blogsdata'
-import {
-  blogHomePosts,
-  formatBlogPostDate,
-  getBlogHomeUi,
-  getBlogPostContent,
-  getNewsUi
-} from '@/utils/blogsdata'
+import { getBlogsQuery } from '@/services/blogs/queries'
+import { BlogCategoryResponse, BlogResponse } from '@/types/types'
 
-type NewsTab = 'all' | BlogHomePost['category']
+function formatBlogPostDate(value: string, locale: string) {
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return value
+  return new Intl.DateTimeFormat(locale, {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).format(date)
+}
 
-export default function NewsSection() {
-  const ui = getNewsUi()
-  const homeUi = getBlogHomeUi()
+function extractReadTime(value: string) {
+  const match = value.match(/\d+/)
+  return match?.[0] ?? value
+}
 
-  const [tab, setTab] = useState<NewsTab>('all')
+export default function NewsSection({
+  blogCategories,
+  blogs
+}: {
+  blogCategories: BlogCategoryResponse[] | undefined
+  blogs: BlogResponse[] | undefined
+}) {
+  const locale = useLocale()
+  const t = useTranslations('home')
+  const categories = useMemo(() => blogCategories ?? [], [blogCategories])
+  const initialBlogs = useMemo(() => blogs ?? [], [blogs])
+
+  const tabs = useMemo(() => {
+    return [
+      { key: 'all', label: t('news.tabs.all'), categoryId: null },
+      ...categories.map((category, index) => ({
+        key: category.slug || `${category.name}-${index}`,
+        label: category.name,
+        categoryId: index + 1
+      }))
+    ]
+  }, [categories, t])
+
+  const initialTabKey = tabs[0]?.key ?? 'all'
+  const [activeTabKey, setActiveTabKey] = useState<string>(initialTabKey)
   const [query, setQuery] = useState('')
   const [visible, setVisible] = useState(9)
 
-  const tabs = useMemo(
-    () =>
-      [
-        { id: 'all' as const, label: ui.tabs.all },
-        { id: 'networking' as const, label: ui.tabs.networking },
-        { id: 'tender' as const, label: ui.tabs.tender },
-        { id: 'events' as const, label: ui.tabs.events },
-        { id: 'news' as const, label: ui.tabs.news }
-      ] as const,
-    [ui]
-  )
+  const activeTab = useMemo(() => {
+    return tabs.find((tab) => tab.key === activeTabKey) ?? tabs[0]
+  }, [activeTabKey, tabs])
 
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase()
+  const categoryId = activeTab?.categoryId ?? null
 
-    return blogHomePosts
-      .filter((p) => (tab === 'all' ? true : p.category === tab))
-      .filter((p) => {
-        if (!q) return true
-        const content = getBlogPostContent(p)
-        const title = content.title.toLowerCase()
-        const excerpt = content.excerpt.toLowerCase()
-        return title.includes(q) || excerpt.includes(q)
-      })
-  }, [query, tab])
+  const blogsQuery = useQuery({
+    ...getBlogsQuery(locale, categoryId, query.trim()),
+    initialData:
+      activeTabKey === initialTabKey && query.trim() === ''
+        ? { status: true, message: '', data: initialBlogs }
+        : undefined,
+    enabled: categoryId === null || Number.isFinite(categoryId)
+  })
 
-  const shown = filtered.slice(0, visible)
-  const canLoadMore = visible < filtered.length
+  const list = blogsQuery.data?.data ?? []
+  const shown = list.slice(0, visible)
+  const canLoadMore = visible < list.length
+  const isLoading = blogsQuery.isLoading
+  const isError = blogsQuery.isError
 
   return (
     <section className="bg-[#f8fafc] pb-16 pt-10 sm:pb-24 sm:pt-12">
@@ -61,13 +82,13 @@ export default function NewsSection() {
         <div className="flex flex-col gap-8 sm:gap-10">
           <div className="flex w-full gap-3 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {tabs.map((x) => {
-              const isActive = tab === x.id
+              const isActive = activeTabKey === x.key
               return (
                 <button
-                  key={x.id}
+                  key={x.key}
                   type="button"
                   onClick={() => {
-                    setTab(x.id)
+                    setActiveTabKey(x.key)
                     setVisible(9)
                   }}
                   className={`shrink-0 rounded-xl border px-4 py-2 text-base leading-6 transition-colors ${
@@ -90,8 +111,11 @@ export default function NewsSection() {
               />
               <Input
                 value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder={ui.searchPlaceholder}
+                onChange={(e) => {
+                  setQuery(e.target.value)
+                  setVisible(9)
+                }}
+                placeholder={t('news.searchPlaceholder')}
                 className="h-12 rounded-xl border-[#dadee2] bg-white pl-10 pr-3 text-base text-[#32393f] placeholder:text-[#889097] focus-visible:ring-0"
               />
             </div>
@@ -99,29 +123,31 @@ export default function NewsSection() {
             <button
               type="button"
               className="inline-flex h-12 w-full items-center justify-between gap-2 rounded-xl border border-[#dadee2] bg-white px-4 text-base leading-6 text-[#32393f] sm:w-[200px]"
-              aria-label={ui.filterDate}
+              aria-label={t('news.filterDate')}
             >
-              <span>{ui.filterDate}</span>
+              <span>{t('news.filterDate')}</span>
               <Calendar className="size-5 text-[#32393f]" aria-hidden />
             </button>
           </div>
 
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-            {shown.map((post) => {
-              const content = getBlogPostContent(post)
-              const title = content.title
-              const excerpt = content.excerpt
-
-              return (
+            {isLoading ? (
+              <div className="col-span-full py-10 text-center text-sm text-[#6b6e71]">Loading...</div>
+            ) : isError ? (
+              <div className="col-span-full py-10 text-center text-sm text-red-600">Failed to load blogs</div>
+            ) : shown.length === 0 ? (
+              <div className="col-span-full py-10 text-center text-sm text-[#6b6e71]">No blogs found</div>
+            ) : (
+              shown.map((post) => (
                 <Link
-                  key={`${post.key}-${post.slug}`}
+                  key={post.slug}
                   href={`/news/${post.slug}`}
                   className="group flex flex-col gap-4 rounded-2xl border border-[#eaf1fa] bg-white px-2 pb-5 pt-2"
                 >
                   <div className="relative h-[220px] w-full overflow-hidden rounded-xl min-[400px]:h-[280px] sm:h-[320px]">
                     <Image
-                      src={post.imageSrc}
-                      alt={title}
+                      src={post.image}
+                      alt={post.title}
                       fill
                       className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
                       sizes="(max-width: 1024px) 100vw, 421px"
@@ -131,10 +157,10 @@ export default function NewsSection() {
                   <div className="flex flex-col gap-6 px-2">
                     <div className="flex flex-col gap-3">
                       <p className="line-clamp-1 text-xl font-semibold leading-7 text-[#14171a]">
-                        {title}
+                        {post.title}
                       </p>
                       <p className="line-clamp-2 text-base leading-6 text-[#6b6e71]">
-                        {excerpt}
+                        {post.description.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()}
                       </p>
                     </div>
 
@@ -142,20 +168,20 @@ export default function NewsSection() {
                       <div className="flex items-center gap-1.5 text-[#6b6e71]">
                         <Clock className="size-4 shrink-0 sm:size-5" aria-hidden />
                         <span className="text-sm leading-5 sm:text-base sm:leading-6">
-                          {homeUi.readTime(post.readTimeMinutes)}
+                          {t('blogReadTime', { minutes: extractReadTime(post.read_time) })}
                         </span>
                       </div>
                       <div className="flex items-center gap-1.5 text-[#6b6e71]">
                         <Calendar className="size-4 shrink-0 sm:size-5" aria-hidden />
                         <span className="text-sm leading-5 sm:text-base sm:leading-6">
-                          {formatBlogPostDate(post.dateISO, 'az')}
+                          {formatBlogPostDate(post.created_at ?? '', locale)}
                         </span>
                       </div>
                     </div>
                   </div>
                 </Link>
-              )
-            })}
+              ))
+            )}
           </div>
 
           {canLoadMore ? (
@@ -165,7 +191,7 @@ export default function NewsSection() {
                 onClick={() => setVisible((v) => v + 9)}
                 className="inline-flex items-center gap-1 text-base font-medium leading-6 text-[#64717c] transition-opacity hover:opacity-80"
               >
-                {ui.loadMore}
+                {t('news.loadMore')}
                 <ChevronDown className="size-6" aria-hidden />
               </button>
             </div>

@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useLocale } from 'next-intl'
 import { getSettingsQuery } from '@/services/settings/queries'
 import Container from '../shared/container'
+import { getSocialMediaQuery } from '@/services/contact/queries'
 
 const NAV_LINKS = [
   'Haqqımızda',
@@ -22,6 +23,8 @@ export function Footer() {
   const locale = useLocale()
   const { data: settingsResponse } = useQuery(getSettingsQuery(locale))
   const siteFooterLogoSrc = settingsResponse?.siteFooterLogo || '/images/Logo.svg'
+  const { data: socialMediaResponse } = useQuery(getSocialMediaQuery(locale))
+  const socialMedia = socialMediaResponse?.data
   return (
     <footer className="bg-white pt-14">
       <Container>
@@ -34,18 +37,11 @@ export function Footer() {
             <div className="flex flex-col gap-4">
               <p className="text-[14px] leading-5 text-[#8E8E93]">Bizi izləyin</p>
               <div className="flex items-center gap-6 text-black">
-                <Link href="#" aria-label="Instagram" className="transition-opacity hover:opacity-70">
-                  <Instagram className="h-6 w-6" />
-                </Link>
-                <Link href="#" aria-label="LinkedIn" className="transition-opacity hover:opacity-70">
-                  <Linkedin className="h-6 w-6" />
-                </Link>
-                <Link href="#" aria-label="X" className="transition-opacity hover:opacity-70">
-                  <X className="h-6 w-6" />
-                </Link>
-                <Link href="#" aria-label="Telegram" className="transition-opacity hover:opacity-70">
-                  <Send className="h-6 w-6" />
-                </Link>
+           {socialMedia?.map((item) => (
+            <Link key={item.link} href={item.link} aria-label={item.link} className="transition-opacity hover:opacity-70">
+              <Image src={item.image} alt={item.link} width={24} height={24} />
+            </Link>
+           ))}
               </div>
             </div>
           </div>

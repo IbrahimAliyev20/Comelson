@@ -8,8 +8,10 @@ const getSuccessStories = async (locale: string) => {
   return response
 }
 
-const getSuccessStoriesBySlug = async (slug: string) => {
-  const response = await get<ApiResponse<SuccessStoriesResponse>>(`/success-stories/${slug}`)
+const getSuccessStoriesBySlug = async (slug: string, locale: string) => {
+  const response = await get<ApiResponse<SuccessStoriesResponse>>(`/success-stories/${slug}`, {
+    params: { locale }
+  })
   return response
 }   
 export { getSuccessStories, getSuccessStoriesBySlug }

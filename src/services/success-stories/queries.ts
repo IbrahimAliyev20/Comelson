@@ -9,10 +9,10 @@ const getSuccessStoriesQuery = (locale: string) => {
     });
 }
 
-const getSuccessStoriesBySlugQuery = (slug: string) => {
+const getSuccessStoriesBySlugQuery = (slug: string, locale: string) => {
     return queryOptions({
-        queryKey: ["success-stories-by-slug", slug],
-        queryFn: () => getSuccessStoriesBySlug(slug),
+        queryKey: ["success-stories-by-slug", slug, locale],
+        queryFn: () => getSuccessStoriesBySlug(slug, locale),
     });
 }
 

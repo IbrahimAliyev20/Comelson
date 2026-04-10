@@ -73,3 +73,63 @@ export interface SuccessStoriesResponse {
       meta_keywords: string;
       meta_description: string;
 }
+
+export interface ContactResponse {
+  phone: string;
+  email: string;
+  address: string;
+  map: string;
+}
+
+export interface SocialMediaResponse {
+      link: string;
+      image: string;
+      thumb_image: string;
+}
+
+
+export interface EventCategoriesResponse {
+  id?: number;
+  name: string;
+  slug: string;
+}
+
+export interface EventResponse {
+  name: string;
+  slug: string;
+  image: string;
+  thumb_image: string;
+  description: string;
+  category: {
+    id: number;
+    name: string;
+  };
+  created_at: string;
+  meta_title: string;
+  meta_keywords: string;
+  meta_description: string;
+}
+
+
+export interface BlogCategoryResponse {
+  name: string;
+  slug: string;
+}
+
+export interface BlogResponse {    
+      image: string;
+      thumb_image: string;
+      title: string;
+      slug: string;
+      read_time: string;
+      description: string;
+      created_at?: string;
+      
+      category: {
+        id: number;
+        name: string;
+      };
+      meta_title: string;
+      meta_keywords: string;
+      meta_description: string;
+}
