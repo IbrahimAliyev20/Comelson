@@ -84,7 +84,7 @@ export default async function NewsDetailPage({
   } as const
 
   return (
-    <section className="bg-[#f8fafc] pb-16 pt-10 sm:pb-24 sm:pt-12">
+    <section className="bg-[#f8fafc] py-8 md:py-[70px]">
       <Container className="rounded-2xl bg-white p-6">
         <div className="mx-auto flex w-full max-w-[1000px] flex-col gap-8 sm:gap-10">
           <nav className="flex items-center gap-1 text-xs leading-4">

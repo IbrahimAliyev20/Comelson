@@ -1,208 +1,101 @@
 {
-    "home": {
-        "title": "HR-vacancies",
-        "description": "HR-vacancies",
-        "heroTitle": "Connect Your Business With the Right People",
-        "heroSubtitle": "Comelson brings companies together to build a strong business network for collaboration, partnership, and new opportunities.",
-        "heroCta": "Tender query",
-        "partnersLabel": "Meet our partners:",
-        "aboutTitlePrefix": "Comelson – Where Connections Become",
-        "aboutTitleAccent": "Opportunities",
-        "aboutBody": "Comelson is a business network that brings together companies and entrepreneurs. The platform was created to support building and growing business relationships. Here, companies and professionals from different fields can meet and explore collaboration opportunities. Comelson gives members an environment to present their work and find new partners. The platform also shares tenders and business opportunities. Users can stay informed about sector news and updates—helping them make better-informed decisions in the business world. Comelson aims to make connections more efficient and purposeful. Our goal is to bring the business community together and contribute to mutually beneficial partnerships.",
-        "aboutCta": "Learn more",
-        "membersTitleMain": "Meet our",
-        "membersTitleAccent": "members",
-        "membersCta": "View all",
-        "statsTitlePrefix": "Comelson’s Growing",
-        "statsTitleAccent": "Business",
-        "statsTitleSuffix": "Network",
-        "statsBody": "On the Comelson platform, hundreds of members and partners come together across different sectors. These indicators reflect an active and steadily growing business community.",
-        "statsItems": {
-            "membersLabel": "Members",
-            "membersValue": "200+",
-            "eventsLabel": "Events held",
-            "eventsValue": "100+",
-            "sectorsLabel": "Sectors",
-            "sectorsValue": "100+",
-            "partnersLabel": "Partners",
-            "partnersValue": "200+"
-        },
-        "blogTitleBlack": "Latest from the ",
-        "blogTitleGray": "Comelson community",
-        "blogCta": "View all",
-        "blogReadTime": "{minutes} min read",
-        "blogPosts": {
-            "opportunities": {
-                "title": "New collaboration opportunities for Comelson members",
-                "excerpt": "New partnership opportunities have been introduced for companies active on the platform. This initiative will help strengthen connections between businesses."
-            },
-            "sectorNews": {
-                "title": "Sector news and events",
-                "excerpt": "A short overview of curated news for the Comelson community, event announcements, and key changes in the business environment."
-            },
-            "networking": {
-                "title": "Networking and new connections",
-                "excerpt": "Professionals and companies meet on the platform to discuss collaboration opportunities and build new partnerships."
-            }
-        },
-        "successStoriesTitleBlack": "Listen to ",
-        "successStoriesTitleMid": "Our ",
-        "successStoriesTitleGray": "Success Stories",
-        "successStoriesCta": "View all",
-        "successStoriesSliderLabel": "Success story slides",
-        "successStoriesItems": {
-            "cubekit": {
-                "company": "Cubekit",
-                "quote": "“Every connection built on Comelson means a new opportunity. Entrepreneurs and companies who meet on our platform create joint projects and successful partnerships.”",
-                "author": "Ayaz Afandi",
-                "role": "Chief Executive Officer"
-            },
-            "ventureOne": {
-                "company": "Venture One",
-                "quote": "“Comelson brought us new partners and real business opportunities. Relationships formed through the network have directly helped our projects grow.”",
-                "author": "Leyla Mammadova",
-                "role": "Business Development Manager"
-            },
-            "biznet": {
-                "company": "BizNet Group",
-                "quote": "“Tenders and news shared on the platform help us make faster, better-informed decisions. Working with the Comelson community has been consistent and valuable.”",
-                "author": "Rashad Huseynov",
-                "role": "Chief Operating Officer"
-            }
-        },
-        "pricePackages": {
-            "titleLine1": "Explore our",
-            "titleLine2": "Partnership Packages",
-            "headerCta": "Our partners",
-            "period": "/month",
-            "badge": "Most popular",
-            "tagline": "Membership for new entrepreneurs",
-            "button": "Become a member",
-            "featureItem": "Standard access to Comelson events",
-            "names": {
-                "basic": "Basic",
-                "business": "Business",
-                "premium": "Premium"
-            }
-        },
-        "tenders": {
-            "titleBlack": "Explore",
-            "titleGray": " tenders",
-            "cta": "View all",
-            "columns": {
-                "no": "#",
-                "buyer": "Buyer organization",
-                "subject": "Subject",
-                "start": "Start date",
-                "end": "End date"
-            },
-            "rowCta": "View details"
-        },
-        "ctaBanner": {
-            "titlePart1": "Want to ",
-            "titlePart2": "Partner ",
-            "titlePart3": "with us?",
-            "body": "Apply to benefit from partnership opportunities on Comelson and get access to tenders.",
-            "button": "Apply for membership"
-        },
-        "aboutPage": {
-            "whoTitle": "Who are we?",
-            "whoBody": "Comelson Networking is a platform that brings businesses together and strengthens connections between them. Our main goal is to help companies find each other more easily and build collaboration. By bringing companies from different industries into one place, we create new opportunities. Through our platform, users can present their business and reach a wider audience.\n\nWe are not just a directory—we aim to build an active business environment. Here, companies discover new partners, build relationships, and access real business opportunities. At the same time, we make collaboration processes more accessible through the tender section. Our mission is to ensure companies can reach the right people and opportunities without wasting time.\n\nComelson is a constantly evolving and improving platform. New features are added based on user needs and the system is continuously refined. We prioritize simplicity and ease of use. Every detail is designed to create maximum value for companies."
-        },
-        "news": {
-            "tabs": {
-                "all": "All",
-                "networking": "Networking",
-                "tender": "Tender",
-                "events": "Event management",
-                "updates": "News & Updates"
-            },
-            "searchPlaceholder": "Search..",
-            "filterDate": "Date",
-            "loadMore": "Load more"
-        },
-        "newsDetail": {
-            "breadcrumbBase": "News",
-            "readTime": "{minutes} min read",
-            "publishedLabel": "Published:",
-            "shareLabel": "Share:",
-            "pickedTitlePart1": "Picked ",
-            "pickedTitlePart2": "for you",
-            "sections": {
-                "opportunities": {
-                    "s1Title": "Collaboration opportunities",
-                    "s1Body": "New collaboration opportunities have been introduced for companies active on the Comelson platform. This initiative helps members build closer connections and present their offerings to a wider audience. The program is designed to grow business networks and enable members to find partners for new projects.",
-                    "s2Title": "Benefits of partnerships",
-                    "s2Body": "Partnership opportunities help members scale their work. By connecting with other members, companies can start new projects, exchange information more easily, and use resources more efficiently across sectors.",
-                    "s3Title": "Member activity",
-                    "s3Body": "Comelson encourages active participation across the community. Higher activity increases opportunities, accelerates outcomes, and helps relationships turn into long-term collaborations with real results."
-                },
-                "sectorNews": {
-                    "s1Title": "Overview",
-                    "s1Body": "A short overview of curated sector news, events, and key changes that help you make better-informed decisions.",
-                    "s2Title": "Events and announcements",
-                    "s2Body": "Follow event announcements, important dates, and collaboration opportunities for the Comelson community. Updates are refreshed regularly.",
-                    "s3Title": "Wrap-up",
-                    "s3Body": "Stay up to date to strengthen your network and act on opportunities in time."
-                },
-                "networking": {
-                    "s1Title": "Networking",
-                    "s1Body": "Professionals and companies meet on the platform to discuss collaboration opportunities and build new partnerships.",
-                    "s2Title": "New connections",
-                    "s2Body": "Connecting with the right people at the right time accelerates growth. Comelson makes this process more accessible.",
-                    "s3Title": "Continuous growth",
-                    "s3Body": "Relationships built through the network turn into long-term collaborations and tangible outcomes."
-                }
-            }
-        },
-        "contact": {
-            "methodsTitle": "Contact methods",
-            "phoneLabel": "Phone number",
-            "phoneValue": "+994 70 777 77 77",
-            "emailLabel": "Email",
-            "emailValue": "info@comelson.az",
-            "addressLabel": "Address",
-            "addressValue": "Baku, Azerbaijan, Ahmadli",
-            "formTitle": "Have a question? Write to us",
-            "nameLabel": "Full name",
-            "namePlaceholder": "Enter your full name",
-            "emailPlaceholder": "Enter your email address",
-            "topicLabel": "Subject",
-            "topicPlaceholder": "Select a subject",
-            "messageLabel": "Message",
-            "messagePlaceholder": "Your message..",
-            "submit": "Send",
-            "topics": {
-                "membership": "Membership",
-                "tender": "Tender",
-                "partnership": "Partnership",
-                "support": "Support"
-            }
-        }
+  "home": {
+    "heroTitle": "Connect Your Business With the Right People",
+    "heroSubtitle": "Comelson brings companies together to build a strong business network for collaboration, partnership, and new opportunities.",
+    "heroCta": "Tender query",
+    "partnersLabel": "Meet our partners:",
+    "aboutCta": "Learn more",
+    "membersTitleMain": "Meet our",
+    "membersTitleAccent": "members",
+    "membersCta": "View all",
+    "statsTitlePrefix": "Comelson’s Growing",
+    "statsTitleAccent": "Business",
+    "statsTitleSuffix": "Network",
+    "statsBody": "On the Comelson platform, hundreds of members and partners come together across different sectors. These indicators reflect an active and steadily growing business community.",
+    "blogTitleBlack": "Latest from the ",
+    "blogTitleGray": "Comelson community",
+    "blogCta": "View all",
+    "blogReadTime": "{minutes} min read",
+    "successStoriesTitleBlack": "Listen to ",
+    "successStoriesTitleMid": "Our ",
+    "successStoriesTitleGray": "Success Stories",
+    "successStoriesCta": "View all",
+    "successStoriesSliderLabel": "Success story slides",
+    "pricePackages": {
+      "titleLine1": "Explore our",
+      "titleLine2": "Partnership Packages",
+      "headerCta": "Our partners",
+      "badge": "Most popular",
+      "button": "Become a member"
     },
-    "navigation": {
-        "jobs": "Jobs",
-        "companies": "Companies",
-        "categories": "Categories",
-        "cvs": "CVs",
-        "about": "About",
-        "heroNav": {
-            "home": "Home",
-            "about": "About",
-            "tenders": "Tenders",
-            "members": "Members",
-            "news": "News",
-            "contact": "Contact",
-            "events": "Events"
-        },
-        "aboutDropdown": {
-            "about": "About",
-            "successStories": "Success stories",
-            "partnership": "Partnership"
-        },
-        "headerCta": "Tender query"
+    "tenders": {
+      "titleBlack": "Explore",
+      "titleGray": " tenders",
+      "cta": "View all",
+      "columns": {
+        "no": "#",
+        "buyer": "Buyer organization",
+        "subject": "Subject",
+        "start": "Start date",
+        "end": "End date"
+      },
+      "rowCta": "View details"
     },
-    "common": {
-        "loading": "Loading..."
+    "ctaBanner": {
+      "titlePart1": "Want to ",
+      "titlePart2": "Partner ",
+      "titlePart3": "with us?",
+      "body": "Apply to benefit from partnership opportunities on Comelson and get access to tenders.",
+      "button": "Apply for membership"
+    },
+    "news": {
+      "tabs": {
+        "all": "All"
+      },
+      "searchPlaceholder": "Search..",
+      "filterDate": "Date",
+      "loadMore": "Load more"
+    },
+    "contact": {
+      "methodsTitle": "Contact methods",
+      "phoneLabel": "Phone number",
+      "emailLabel": "Email",
+      "addressLabel": "Address",
+      "formTitle": "Have a question? Write to us",
+      "nameLabel": "Full name",
+      "namePlaceholder": "Enter your full name",
+      "emailPlaceholder": "Enter your email address",
+      "topicLabel": "Subject",
+      "topicPlaceholder": "Select a subject",
+      "messageLabel": "Message",
+      "messagePlaceholder": "Your message..",
+      "submit": "Send",
+      "topics": {
+        "membership": "Membership",
+        "tender": "Tender",
+        "partnership": "Partnership",
+        "support": "Support"
+      }
     }
+  },
+  "navigation": {
+    "heroNav": {
+      "home": "Home",
+      "about": "About",
+      "tenders": "Tenders",
+      "members": "Members",
+      "news": "News",
+      "contact": "Contact",
+      "events": "Events"
+    },
+    "aboutDropdown": {
+      "about": "About",
+      "successStories": "Success stories",
+      "partnership": "Partnership"
+    },
+    "headerCta": "Tender query"
+  },
+  "common": {
+    "loading": "Loading..."
+  }
 }

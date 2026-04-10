@@ -42,7 +42,7 @@ export default async function MemberDetailPage({
   const others = members.filter((item) => item.slug !== slug).slice(0, 2)
 
   return (
-    <section className="bg-[#f8fafc] pb-16 pt-10 sm:pb-24 sm:pt-12">
+    <section className="bg-[#f8fafc] py-8 md:py-[70px]">
       <Container>
         <div className="rounded-2xl bg-white p-6 sm:p-10">
           <div className="mx-auto flex max-w-[1150px] flex-col gap-8 sm:gap-10">

@@ -141,7 +141,7 @@ export default async function SuccessStoryDetailPage({
       </section>
 
       {relatedStories.length > 0 ? (
-        <section className="bg-[#f8fafc] py-12 sm:py-16">
+        <section className="bg-[#f8fafc] py-8 md:py-[70px]">
           <Container>
             <div className="flex flex-col gap-8 sm:gap-12">
               <h2 className="text-balance text-[28px] font-semibold leading-[36px] text-[#6b6e71] sm:text-[40px] sm:leading-[56px]">

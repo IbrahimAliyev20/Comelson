@@ -59,7 +59,7 @@ export default function MembersSection({
   const canLoadMore = visible < filtered.length
 
   return (
-    <section className="bg-[#f8fafc] pb-24 pt-12">
+    <section className="bg-[#f8fafc] py-8 md:py-[70px]">
       <Container>
         <div className="flex flex-col gap-10">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">

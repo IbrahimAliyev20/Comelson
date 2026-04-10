@@ -27,21 +27,21 @@ export default async function PricePackagesSection({ partnerships }: { partnersh
   const packages = partnerships ?? []
 
   return (
-    <section className="bg-[#f4f6fa] py-20 md:py-[100px]">
+    <section className="bg-[#f4f6fa] py-8 md:py-[70px]">
       <Container>
-        <div className="flex flex-col gap-12">
+        <div className="flex flex-col gap-8">
           <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-end">
-            <h2 className="flex max-w-[575px] flex-col text-3xl font-semibold leading-tight md:text-[40px] md:leading-[56px]">
+            <h2 className="flex max-w-[575px] flex-col text-2xl font-semibold leading-tight min-[360px]:text-3xl md:text-[40px] md:leading-[56px]">
               <span className="text-[#6b6e71]">{t('pricePackages.titleLine2')}</span>
               <span className="text-black">{t('pricePackages.titleLine1')}</span>
             </h2>
 
             <Link
               href="/members"
-              className="inline-flex h-12 shrink-0 items-center justify-center gap-3 rounded-2xl px-6 py-3 text-base font-medium leading-6 text-black transition-opacity hover:opacity-80"
+              className="inline-flex h-11 w-full shrink-0 items-center justify-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-medium leading-5 text-black transition-opacity hover:opacity-80 min-[400px]:h-12 min-[400px]:w-auto min-[400px]:gap-3 min-[400px]:px-6 min-[400px]:py-3 min-[400px]:text-base min-[400px]:leading-6"
             >
               {t('pricePackages.headerCta')}
-              <ArrowRight className="size-6 shrink-0" aria-hidden />
+              <ArrowRight className="size-5 shrink-0 min-[400px]:size-6" aria-hidden />
             </Link>
           </div>
 
@@ -53,15 +53,15 @@ export default async function PricePackagesSection({ partnerships }: { partnersh
               return (
                 <article
                   key={`${pkg.plan}-${index}`}
-                  className={`flex w-full flex-col justify-between rounded-2xl p-6 shadow-sm ${
+                  className={`flex w-full flex-col justify-between rounded-2xl p-4 shadow-sm sm:p-6 ${
                     isFeatured
                       ? 'bg-[#0f477d] text-white ring-1 ring-[#175585] lg:min-h-[560px]'
                       : 'border border-[#e8eaed] bg-white'
                   }`}
                 >
-                  <div className="flex flex-col gap-9">
-                    <div className="flex flex-col gap-6">
-                      <div className="flex flex-col gap-5">
+                  <div className="flex flex-col gap-7 sm:gap-9">
+                    <div className="flex flex-col gap-5 sm:gap-6">
+                      <div className="flex flex-col gap-4 sm:gap-5">
                         {isFeatured ? (
                           <div className="flex items-start justify-between gap-3">
                             <p className="text-2xl font-semibold leading-8 text-white">
@@ -93,7 +93,7 @@ export default async function PricePackagesSection({ partnerships }: { partnersh
 
                       <div className="flex items-end gap-1">
                         <span
-                          className={`text-5xl font-semibold leading-[48px] ${
+                          className={`text-4xl font-semibold leading-[40px] sm:text-5xl sm:leading-[48px] ${
                             isFeatured ? 'text-white' : 'text-black'
                           }`}
                         >
@@ -104,7 +104,7 @@ export default async function PricePackagesSection({ partnerships }: { partnersh
 
                     <Link
                       href="/register"
-                      className={`flex h-12 w-full items-center justify-center gap-4 rounded-2xl px-6 text-base font-medium leading-6 transition-opacity hover:opacity-90 ${
+                      className={`flex h-11 w-full items-center justify-center gap-4 rounded-2xl px-6 text-sm font-medium leading-5 transition-opacity hover:opacity-90 sm:h-12 sm:text-base sm:leading-6 ${
                         isFeatured
                           ? 'bg-white text-[#0f477d]'
                           : 'bg-[#e7f1f8] text-[#0f477d]'
@@ -114,7 +114,7 @@ export default async function PricePackagesSection({ partnerships }: { partnersh
                     </Link>
                   </div>
 
-                  <ul className="mt-9 flex flex-col gap-4">
+                  <ul className="mt-6 flex flex-col gap-3 sm:mt-9 sm:gap-4">
                     {features.map((feature, i) => (
                       <li key={`${pkg.plan}-${i}`} className="flex gap-2.5">
                         <PricingCheckIcon

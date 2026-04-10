@@ -14,7 +14,7 @@ export function getCurrentLocale(): string {
     if (localeMatch) {
       const locale = localeMatch[1]
       // Validate it's one of our supported locales
-      if (['az', 'en', 'ru'].includes(locale)) {
+      if (['az', 'en', 'tr', 'ru'].includes(locale)) {
         return locale
       }
     }
@@ -30,6 +30,7 @@ export function getAcceptLanguageHeader(locale?: string): string {
   const localeMap: Record<string, string> = {
     'az': 'az-AZ,az;q=0.9,en;q=0.8',
     'en': 'en-US,en;q=0.9,az;q=0.8',
+    'tr': 'tr-TR,tr;q=0.9,en;q=0.8',
     'ru': 'ru-RU,ru;q=0.9,en;q=0.8'
   }
   

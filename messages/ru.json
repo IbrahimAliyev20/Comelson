@@ -1,0 +1,101 @@
+{
+  "home": {
+    "heroTitle": "Соедините ваш бизнес с нужными людьми",
+    "heroSubtitle": "Comelson объединяет компании, создавая сильную деловую сеть для сотрудничества, партнерства и новых возможностей.",
+    "heroCta": "Связаться с нами",
+    "partnersLabel": "Познакомьтесь с нашими партнерами:",
+    "aboutCta": "Подробнее",
+    "membersTitleMain": "Познакомьтесь с",
+    "membersTitleAccent": "нашими участниками",
+    "membersCta": "Посмотреть все",
+    "statsTitlePrefix": "Растущая",
+    "statsTitleAccent": "деловая",
+    "statsTitleSuffix": "сеть Comelson",
+    "statsBody": "На платформе Comelson сотни участников и партнеров объединяются из разных отраслей. Эти показатели отражают активное и устойчиво растущее бизнес-сообщество.",
+    "blogTitleBlack": "Последние новости ",
+    "blogTitleGray": "сообщества Comelson",
+    "blogCta": "Посмотреть все",
+    "blogReadTime": "{minutes} мин чтения",
+    "successStoriesTitleBlack": "Слушайте",
+    "successStoriesTitleMid": " наши ",
+    "successStoriesTitleGray": "истории успеха",
+    "successStoriesCta": "Посмотреть все",
+    "successStoriesSliderLabel": "Слайдер историй успеха",
+    "pricePackages": {
+      "titleLine1": "Выберите",
+      "titleLine2": "подходящий план ",
+      "headerCta": "Наши партнеры",
+      "badge": "Самый популярный",
+      "button": "Стать участником"
+    },
+    "tenders": {
+      "titleBlack": "Ознакомьтесь",
+      "titleGray": " с тендерами",
+      "cta": "Посмотреть все",
+      "columns": {
+        "no": "№",
+        "buyer": "Название закупающей организации",
+        "subject": "Предмет закупки",
+        "start": "Дата начала",
+        "end": "Дата окончания"
+      },
+      "rowCta": "Подробнее"
+    },
+    "ctaBanner": {
+      "titlePart1": "Хотите ",
+      "titlePart2": "стать нашим ",
+      "titlePart3": "партнером?",
+      "body": "Подайте заявку, чтобы воспользоваться партнерскими возможностями на платформе Comelson и получить доступ к тендерам.",
+      "button": "Подать заявку на участие"
+    },
+    "news": {
+      "tabs": {
+        "all": "Все"
+      },
+      "searchPlaceholder": "Поиск..",
+      "filterDate": "Дата",
+      "loadMore": "Показать больше"
+    },
+    "contact": {
+      "methodsTitle": "Способы связи",
+      "phoneLabel": "Номер телефона",
+      "emailLabel": "Электронная почта",
+      "addressLabel": "Адрес",
+      "formTitle": "Есть вопрос? Напишите нам",
+      "nameLabel": "Имя, фамилия",
+      "namePlaceholder": "Введите имя и фамилию",
+      "emailPlaceholder": "Введите адрес электронной почты",
+      "topicLabel": "Тема обращения",
+      "topicPlaceholder": "Выберите тему обращения",
+      "messageLabel": "Сообщение",
+      "messagePlaceholder": "Ваше сообщение..",
+      "submit": "Отправить",
+      "topics": {
+        "membership": "Участие",
+        "tender": "Тендер",
+        "partnership": "Партнерство",
+        "support": "Поддержка"
+      }
+    }
+  },
+  "navigation": {
+    "heroNav": {
+      "home": "Главная",
+      "about": "О нас",
+      "tenders": "Тендеры",
+      "members": "Участники",
+      "news": "Новости",
+      "contact": "Контакты",
+      "events": "События"
+    },
+    "aboutDropdown": {
+      "about": "О нас",
+      "successStories": "Истории успеха",
+      "partnership": "Партнерство"
+    },
+    "headerCta": "Запрос по тендеру"
+  },
+  "common": {
+    "loading": "Загрузка..."
+  }
+}

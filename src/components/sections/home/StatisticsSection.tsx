@@ -20,10 +20,9 @@ export default async function StatisticsSection({ statistics }: { statistics: St
   const STATS_COL_RIGHT = STATS.slice(2, 4)
 
   const t = await getTranslations('home')
-  console.log(statistics)
 
   return (
-    <section className="relative overflow-hidden bg-[#0f477d] py-18 md:py-[100px]">
+    <section className="relative overflow-hidden bg-[#0f477d] py-12 md:py-[60px]">
       <Image
         src="/images/statistcbg.png"
         alt=""
@@ -47,7 +46,7 @@ export default async function StatisticsSection({ statistics }: { statistics: St
           </div>
 
           <div className="flex w-full max-w-[619px] flex-col gap-6 lg:flex-row lg:items-start lg:gap-[27px]">
-            <div className="flex w-full max-w-[296px] flex-col gap-6 self-stretch">
+            <div className="flex w-full flex-col gap-6 self-stretch lg:max-w-[296px]">
               {STATS_COL_LEFT.map((item, idx) => (
                 <div
                   key={`left-${item.iconSrc}-${idx}`}
@@ -76,7 +75,7 @@ export default async function StatisticsSection({ statistics }: { statistics: St
               ))}
             </div>
 
-            <div className="flex w-full max-w-[296px] flex-col gap-6 self-stretch pt-0 lg:pt-24">
+            <div className="flex w-full flex-col gap-6 self-stretch pt-0 lg:max-w-[296px] lg:pt-24">
               {STATS_COL_RIGHT.map((item, idx) => (
                 <div
                   key={`right-${item.iconSrc}-${idx}`}

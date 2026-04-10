@@ -70,7 +70,7 @@ export default function EventsSection({
   const isError = eventsQuery.isError
 
   return (
-    <section className="bg-[#f8fafc] pb-16 pt-6 sm:pb-24">
+    <section className="bg-[#f8fafc] py-8 md:py-[70px]">
       <Container>
         <div className="flex flex-col items-center gap-10">
           <div className="w-full border-b border-[#dadee2]">

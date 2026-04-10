@@ -18,8 +18,8 @@ const getEvents = async (locale: string, category_id: number) => {
   }
 
 const getEvent = async (locale: string, slug: string) => {
-  const response = await get<ApiResponse<EventResponse>>(`/events/${slug}`, {
-    params: { locale, slug }
+  const response = await get<ApiResponse<EventResponse>>(`/event/${slug}`, {
+    params: { locale }
   })
   return response
 }

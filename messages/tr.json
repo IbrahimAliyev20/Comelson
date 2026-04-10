@@ -1,0 +1,101 @@
+{
+  "home": {
+    "heroTitle": "İşinizi Doğru İnsanlarla Buluşturun",
+    "heroSubtitle": "Comelson, iş birliği, ortaklık ve yeni fırsatlar için güçlü bir iş ağı kurmak amacıyla şirketleri bir araya getirir.",
+    "heroCta": "Bizimle iletişime geçin",
+    "partnersLabel": "Ortaklarımızla tanışın:",
+    "aboutCta": "Ətraflı bax",
+    "membersTitleMain": "Üyelerimizle",
+    "membersTitleAccent": "tanışın",
+    "membersCta": "Tümünü gör",
+    "statsTitlePrefix": "Comelson’un Büyüyen",
+    "statsTitleAccent": "İş",
+    "statsTitleSuffix": "Ağı",
+    "statsBody": "Comelson platformasında yüzlerce üye ve ortak farklı sektörler üzrə bir araya geliyor. Bu göstergeler platformanın aktif ve sürekli büyüyen iş topluluğunu yansıtıyor.",
+    "blogTitleBlack": "Comelson Topluluğundan ",
+    "blogTitleGray": "Son Yenilikler",
+    "blogCta": "Tümünü gör",
+    "blogReadTime": "{minutes} dakikalık okuma",
+    "successStoriesTitleBlack": "Başarı",
+    "successStoriesTitleMid": " Hikayelerimizi ",
+    "successStoriesTitleGray": "Dinleyin",
+    "successStoriesCta": "Tümünü gör",
+    "successStoriesSliderLabel": "Başarı hikayeleri sliderı",
+    "pricePackages": {
+      "titleLine1": "Planı Keşfedin",
+      "titleLine2": "Sizin İçin En Uygun ",
+      "headerCta": "Ortaklarımız",
+      "badge": "En çok tercih edilen",
+      "button": "Üye ol"
+    },
+    "tenders": {
+      "titleBlack": "İhalelerle",
+      "titleGray": " tanışın",
+      "cta": "Tümünü gör",
+      "columns": {
+        "no": "№",
+        "buyer": "Satın alan kurumun adı",
+        "subject": "Satın alma konusu",
+        "start": "Başlangıç tarihi",
+        "end": "Bitiş tarihi"
+      },
+      "rowCta": "Detaylı bax"
+    },
+    "ctaBanner": {
+      "titlePart1": "Bizimle ",
+      "titlePart2": "Ortak Olmak ",
+      "titlePart3": "İster misiniz?",
+      "body": "Comelson platformasındaki ortaklık fırsatlarından yararlanmak ve ihalelere erişim elde etmek için başvurun.",
+      "button": "Üyelik için başvur"
+    },
+    "news": {
+      "tabs": {
+        "all": "Tümü"
+      },
+      "searchPlaceholder": "Arayın..",
+      "filterDate": "Tarih",
+      "loadMore": "Daha fazla"
+    },
+    "contact": {
+      "methodsTitle": "İletişim araçları",
+      "phoneLabel": "Telefon numarası",
+      "emailLabel": "E-posta",
+      "addressLabel": "Adres",
+      "formTitle": "Sorunuz mu var? Bize yazın",
+      "nameLabel": "Ad, soyad",
+      "namePlaceholder": "Ad ve soyadınızı girin",
+      "emailPlaceholder": "E-posta adresinizi girin",
+      "topicLabel": "Başvuru konusu",
+      "topicPlaceholder": "Başvuru konusunu seçin",
+      "messageLabel": "Mesaj",
+      "messagePlaceholder": "Mesajınız..",
+      "submit": "Gönder",
+      "topics": {
+        "membership": "Üyelik",
+        "tender": "İhale",
+        "partnership": "Ortaklık",
+        "support": "Destek"
+      }
+    }
+  },
+  "navigation": {
+    "heroNav": {
+      "home": "Ana sayfa",
+      "about": "Hakkımızda",
+      "tenders": "İhaleler",
+      "members": "Üyeler",
+      "news": "Haberler",
+      "contact": "İletişim",
+      "events": "Etkinlikler"
+    },
+    "aboutDropdown": {
+      "about": "Hakkımızda",
+      "successStories": "Başarı hikayeleri",
+      "partnership": "Ortaklık"
+    },
+    "headerCta": "İhale sorgusu"
+  },
+  "common": {
+    "loading": "Yükleniyor..."
+  }
+}

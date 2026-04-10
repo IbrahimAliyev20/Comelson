@@ -16,7 +16,7 @@ export default function StroiesCardSections({
   if (stories.length === 0) return null
 
   return (
-    <section className="bg-[#f8fafc] pb-16 pt-10 sm:pb-24 sm:pt-12">
+    <section className="bg-[#f8fafc] py-8 md:py-[70px]">
       <Container>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {stories.map((story, idx) => (

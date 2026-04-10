@@ -27,7 +27,7 @@ export function Footer() {
   const { data: contactResponse } = useQuery(getContactQuery(locale))
   const contact = contactResponse?.data
   return (
-    <footer className="bg-white pt-14">
+    <footer className="bg-white pt-8">
       <Container>
         <div className="flex flex-col gap-10 md:flex-row md:items-start md:justify-between">
           <div className="flex flex-col gap-8">

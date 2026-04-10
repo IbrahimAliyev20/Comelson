@@ -6,15 +6,44 @@ import Container from "@/components/shared/container";
 import { Link } from "@/i18n/navigation";
 import { AboutResponse } from "@/types/types";
 
+function ImageSlot({
+  src,
+  alt,
+  width,
+  height,
+  sizes,
+}: {
+  src?: string | null;
+  alt: string;
+  width: number;
+  height: number;
+  sizes: string;
+}) {
+  if (!src) {
+    return <div className="h-full w-full bg-[#eef2f6]" />
+  }
+
+  return (
+    <Image
+      src={src}
+      alt={alt}
+      width={width}
+      height={height}
+      className="h-full w-full object-cover"
+      sizes={sizes}
+    />
+  )
+}
+
 export default async function AboutHomeSection({ about }: { about: AboutResponse | undefined }) {
   const t = await getTranslations("home");
 
   return (
-    <section className="bg-[#F8FAFC] pb-16 pt-14 md:pb-20 md:pt-[72px] lg:pb-24 lg:pt-[90px]">
+    <section className="bg-[#F8FAFC] py-8 md:py-[60px]">
       <Container>
         <div className="flex flex-col items-start justify-between gap-10 md:gap-12 lg:flex-row lg:gap-8 xl:gap-16">
           <div className="flex w-full max-w-[585px] flex-col gap-6 md:gap-8">
-            <h2 className="max-w-[14ch] text-balance text-[32px] font-semibold leading-[1.1] tracking-[-0.03em] text-[#14171a] md:max-w-[12ch] md:text-[40px] md:leading-[48px] lg:max-w-none lg:leading-[56px]">
+            <h2 className="max-w-[24ch] text-balance text-[32px] font-semibold leading-[1.1] tracking-[-0.03em] text-[#14171a] md:max-w-[12ch] md:text-[40px] md:leading-[48px] lg:max-w-none lg:leading-[56px]">
               {about?.title}
             </h2>
             <div className="flex flex-col gap-4">
@@ -34,33 +63,30 @@ export default async function AboutHomeSection({ about }: { about: AboutResponse
           <div className="flex w-full shrink-0 flex-col gap-4 sm:gap-5 md:items-center lg:w-auto lg:flex-row lg:items-center lg:justify-end lg:gap-5">
             <div className="order-2 grid w-full grid-cols-2 gap-4 sm:gap-5 lg:order-1 lg:flex lg:w-full lg:max-w-[360px] lg:flex-col lg:items-end">
               <div className="relative h-[168px] w-full overflow-hidden rounded-xl sm:h-[220px] md:h-[240px]">
-                <Image
-                  src={about?.image_1 ?? ""}
+                <ImageSlot
+                  src={about?.image_1}
                   alt="Comelson – Əlaqələrin İmkanlara Çevrildiyi Yer"
                   width={360}
                   height={240}
-                  className="h-full w-full object-cover"
                   sizes="(max-width: 639px) 50vw, (max-width: 1023px) 360px, 360px"
                 />
               </div>
               <div className="relative h-[168px] w-full overflow-hidden rounded-xl sm:h-[200px] md:h-[208px] lg:max-w-[312px]">
-                <Image
-                  src={about?.image_3 ?? ""}
+                <ImageSlot
+                  src={about?.image_3}
                   alt="Comelson – Əlaqələrin İmkanlara Çevrildiyi Yer"
                   width={312}
                   height={208}
-                  className="h-full w-full object-cover"
                   sizes="(max-width: 639px) 50vw, (max-width: 1023px) 312px, 312px"
                 />
               </div>
             </div>
             <div className="order-1 relative h-[220px] w-full overflow-hidden rounded-xl sm:h-[300px] md:h-[334px] lg:order-2 lg:max-w-[262px]">
-              <Image
-                src={about?.image_2 ?? ""}
+              <ImageSlot
+                src={about?.image_2}
                 alt="Comelson – Əlaqələrin İmkanlara Çevrildiyi Yer"
                 width={262}
                 height={334}
-                className="h-full w-full object-cover"
                 sizes="(max-width: 1023px) 100vw, 262px"
               />
             </div>

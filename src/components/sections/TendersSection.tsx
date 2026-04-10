@@ -49,7 +49,7 @@ export default function TendersSection() {
   }, [category, query, status])
 
   return (
-    <section className="bg-[#f8fafc] pb-16 pt-10 sm:pb-24 sm:pt-12">
+    <section className="bg-[#f8fafc] py-8 md:py-[70px]">
       <Container>
         <div className="flex flex-col gap-8 sm:gap-10">
           <h1 className="text-balance text-3xl font-semibold leading-tight text-[#14171a] sm:text-[40px] sm:leading-[56px]">

@@ -40,7 +40,7 @@ export default async function TenderDetailPage({
   } as const
 
   return (
-    <section className="bg-[#f8fafc] pb-16 pt-10 sm:pb-24 sm:pt-12">
+    <section className="bg-[#f8fafc] py-8 md:py-[70px]">
       <Container>
         <div className="rounded-2xl border border-[#eaf1fa] bg-white p-6 sm:p-10">
           <div className="mx-auto flex w-full max-w-[1000px] flex-col gap-10 sm:gap-12">

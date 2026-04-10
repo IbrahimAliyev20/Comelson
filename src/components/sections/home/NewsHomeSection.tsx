@@ -1,11 +1,9 @@
 import Image from 'next/image'
 import { ArrowRight, Calendar, Clock } from 'lucide-react'
+import { getTranslations } from 'next-intl/server'
 
 import Container from '@/components/shared/container'
 import { Link } from '@/i18n/navigation'
-import {
-  getBlogHomeUi,
-} from '@/utils/blogsdata'
 import { BlogResponse } from '@/types/types'
 import { getServerLocale } from '@/lib/utils'
 
@@ -24,27 +22,27 @@ function extractReadTime(value: string) {
   return match?.[0] ?? value
 }
 
-export default async function NewsHomeSection( { blogs }: { blogs: BlogResponse[] | undefined } ) {
-  const ui = getBlogHomeUi()
+export default async function NewsHomeSection({ blogs }: { blogs: BlogResponse[] | undefined }) {
+  const t = await getTranslations('home')
   const locale = await getServerLocale()
   const list = (blogs ?? []).slice(0, 3)
   if (list.length === 0) return null
 
   return (
-    <section className="bg-white pb-16 pt-20 md:pb-[90px] md:pt-[100px]">
+    <section className="bg-white py-8  md:py-[60px]">
       <Container>
-        <div className="flex flex-col gap-12">
+        <div className="flex flex-col gap-8">
           <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-end">
             <h2 className="max-w-[498px] text-balance text-3xl font-semibold leading-tight md:text-[40px] md:leading-[56px]">
-              <span className="text-black">{ui.titleBlack}</span>
-              <span className="text-[#6b6e71]">{ui.titleGray}</span>
+              <span className="text-black">{t('blogTitleBlack')}</span>
+              <span className="text-[#6b6e71]">{t('blogTitleGray')}</span>
             </h2>
 
             <Link
               href={`/${locale}/news`}
               className="inline-flex h-12 shrink-0 items-center justify-center gap-3 rounded-2xl px-6 py-3 text-base font-medium leading-6 text-black transition-opacity hover:opacity-80"
             >
-              {ui.cta}
+              {t('blogCta')}
               <ArrowRight className="size-6 shrink-0" aria-hidden />
             </Link>
           </div>
@@ -78,7 +76,7 @@ export default async function NewsHomeSection( { blogs }: { blogs: BlogResponse[
                     <div className="flex items-center gap-[5px] text-[#494f4a]">
                       <Clock className="size-5 shrink-0" aria-hidden />
                       <span className="whitespace-nowrap text-base font-medium leading-6">
-                        {ui.readTime(Number(extractReadTime(post.read_time)) || 0)}
+                        {t('blogReadTime', { minutes: Number(extractReadTime(post.read_time)) || 0 })}
                       </span>
                     </div>
                     {post.created_at ? (

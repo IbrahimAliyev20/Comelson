@@ -54,7 +54,7 @@ const setupInterceptors = (): void => {
             ? window.location.pathname.split('/')[1] 
             : 'az'
           
-          const validLocales = ['az', 'en', 'ru']
+          const validLocales = ['az', 'en', 'tr', 'ru']
           const locale = validLocales.includes(currentLocale) ? currentLocale : 'az'
           config.headers['Accept-Language'] = getAcceptLanguageHeader(locale)
         }

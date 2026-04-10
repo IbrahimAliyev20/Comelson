@@ -7,7 +7,7 @@ export default async function CtaBanner() {
   const t = await getTranslations('home')
 
   return (
-    <section className="bg-white py-12 sm:py-16 md:py-[72px]">
+    <section className="bg-white py-8 md:py-[60px]">
         <div className="relative overflow-hidden  ">
           <Image
             src="/images/ctabg.png"
