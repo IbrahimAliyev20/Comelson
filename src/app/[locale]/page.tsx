@@ -9,7 +9,9 @@ import TendersHomeSection from "@/components/sections/home/TendersHomeSection";
 import { getServerLocale } from "@/lib/utils";
 import { getServerQueryClient } from "@/providers/server";
 import { getAboutQuery } from "@/services/about/queries";
+import { getBlogsQuery } from "@/services/blogs/queries";
 import { getFormLogoQuery } from "@/services/form-logo/queries";
+import { getMembersQuery } from "@/services/members/queries";
 import { getSlidersQuery } from "@/services/sliders/queries";
 import { getStatisticsQuery } from "@/services/statistics/queries";
 import { getSuccessStoriesQuery } from "@/services/success-stories/queries";
@@ -26,9 +28,13 @@ export default async function Home() {
      queryClient.prefetchQuery(getSlidersQuery(locale)),
      queryClient.prefetchQuery(getFormLogoQuery(locale)),
      queryClient.prefetchQuery(getSuccessStoriesQuery(locale)),
+     queryClient.prefetchQuery(getMembersQuery(locale)),
+     queryClient.prefetchQuery(getBlogsQuery(locale, null, '')),
     
     ]);
-
+    
+  const blogs = queryClient.getQueryData(getBlogsQuery(locale, null, '').queryKey)?.data;
+  const members = queryClient.getQueryData(getMembersQuery(locale).queryKey)?.data;
   const formLogo = queryClient.getQueryData(getFormLogoQuery(locale).queryKey)?.data;
   const statistics = queryClient.getQueryData(getStatisticsQuery(locale).queryKey)?.data;
   const sliders = queryClient.getQueryData(getSlidersQuery(locale).queryKey)?.data;
@@ -38,10 +44,10 @@ export default async function Home() {
     <div className="flex flex-col ">
       <HeroHomeSection sliders={sliders} formLogo={formLogo} />
       <AboutHomeSection about={about} />
-      <MembersHomeSection />
+      <MembersHomeSection members={members} />
       <StatisticsSection statistics={statistics} />
       <TendersHomeSection />
-      <NewsHomeSection />
+      <NewsHomeSection blogs={blogs} />
       <SuccessHomeStories successStories={successStories} />
       <CtaBanner />
     </div>

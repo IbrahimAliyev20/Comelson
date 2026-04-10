@@ -4,20 +4,15 @@ import { getTranslations } from 'next-intl/server'
 
 import Container from '@/components/shared/container'
 import { Link } from '@/i18n/navigation'
+import { getServerLocale } from '@/lib/utils'
+import { MemberResponse } from '@/types/types'
 
-const MEMBER_LOGOS = [
-  { src: '/images/abouthome1.jpg'},
-  { src: '/images/abouthome2.jpg'},
-  { src: '/images/abouthome3.jpg'},
-  { src: '/images/abouthome1.jpg'},
-  { src: '/images/abouthome2.jpg'},
-  { src: '/images/abouthome3.jpg'},
-  { src: '/images/abouthome1.jpg'},
-  { src: '/images/abouthome2.jpg'},
-] as const
-
-export default async function MembersHomeSection() {
+export default async function MembersHomeSection( { members }: { members: MemberResponse[] | undefined } ) {
   const t = await getTranslations('home')
+  const locale = await getServerLocale()
+
+  const list = (members ?? []).slice(0, 8)
+  if (list.length === 0) return null
 
   return (
     <section className="bg-[#F8FAFC] py-16 md:py-[100px]">
@@ -30,7 +25,7 @@ export default async function MembersHomeSection() {
             </h2>
 
             <Link
-              href="/members"
+              href={`/${locale}/members`}
               className="inline-flex items-center gap-3 text-sm font-medium leading-5 text-black transition-opacity hover:opacity-80"
             >
               {t('membersCta')}
@@ -39,20 +34,21 @@ export default async function MembersHomeSection() {
           </div>
 
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {MEMBER_LOGOS.map((logo, idx) => (
-              <div
-                key={`${logo.src}-${idx}`}
-                className="flex h-[188px] items-center justify-center overflow-hidden rounded-[10px] border border-[#e8eaed] bg-white p-6"
+            {list.map((member) => (
+              <Link
+                key={member.slug}
+                href={`/${locale}/members/${member.slug}`}
+                className="group flex h-[188px] items-center justify-center overflow-hidden rounded-[10px] border border-[#e8eaed] bg-white p-6 transition-shadow hover:shadow-[0_14px_40px_rgba(15,71,125,0.10)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0f477d]/40"
               >
-                  <Image
-                    src={logo.src}
-                    alt=""
-                    width={360}
-                    height={240}
-                    className="h-full w-full object-cover"
-                    unoptimized
-                  />
-              </div>
+                <Image
+                  src={member.image}
+                  alt={member.company}
+                  width={360}
+                  height={240}
+                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+                  sizes="(max-width: 1024px) 100vw, 360px"
+                />
+              </Link>
             ))}
           </div>
         </div>

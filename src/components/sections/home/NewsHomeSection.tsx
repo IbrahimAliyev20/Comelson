@@ -4,14 +4,31 @@ import { ArrowRight, Calendar, Clock } from 'lucide-react'
 import Container from '@/components/shared/container'
 import { Link } from '@/i18n/navigation'
 import {
-  blogHomePosts,
-  formatBlogPostDate,
   getBlogHomeUi,
-  getBlogPostContent
 } from '@/utils/blogsdata'
+import { BlogResponse } from '@/types/types'
+import { getServerLocale } from '@/lib/utils'
 
-export default async function NewsHomeSection() {
+function stripHtml(value: string) {
+  return value.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
+}
+
+function formatDate(value: string, locale: string) {
+  const d = new Date(value)
+  if (Number.isNaN(d.getTime())) return value
+  return new Intl.DateTimeFormat(locale, { day: '2-digit', month: '2-digit', year: 'numeric' }).format(d)
+}
+
+function extractReadTime(value: string) {
+  const match = value.match(/\d+/)
+  return match?.[0] ?? value
+}
+
+export default async function NewsHomeSection( { blogs }: { blogs: BlogResponse[] | undefined } ) {
   const ui = getBlogHomeUi()
+  const locale = await getServerLocale()
+  const list = (blogs ?? []).slice(0, 3)
+  if (list.length === 0) return null
 
   return (
     <section className="bg-white pb-16 pt-20 md:pb-[90px] md:pt-[100px]">
@@ -24,7 +41,7 @@ export default async function NewsHomeSection() {
             </h2>
 
             <Link
-              href="/news"
+              href={`/${locale}/news`}
               className="inline-flex h-12 shrink-0 items-center justify-center gap-3 rounded-2xl px-6 py-3 text-base font-medium leading-6 text-black transition-opacity hover:opacity-80"
             >
               {ui.cta}
@@ -33,19 +50,16 @@ export default async function NewsHomeSection() {
           </div>
 
           <div className="flex flex-col gap-6 lg:flex-row lg:flex-wrap lg:gap-6">
-            {blogHomePosts.map((post) => {
-              const content = getBlogPostContent(post)
-              const title = content.title
-              return (
+            {list.map((post) => (
               <Link
-                key={post.key}
-                href={`/news/${post.slug}`}
+                key={post.slug}
+                href={`/${locale}/news/${post.slug}`}
                 className="group flex w-full max-w-[421px] flex-col gap-4 rounded-2xl border border-[#e5e6e5] bg-white p-2 pb-5 transition-shadow hover:shadow-md lg:shrink-0"
               >
                 <div className="relative h-[320px] w-full overflow-hidden rounded-xl">
                   <Image
-                    src={post.imageSrc}
-                    alt={title}
+                    src={post.image}
+                    alt={post.title}
                     fill
                     className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
                     sizes="(max-width: 1024px) 100vw, 421px"
@@ -54,11 +68,9 @@ export default async function NewsHomeSection() {
 
                 <div className="flex flex-col gap-6 px-2">
                   <div className="flex flex-col gap-3">
-                    <p className="line-clamp-1 text-xl font-semibold leading-7 text-[#161e17]">
-                      {title}
-                    </p>
+                    <p className="line-clamp-1 text-xl font-semibold leading-7 text-[#161e17]">{post.title}</p>
                     <p className="line-clamp-3 text-base leading-6 tracking-[0.16px] text-[#494f4a]">
-                      {content.excerpt}
+                      {stripHtml(post.description ?? '')}
                     </p>
                   </div>
 
@@ -66,20 +78,21 @@ export default async function NewsHomeSection() {
                     <div className="flex items-center gap-[5px] text-[#494f4a]">
                       <Clock className="size-5 shrink-0" aria-hidden />
                       <span className="whitespace-nowrap text-base font-medium leading-6">
-                        {ui.readTime(post.readTimeMinutes)}
+                        {ui.readTime(Number(extractReadTime(post.read_time)) || 0)}
                       </span>
                     </div>
-                    <div className="flex items-center gap-[5px] text-[#494f4a]">
-                      <Calendar className="size-5 shrink-0" aria-hidden />
-                      <span className="whitespace-nowrap text-base font-medium leading-6">
-                        {formatBlogPostDate(post.dateISO, 'az')}
-                      </span>
-                    </div>
+                    {post.created_at ? (
+                      <div className="flex items-center gap-[5px] text-[#494f4a]">
+                        <Calendar className="size-5 shrink-0" aria-hidden />
+                        <span className="whitespace-nowrap text-base font-medium leading-6">
+                          {formatDate(post.created_at, locale)}
+                        </span>
+                      </div>
+                    ) : null}
                   </div>
                 </div>
               </Link>
-              )
-            })}
+            ))}
           </div>
         </div>
       </Container>

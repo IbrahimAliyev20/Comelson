@@ -133,3 +133,33 @@ export interface BlogResponse {
       meta_keywords: string;
       meta_description: string;
 }
+
+export interface CountryResponse {
+  name: string;
+}
+
+export interface ActivityResponse {
+  name: string;
+}
+
+export interface MemberResponse {
+    image: string;
+    thumb_image: string;
+    company: string;
+    catalog: string;
+    description: string;
+    slug: string;
+    email: string;
+    phone: string;
+    activity: {
+      id: number;
+      name: string;
+    };
+    country: {
+      id: number;
+      name: string;
+    };
+    meta_title: string;
+    meta_keywords: string;
+    meta_description: string;
+}

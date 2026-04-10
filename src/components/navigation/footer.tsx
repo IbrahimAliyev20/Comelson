@@ -1,12 +1,11 @@
 'use client'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Instagram, Linkedin, Send, X } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { useLocale } from 'next-intl'
 import { getSettingsQuery } from '@/services/settings/queries'
 import Container from '../shared/container'
-import { getSocialMediaQuery } from '@/services/contact/queries'
+import { getContactQuery, getSocialMediaQuery } from '@/services/contact/queries'
 
 const NAV_LINKS = [
   'Haqqımızda',
@@ -25,6 +24,8 @@ export function Footer() {
   const siteFooterLogoSrc = settingsResponse?.siteFooterLogo || '/images/Logo.svg'
   const { data: socialMediaResponse } = useQuery(getSocialMediaQuery(locale))
   const socialMedia = socialMediaResponse?.data
+  const { data: contactResponse } = useQuery(getContactQuery(locale))
+  const contact = contactResponse?.data
   return (
     <footer className="bg-white pt-14">
       <Container>
@@ -66,19 +67,25 @@ export function Footer() {
             <div className="flex flex-col gap-6">
               <h3 className="px-2 text-[16px] font-medium leading-6 text-black">Əlaqə</h3>
               <div className="flex flex-col gap-2">
-                <p className="px-2 text-[14px] font-medium leading-5 text-[#8E8E93]">Bakı, Azərabycan, Əhmədli</p>
-                <Link
-                  href="mailto:info@comelson.az"
-                  className="px-2 text-[14px] font-medium leading-5 text-[#8E8E93] transition-colors hover:text-black"
-                >
-                  info@comelson.az
-                </Link>
-                <Link
-                  href="tel:+994707777777"
-                  className="px-2 text-[14px] font-medium leading-5 text-[#8E8E93] transition-colors hover:text-black"
-                >
-                  +994 70 777 77 77
-                </Link>
+                {contact?.address ? (
+                  <p className="px-2 text-[14px] font-medium leading-5 text-[#8E8E93]">{contact.address}</p>
+                ) : null}
+                {contact?.email ? (
+                  <a
+                    href={`mailto:${contact.email}`}
+                    className="px-2 text-[14px] font-medium leading-5 text-[#8E8E93] transition-colors hover:text-black"
+                  >
+                    {contact.email}
+                  </a>
+                ) : null}
+                {contact?.phone ? (
+                  <a
+                    href={`tel:${contact.phone.replace(/\s+/g, '')}`}
+                    className="px-2 text-[14px] font-medium leading-5 text-[#8E8E93] transition-colors hover:text-black"
+                  >
+                    {contact.phone}
+                  </a>
+                ) : null}
               </div>
             </div>
           </div>

@@ -1,4 +1,4 @@
- 'use client'
+'use client'
 
 import Image from 'next/image'
 import { ChevronDown, Search } from 'lucide-react'
@@ -15,39 +15,45 @@ import {
 } from '@/components/ui/select'
 import { Link } from '@/i18n/navigation'
 import { cn } from '@/lib/utils'
-import { memberCompanies } from '@/utils/members-data'
+import { ActivityResponse, CountryResponse, MemberResponse } from '@/types/types'
 
-export default function MembersSection() {
+function stripHtml(value: string) {
+  return value.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
+}
+
+export default function MembersSection({
+  members,
+  activities,
+  countries
+}: {
+  members: MemberResponse[] | undefined
+  activities: ActivityResponse[] | undefined
+  countries: CountryResponse[] | undefined
+}) {
   const [query, setQuery] = useState('')
   const [country, setCountry] = useState<string | null>(null)
   const [industry, setIndustry] = useState<string | null>(null)
   const [visible, setVisible] = useState(9)
 
-  const countries = useMemo(() => {
-    const set = new Set(memberCompanies.map((x) => x.country))
-    return Array.from(set)
-  }, [])
-
-  const industries = useMemo(() => {
-    const set = new Set(memberCompanies.map((x) => x.industry))
-    return Array.from(set)
-  }, [])
+  const membersList = useMemo(() => members ?? [], [members])
+  const countryOptions = useMemo(() => countries ?? [], [countries])
+  const industryOptions = useMemo(() => activities ?? [], [activities])
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
 
-    return memberCompanies
-      .filter((x) => (country ? x.country === country : true))
-      .filter((x) => (industry ? x.industry === industry : true))
+    return membersList
+      .filter((x) => (country ? x.country?.name === country : true))
+      .filter((x) => (industry ? x.activity?.name === industry : true))
       .filter((x) => {
         if (!q) return true
         return (
-          x.name.toLowerCase().includes(q) ||
-          x.industry.toLowerCase().includes(q) ||
-          x.description.toLowerCase().includes(q)
+          x.company.toLowerCase().includes(q) ||
+          x.activity?.name.toLowerCase().includes(q) ||
+          stripHtml(x.description).toLowerCase().includes(q)
         )
       })
-  }, [country, industry, query])
+  }, [country, industry, membersList, query])
 
   const shown = filtered.slice(0, visible)
   const canLoadMore = visible < filtered.length
@@ -86,9 +92,9 @@ export default function MembersSection() {
                 </SelectTrigger>
                 <SelectContent className="rounded-xl">
                   <SelectItem value="all">Ölkələr</SelectItem>
-                  {countries.map((c) => (
-                    <SelectItem key={c} value={c}>
-                      {c}
+                  {countryOptions.map((item) => (
+                    <SelectItem key={item.name} value={item.name}>
+                      {item.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -106,9 +112,9 @@ export default function MembersSection() {
                 </SelectTrigger>
                 <SelectContent className="rounded-xl">
                   <SelectItem value="all">Fəaliyyət sahəsi</SelectItem>
-                  {industries.map((x) => (
-                    <SelectItem key={x} value={x}>
-                      {x}
+                  {industryOptions.map((item) => (
+                    <SelectItem key={item.name} value={item.name}>
+                      {item.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -120,15 +126,15 @@ export default function MembersSection() {
             <div className="grid w-full grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
               {shown.map((company) => (
                 <div
-                  key={company.id}
+                  key={company.slug}
                   className="flex w-full flex-col items-center gap-6 overflow-hidden rounded-xl border border-[#eaf1fa] bg-white px-5 py-6"
                 >
                   <div className="flex w-full flex-col gap-4">
                     <div className="flex w-full items-center gap-4">
                       <div className="relative size-20 overflow-hidden rounded-[56px] border border-[#f1f2f6]">
                         <Image
-                          src={company.logoSrc}
-                          alt=""
+                          src={company.image}
+                          alt={company.company}
                           fill
                           className="object-cover"
                           sizes="80px"
@@ -136,16 +142,16 @@ export default function MembersSection() {
                       </div>
                       <div className="flex min-w-0 flex-1 flex-col gap-2">
                         <p className="truncate text-xl font-medium leading-7 text-[#1d212a]">
-                          {company.name}
+                          {company.company}
                         </p>
                         <p className="text-sm leading-5 text-[#6b6e71]">
-                          {company.industry}
+                          {company.activity?.name}
                         </p>
                       </div>
                     </div>
 
                     <p className="line-clamp-3 text-sm leading-5 text-[#64717c]">
-                      {company.description}
+                      {stripHtml(company.description)}
                     </p>
                   </div>
 

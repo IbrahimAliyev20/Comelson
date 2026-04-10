@@ -5,41 +5,54 @@ import { notFound } from 'next/navigation'
 import Container from '@/components/shared/container'
 import { Link } from '@/i18n/navigation'
 import { cn } from '@/lib/utils'
-import { memberCompanies } from '@/utils/members-data'
+import { getServerQueryClient } from '@/providers/server'
+import { getMemberQuery, getMembersQuery } from '@/services/members/queries'
+
+function stripHtml(value: string) {
+  return value.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
+}
 
 export default async function MemberDetailPage({
   params
 }: {
-  params: Promise<{ slug: string }>
+  params: Promise<{ locale: string; slug: string }>
 }) {
-  const { slug } = await params
+  const { locale, slug } = await params
+  const queryClient = getServerQueryClient()
 
-  const company = memberCompanies.find((x) => x.slug === slug)
+  const membersResponse = await queryClient.fetchQuery(getMembersQuery(locale))
+  const members = membersResponse?.data ?? []
+
+  let company = null
+
+  try {
+    const singleResponse = await queryClient.fetchQuery(getMemberQuery(locale, slug))
+    company = singleResponse?.data ?? singleResponse ?? null
+  } catch {
+    company = members.find((item) => item.slug === slug) ?? null
+  }
+
+  if (!company) {
+    company = members.find((item) => item.slug === slug) ?? null
+  }
+
   if (!company) notFound()
 
-  const about =
-    company.about?.length
-      ? company.about
-      : [
-          company.description,
-          'Agentlik UI/UX dizayn, veb və mobil tətbiq inkişafı, brendinq və məhsul strategiyası sahələrində xidmət göstərir. Komanda istifadəçi təcrübəsini ön planda tutaraq funksional və estetik interfeyslər yaradır.',
-          'Uzunmüddətli tərəfdaşlıqlara üstünlük verilir və layihədən sonra da dəstək xidmətləri təqdim edilir.'
-        ]
-
-  const others = memberCompanies.filter((x) => x.slug !== slug).slice(0, 2)
+  const about = stripHtml(company.description)
+  const others = members.filter((item) => item.slug !== slug).slice(0, 2)
 
   return (
     <section className="bg-[#f8fafc] pb-16 pt-10 sm:pb-24 sm:pt-12">
-      <Container >
-        <div className="rounded-2xl bg-white p-6 sm:p-10 ">
-          <div className="flex flex-col gap-8 sm:gap-10 max-w-[1150px] mx-auto">
+      <Container>
+        <div className="rounded-2xl bg-white p-6 sm:p-10">
+          <div className="mx-auto flex max-w-[1150px] flex-col gap-8 sm:gap-10">
             <nav className="flex items-center gap-1 text-xs leading-4">
               <Link href="/members" className="text-[#6b6e71] hover:underline">
                 Üzvlər
               </Link>
               <span className="text-[#6b6e71]">/</span>
               <span className="line-clamp-1 font-medium text-[#32393f]">
-                {company.name}
+                {company.company}
               </span>
             </nav>
 
@@ -47,8 +60,8 @@ export default async function MemberDetailPage({
               <div className="flex items-center gap-6">
                 <div className="relative size-[96px] overflow-hidden rounded-full border border-[#f1f2f6] sm:size-[120px]">
                   <Image
-                    src={company.logoSrc}
-                    alt=""
+                    src={company.image}
+                    alt={company.company}
                     fill
                     className="object-cover"
                     sizes="(max-width: 640px) 96px, 120px"
@@ -57,10 +70,10 @@ export default async function MemberDetailPage({
 
                 <div className="flex min-w-0 flex-col gap-1">
                   <p className="truncate text-2xl font-semibold leading-8 text-[#1d212a] sm:text-[32px] sm:leading-[44px]">
-                    {company.name}
+                    {company.company}
                   </p>
                   <p className="text-base leading-6 text-[#6b6e71]">
-                    {company.industry}
+                    {company.activity?.name}
                   </p>
                 </div>
               </div>
@@ -96,63 +109,63 @@ export default async function MemberDetailPage({
 
             <div className="flex flex-col gap-4">
               <h2 className="text-2xl font-semibold leading-8 text-[#14171a] sm:text-[32px] sm:leading-[44px]">
-                Şikət haqqında
+                Şirkət haqqında
               </h2>
 
               <div className="flex flex-col gap-4 text-sm leading-6 text-[#6b6e71] sm:text-base">
-                {about.map((p, idx) => (
-                  <p key={idx} className={cn(idx === 0 ? 'text-[#64717c]' : '')}>
-                    {p}
-                  </p>
-                ))}
+                <p className={cn('text-[#64717c]')}>
+                  {about}
+                </p>
               </div>
             </div>
 
-            <div className="flex flex-col gap-6 pt-2">
-              <h3 className="text-2xl font-semibold leading-8 text-[#14171a] sm:text-[32px] sm:leading-[44px]">
-                Digər Şirkətlər
-              </h3>
+            {others.length > 0 ? (
+              <div className="flex flex-col gap-6 pt-2">
+                <h3 className="text-2xl font-semibold leading-8 text-[#14171a] sm:text-[32px] sm:leading-[44px]">
+                  Digər Şirkətlər
+                </h3>
 
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                {others.map((x) => (
-                  <div
-                    key={x.id}
-                    className="flex w-full flex-col gap-4 rounded-xl border border-[#eaf1fa] bg-white px-5 py-6"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="relative size-20 overflow-hidden rounded-[56px] border border-[#f1f2f6]">
-                        <Image
-                          src={x.logoSrc}
-                          alt=""
-                          fill
-                          className="object-cover"
-                          sizes="80px"
-                        />
-                      </div>
-                      <div className="flex min-w-0 flex-1 flex-col gap-1">
-                        <p className="truncate text-xl font-medium leading-7 text-[#1d212a]">
-                          {x.name}
-                        </p>
-                        <p className="text-sm leading-5 text-[#6b6e71]">
-                          {x.industry}
-                        </p>
-                      </div>
-                    </div>
-
-                    <p className="line-clamp-3 text-sm leading-5 text-[#64717c]">
-                      {x.description}
-                    </p>
-
-                    <Link
-                      href={`/members/${x.slug}`}
-                      className="inline-flex h-12 w-full items-center justify-center rounded-2xl bg-[#e6eff6] px-6 text-base font-medium leading-6 text-[#0f477d] transition-opacity hover:opacity-90"
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                  {others.map((item) => (
+                    <div
+                      key={item.slug}
+                      className="flex w-full flex-col gap-4 rounded-xl border border-[#eaf1fa] bg-white px-5 py-6"
                     >
-                      Profilə keçid edin
-                    </Link>
-                  </div>
-                ))}
+                      <div className="flex items-center gap-4">
+                        <div className="relative size-20 overflow-hidden rounded-[56px] border border-[#f1f2f6]">
+                          <Image
+                            src={item.image}
+                            alt={item.company}
+                            fill
+                            className="object-cover"
+                            sizes="80px"
+                          />
+                        </div>
+                        <div className="flex min-w-0 flex-1 flex-col gap-1">
+                          <p className="truncate text-xl font-medium leading-7 text-[#1d212a]">
+                            {item.company}
+                          </p>
+                          <p className="text-sm leading-5 text-[#6b6e71]">
+                            {item.activity?.name}
+                          </p>
+                        </div>
+                      </div>
+
+                      <p className="line-clamp-3 text-sm leading-5 text-[#64717c]">
+                        {stripHtml(item.description)}
+                      </p>
+
+                      <Link
+                        href={`/members/${item.slug}`}
+                        className="inline-flex h-12 w-full items-center justify-center rounded-2xl bg-[#e6eff6] px-6 text-base font-medium leading-6 text-[#0f477d] transition-opacity hover:opacity-90"
+                      >
+                        Profilə keçid edin
+                      </Link>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
+            ) : null}
           </div>
         </div>
       </Container>
