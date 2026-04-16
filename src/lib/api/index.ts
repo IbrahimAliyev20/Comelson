@@ -1,7 +1,8 @@
 export { 
   apiClient, 
   get, 
-  post, 
+  post,
+  postForm,
   put, 
   patch, 
   del,

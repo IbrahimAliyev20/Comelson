@@ -93,7 +93,15 @@
       "successStories": "Истории успеха",
       "partnership": "Партнерство"
     },
-    "headerCta": "Запрос по тендеру"
+    "headerCta": "Запрос по тендеру",
+    "loginCta": "Войти",
+    "accountNav": "Мой аккаунт",
+    "userMenu": {
+      "account": "Мой аккаунт",
+      "company": "Моя компания",
+      "tenders": "Мои тендеры",
+      "logout": "Выйти"
+    }
   },
   "common": {
     "loading": "Загрузка..."

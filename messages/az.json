@@ -93,7 +93,15 @@
       "successStories": "Uğur hekayələri",
       "partnership": "Tərəfdaşlıq"
     },
-    "headerCta": "Tender sorğusu"
+    "headerCta": "Tender sorğusu",
+    "loginCta": "Giriş et",
+    "accountNav": "Hesabım",
+    "userMenu": {
+      "account": "Hesabım",
+      "company": "Şirkətim",
+      "tenders": "Tenderlərim",
+      "logout": "Hesabdan çıxış"
+    }
   },
   "common": {
     "loading": "Yüklənir..."

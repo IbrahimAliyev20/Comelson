@@ -93,7 +93,15 @@
       "successStories": "Başarı hikayeleri",
       "partnership": "Ortaklık"
     },
-    "headerCta": "İhale sorgusu"
+    "headerCta": "İhale sorgusu",
+    "loginCta": "Giriş yap",
+    "accountNav": "Hesabım",
+    "userMenu": {
+      "account": "Hesabım",
+      "company": "Şirketim",
+      "tenders": "İhalelerim",
+      "logout": "Çıkış yap"
+    }
   },
   "common": {
     "loading": "Yükleniyor..."

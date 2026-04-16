@@ -1,18 +1,54 @@
 'use client'
 
-import { Check, Eye, EyeOff } from 'lucide-react'
-import { useState } from 'react'
-
+import { Check, Eye, EyeOff, Loader2 } from 'lucide-react'
+import { type FormEvent, useState, useTransition } from 'react'
+import { toast } from 'sonner'
 import { AuthSplitLayout } from '@/components/auth/AuthSplitLayout'
-import { Link } from '@/i18n/navigation'
+import { Link, useRouter } from '@/i18n/navigation'
 import { cn } from '@/lib/utils'
+import { loginAction } from '@/services/auth/serveractions'
 
 export default function LoginPage() {
+  const router = useRouter()
+  const [isPending, startTransition] = useTransition()
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
   const [isRemember, setIsRemember] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [formError, setFormError] = useState<string | null>(null)
   const canSubmit = email.trim().length > 0 && password.trim().length > 0
+
+  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    if (!canSubmit || isPending) return
+
+    setFormError(null)
+    startTransition(async () => {
+      const result = await loginAction({
+        email: email.trim(),
+        password,
+        remember_me: isRemember,
+      })
+
+      if (result.ok) {
+        toast.success(result.data.message)
+        router.push('/account')
+        router.refresh()
+        return
+      }
+
+      if (result.error === 'validation') {
+        const msg = 'Məlumatları düzgün daxil edin'
+        setFormError(msg)
+        toast.error(msg)
+        return
+      }
+
+      setFormError(result.error)
+      toast.error(result.error)
+      
+    })
+  }
 
   return (
     <AuthSplitLayout>
@@ -28,14 +64,29 @@ export default function LoginPage() {
                 </p>
               </div>
 
-              <form className="flex w-full flex-col gap-12">
+              <form
+                className="flex w-full flex-col gap-12"
+                onSubmit={handleSubmit}
+                noValidate
+              >
+                {formError ? (
+                  <p
+                    className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800"
+                    role="alert"
+                  >
+                    {formError}
+                  </p>
+                ) : null}
+
                 <div className="flex flex-col gap-4">
                   <label className="flex flex-col gap-2">
                     <span className="px-1 text-sm leading-6 text-[#1d212a]">
                       Email
                     </span>
                     <input
+                      name="email"
                       type="email"
+                      autoComplete="email"
                       placeholder="Email adresinizi daxil edin"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
@@ -53,7 +104,9 @@ export default function LoginPage() {
                       </span>
                       <div className="relative">
                         <input
+                          name="password"
                           type={isPasswordVisible ? 'text' : 'password'}
+                          autoComplete="current-password"
                           placeholder="Şifrənizi daxil edin"
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
@@ -117,17 +170,28 @@ export default function LoginPage() {
 
                 <div className="flex flex-col items-center gap-9">
                   <button
-                    type="button"
-                    disabled={!canSubmit}
-                    aria-disabled={!canSubmit}
+                    type="submit"
+                    disabled={!canSubmit || isPending}
+                    aria-disabled={!canSubmit || isPending}
                     className={cn(
-                      'inline-flex h-12 w-full items-center justify-center gap-4 rounded-2xl px-6 text-base font-medium leading-6 transition-colors',
-                      canSubmit
-                        ? 'bg-[#0f477d] text-white'
-                        : 'bg-[#889097] text-[#dadee2]'
+                      'inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl px-6 text-base font-medium leading-6 transition-colors',
+                      canSubmit && !isPending
+                        ? 'bg-[#0f477d] text-white hover:bg-[#0c3a66]'
+                        : 'bg-[#889097] text-[#dadee2]',
+                      isPending && 'cursor-wait'
                     )}
                   >
-                    Daxil ol
+                    {isPending ? (
+                      <>
+                        <Loader2
+                          className="size-5 shrink-0 animate-spin"
+                          aria-hidden
+                        />
+                        Gözləyin…
+                      </>
+                    ) : (
+                      'Daxil ol'
+                    )}
                   </button>
 
                   <div className="flex items-start gap-2 text-base leading-6">

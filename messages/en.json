@@ -93,7 +93,15 @@
       "successStories": "Success stories",
       "partnership": "Partnership"
     },
-    "headerCta": "Tender query"
+    "headerCta": "Tender query",
+    "loginCta": "Sign in",
+    "accountNav": "My account",
+    "userMenu": {
+      "account": "My account",
+      "company": "My company",
+      "tenders": "My tenders",
+      "logout": "Log out"
+    }
   },
   "common": {
     "loading": "Loading..."

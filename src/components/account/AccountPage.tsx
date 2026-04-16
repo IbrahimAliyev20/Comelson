@@ -7,10 +7,15 @@ import {
   LogOut,
   Shield,
 } from 'lucide-react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useSearchParams } from 'next/navigation'
 import { type ReactNode, useEffect, useState } from 'react'
 
 import { useRouter } from '@/i18n/navigation'
 import { cn } from '@/lib/utils'
+import { authKeys } from '@/services/auth/keys'
+import { getProfileQuery } from '@/services/auth/queries'
+import { logoutAction } from '@/services/auth/serveractions'
 
 import Container from '../shared/container'
 import CampainsList from './tabs/campains/CampainsList'
@@ -86,14 +91,34 @@ function AccountMainPanel({
 
 export default function AccountPage() {
   const router = useRouter()
+  const queryClient = useQueryClient()
+  const searchParams = useSearchParams()
+  const {
+    data: profile,
+    isPending: profileLoading,
+    isError: profileError,
+    refetch: refetchProfile,
+  } = useQuery(getProfileQuery())
+  const profileUser = profile?.user ?? null
+
   const [activeTab, setActiveTab] = useState<AccountTab>('account')
   const [companiesOpen, setCompaniesOpen] = useState(false)
   const [companiesView, setCompaniesView] = useState<'list' | 'create'>('list')
   const [logoutOpen, setLogoutOpen] = useState(false)
+  const [logoutPending, setLogoutPending] = useState(false)
 
   useEffect(() => {
     if (activeTab !== 'companies') setCompaniesView('list')
   }, [activeTab])
+
+  useEffect(() => {
+    const tab = searchParams.get('tab')
+    if (tab === 'security' || tab === 'companies' || tab === 'tenders') {
+      setActiveTab(tab)
+      return
+    }
+    setActiveTab('account')
+  }, [searchParams])
 
   const inactiveLabel = 'text-base font-normal leading-6 text-[#6b6e71]'
   const activeLabel = 'text-base font-medium leading-6 text-[#0f477d]'
@@ -250,8 +275,17 @@ export default function AccountPage() {
                 activeTab === 'companies' && companiesView === 'create'
               }
             >
-              {activeTab === 'account' ? <İnfoAccount /> : null}
-              {activeTab === 'security' ? <Security /> : null}
+              {activeTab === 'account' ? (
+                <İnfoAccount
+                  user={profileUser}
+                  isLoading={profileLoading}
+                  isError={profileError}
+                  onRetry={() => void refetchProfile()}
+                />
+              ) : null}
+              {activeTab === 'security' ? (
+                <Security userEmail={profileUser?.email ?? ''} />
+              ) : null}
               {activeTab === 'companies' ? (
                 <CampainsList
                   view={companiesView}
@@ -289,13 +323,23 @@ export default function AccountPage() {
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  setLogoutOpen(false)
-                  router.push('/login')
+                disabled={logoutPending}
+                onClick={async () => {
+                  setLogoutPending(true)
+                  try {
+                    await logoutAction()
+                    await queryClient.invalidateQueries({
+                      queryKey: authKeys.profile(),
+                    })
+                  } finally {
+                    setLogoutPending(false)
+                    setLogoutOpen(false)
+                    router.push('/login')
+                  }
                 }}
-                className="rounded-xl bg-red-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-red-700"
+                className="rounded-xl bg-red-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-red-700 disabled:opacity-60"
               >
-                Hesabdan çıx
+                {logoutPending ? 'Çıxılır…' : 'Hesabdan çıx'}
               </button>
             </div>
           </div>

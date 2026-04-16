@@ -1,8 +1,9 @@
 'use client'
 
-import { Check, ChevronLeft, Eye, EyeOff, X } from 'lucide-react'
+import { Check, ChevronLeft, Eye, EyeOff, Loader2, X } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
-import { useEffect, useMemo, useState } from 'react'
+import { type FormEvent, useEffect, useMemo, useState, useTransition } from 'react'
+import { toast } from 'sonner'
 
 import { AuthSplitLayout } from '@/components/auth/AuthSplitLayout'
 import { Link, useRouter } from '@/i18n/navigation'
@@ -13,6 +14,7 @@ import {
   type OtpFlow,
 } from '@/lib/auth/otp-flow'
 import { cn } from '@/lib/utils'
+import { resetPasswordAction } from '@/services/auth/serveractions'
 
 function resolveFlow(flowParam: string | null): OtpFlow {
   return flowParam === OTP_FLOW_FORGOT_PASSWORD
@@ -59,15 +61,19 @@ function getPasswordFeedbackMessages(value: string): string[] {
 export default function NewPasswordPage() {
   const searchParams = useSearchParams()
   const router = useRouter()
+  const [isPending, startTransition] = useTransition()
   const flow = resolveFlow(searchParams.get('flow'))
   const email = searchParams.get('email')?.trim() ?? ''
   const backToOtpHref = `/otp?${buildOtpSearchParams(email, flow)}`
+  const isForgotPasswordFlow = flow === OTP_FLOW_FORGOT_PASSWORD
 
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [showNew, setShowNew] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
+  const [successMessage, setSuccessMessage] = useState('')
+  const [formError, setFormError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!showSuccess) return
@@ -93,6 +99,46 @@ export default function NewPasswordPage() {
     return meetsPasswordRules(password)
   }, [password, confirmPassword])
 
+  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    if (!canSubmit || isPending) return
+
+    if (!isForgotPasswordFlow) {
+      toast.error('Bu səhifə yalnız şifrə bərpası axını üçündür.')
+      return
+    }
+
+    if (!email) {
+      toast.error('Email tapılmadı. OTP addımına qayıdın.')
+      return
+    }
+
+    setFormError(null)
+    startTransition(async () => {
+      const result = await resetPasswordAction({
+        email,
+        new_password: password,
+        new_password_confirmation: confirmPassword,
+      })
+
+      if (result.ok) {
+        setSuccessMessage(result.data.message)
+        setShowSuccess(true)
+        return
+      }
+
+      if (result.error === 'validation') {
+        const msg = 'Məlumatları yoxlayın (şifrələr eyni olmalıdır)'
+        setFormError(msg)
+        toast.error(msg)
+        return
+      }
+
+      setFormError(result.error)
+      toast.error(result.error)
+    })
+  }
+
   const confirmMismatch =
     confirmPassword.length > 0 && password !== confirmPassword
 
@@ -112,12 +158,18 @@ export default function NewPasswordPage() {
 
         <form
           className="flex flex-col gap-12"
-          onSubmit={(e) => {
-            e.preventDefault()
-            if (!canSubmit) return
-            setShowSuccess(true)
-          }}
+          onSubmit={handleSubmit}
+          noValidate
         >
+          {formError ? (
+            <p
+              className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800"
+              role="alert"
+            >
+              {formError}
+            </p>
+          ) : null}
+
           <div className="flex flex-col gap-10">
             <div className="flex flex-col gap-4">
               <h2 className="text-[40px] font-semibold leading-[56px] text-[#14171a]">
@@ -237,16 +289,24 @@ export default function NewPasswordPage() {
 
           <button
             type="submit"
-            disabled={!canSubmit}
-            aria-disabled={!canSubmit}
+            disabled={!canSubmit || isPending}
+            aria-disabled={!canSubmit || isPending}
             className={cn(
-              'inline-flex h-12 w-full min-w-0 items-center justify-center gap-3 rounded-2xl px-4 text-base font-medium leading-6 transition-colors sm:gap-4 sm:px-6',
-              canSubmit
-                ? 'bg-[#0f477d] text-white'
-                : 'bg-[#889097] text-[#dadee2]'
+              'inline-flex h-12 w-full min-w-0 items-center justify-center gap-2 rounded-2xl px-4 text-base font-medium leading-6 transition-colors sm:gap-4 sm:px-6',
+              canSubmit && !isPending
+                ? 'bg-[#0f477d] text-white hover:bg-[#0c3a66]'
+                : 'bg-[#889097] text-[#dadee2]',
+              isPending && 'cursor-wait'
             )}
           >
-            <span className="min-w-0 text-center">Şifrəni yenilə</span>
+            {isPending ? (
+              <>
+                <Loader2 className="size-5 shrink-0 animate-spin" aria-hidden />
+                Gözləyin…
+              </>
+            ) : (
+              <span className="min-w-0 text-center">Şifrəni yenilə</span>
+            )}
           </button>
         </form>
       </div>
@@ -295,7 +355,7 @@ export default function NewPasswordPage() {
                   id="password-success-title"
                   className="text-center text-[18px] font-medium leading-6 text-[#1d212a]"
                 >
-                  Şifrəniz uğurla yeniləndi.
+                  {successMessage || 'Şifrəniz uğurla yeniləndi.'}
                 </p>
               </div>
             </div>

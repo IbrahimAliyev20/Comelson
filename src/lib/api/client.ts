@@ -38,6 +38,14 @@ const handleApiError = (error: AxiosError): void => {
 const setupInterceptors = (): void => {
   client.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
+      if (config.data instanceof FormData && config.headers) {
+        if (typeof config.headers.delete === 'function') {
+          config.headers.delete('Content-Type')
+        } else {
+          delete (config.headers as Record<string, unknown>)['Content-Type']
+        }
+      }
+
       const token = getAuthToken()
       if (token && config.headers) {
         config.headers.Authorization = `Bearer ${token}`
@@ -85,6 +93,12 @@ export const get = async <T>(url: string, config?: AxiosRequestConfig): Promise<
 
 export const post = async <T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> => {
   const response = await client.post<T>(url, data, config)
+  return response.data
+}
+
+/** Multipart — interceptor `Content-Type`-u silir ki, boundary avtomatik qoyulsun */
+export const postForm = async <T>(url: string, data: FormData): Promise<T> => {
+  const response = await client.post<T>(url, data)
   return response.data
 }
 

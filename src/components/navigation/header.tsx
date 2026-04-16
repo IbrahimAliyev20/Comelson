@@ -1,19 +1,21 @@
 "use client"
 
-import { ChevronDown, Menu, X } from 'lucide-react'
+import { ArrowRight, ChevronDown, LogIn, Menu, X } from 'lucide-react'
 import Image from 'next/image'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useLocale, useTranslations } from 'next-intl'
 
 import { Link, usePathname } from '@/i18n/navigation'
 import { routing } from '@/i18n/routing'
 import { cn } from '@/lib/utils'
+import { getProfileQuery } from '@/services/auth/queries'
 import { getSettingsQuery } from '@/services/settings/queries'
 import { heroNavigationItems } from '@/utils/static'
 
 import Container from '../shared/container'
 import LanguageSelector from '../shared/language-selector'
+import { HeaderUserMenu, UserMenuPanel } from './header-user-menu'
 
 export function Header() {
   const t = useTranslations('navigation')
@@ -36,6 +38,13 @@ export function Header() {
 
   const { data: settingsResponse } = useQuery(getSettingsQuery(locale))
   const siteLogoSrc = settingsResponse?.siteLogo || '/images/Logo.svg'
+
+  const { data: profileResponse, isSuccess: profileOk } = useQuery({
+    ...getProfileQuery(),
+    retry: false,
+  })
+  const profileUser = profileResponse?.user
+  const isAuthed = profileOk && Boolean(profileUser)
 
   const spacerStyle = useMemo(() => {
     if (!showSpacer) return undefined
@@ -129,6 +138,12 @@ export function Header() {
       { key: 'partnership', href: '/partnership' }
     ] as const
   }, [])
+
+  /** Figma 90:2830 — Secondary (#e6eff6) + Primary (#0f477d) */
+  const secondaryCtaClass =
+    'inline-flex h-12 items-center justify-center gap-4 rounded-2xl bg-[#e6eff6] px-6 text-base font-medium leading-6 text-[#0f477d] transition-opacity hover:opacity-90'
+  const primaryCtaClass =
+    'inline-flex h-12 items-center justify-center gap-4 rounded-2xl bg-[#0f477d] px-6 text-base font-medium leading-6 text-white transition-opacity hover:opacity-90'
 
   function openAboutDropdown() {
     if (aboutCloseTimeoutRef.current) {
@@ -294,7 +309,7 @@ export function Header() {
               </nav>
             </div>
 
-            <div className="flex shrink-0 items-center gap-3 lg:gap-6">
+            <div className="flex shrink-0 items-center gap-3 lg:gap-5">
               <div className="hidden lg:block">
                 <LanguageSelector variant={showHeroGlass ? "onDark" : "default"} />
               </div>
@@ -302,16 +317,33 @@ export function Header() {
               <div
                 className={cn(
                   'hidden h-6 w-px lg:block',
-                  showHeroGlass ? 'bg-[#565759]' : 'bg-[#e5e6e5]'
+                  showHeroGlass ? 'bg-[#6b6e71]' : 'bg-[#e5e6e5]'
                 )}
                 aria-hidden
               />
-              <Link
-                href="/contact"
-                className="hidden h-12 items-center justify-center gap-4 rounded-2xl bg-[#0f477d] px-6 py-3 text-base font-medium leading-6 text-white transition-opacity hover:opacity-90 lg:inline-flex"
-              >
-                {t('headerCta')}
-              </Link>
+              <div className="hidden items-center gap-5 lg:flex">
+                {!isAuthed ? (
+                  <Link href="/login" className={secondaryCtaClass}>
+                    <LogIn className="size-6 shrink-0" aria-hidden />
+                    {t('loginCta')}
+                  </Link>
+                ) : profileUser ? (
+                  <Suspense
+                    fallback={
+                      <div
+                        className="size-11 shrink-0 animate-pulse rounded-full bg-white/20"
+                        aria-hidden
+                      />
+                    }
+                  >
+                    <HeaderUserMenu user={profileUser} />
+                  </Suspense>
+                ) : null}
+                <Link href="/contact" className={primaryCtaClass}>
+                  <span>{t('headerCta')}</span>
+                  <ArrowRight className="size-5 shrink-0" aria-hidden />
+                </Link>
+              </div>
 
               <button
                 type="button"
@@ -458,13 +490,57 @@ export function Header() {
                     ))}
                   </div>
 
-                  <Link
-                    href="/contact"
-                    className="inline-flex h-12 items-center justify-center gap-3 rounded-2xl bg-[#0f477d] px-6 text-sm font-medium text-white transition-opacity hover:opacity-90"
-                  >
-                    {t("headerCta")}
-                    <ChevronDown className="h-4 w-4 -rotate-90" />
-                  </Link>
+                  {isAuthed && profileUser ? (
+                    <div className="flex flex-col gap-3">
+                      <Suspense
+                        fallback={
+                          <div
+                            className="h-40 animate-pulse rounded-2xl bg-white/10"
+                            aria-hidden
+                          />
+                        }
+                      >
+                        <UserMenuPanel
+                          user={profileUser}
+                          lightOnDark={showHeroGlass}
+                          onNavigate={() => setIsMobileMenuOpen(false)}
+                        />
+                      </Suspense>
+                      <Link
+                        href="/contact"
+                        className={cn(
+                          primaryCtaClass,
+                          'w-full justify-center text-sm sm:text-base'
+                        )}
+                      >
+                        <span className="truncate">{t('headerCta')}</span>
+                        <ArrowRight className="size-5 shrink-0" aria-hidden />
+                      </Link>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-2 gap-3">
+                      <Link
+                        href="/login"
+                        className={cn(
+                          secondaryCtaClass,
+                          'w-full text-sm sm:text-base'
+                        )}
+                      >
+                        <LogIn className="size-5 shrink-0 sm:size-6" aria-hidden />
+                        <span className="truncate">{t('loginCta')}</span>
+                      </Link>
+                      <Link
+                        href="/contact"
+                        className={cn(
+                          primaryCtaClass,
+                          'w-full text-sm sm:text-base'
+                        )}
+                      >
+                        <span className="truncate">{t('headerCta')}</span>
+                        <ArrowRight className="size-5 shrink-0" aria-hidden />
+                      </Link>
+                    </div>
+                  )}
                 </div>
               </div>
             </Container>
