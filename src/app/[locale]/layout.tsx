@@ -7,9 +7,8 @@ import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { routing } from "@/i18n/routing";
 import { QueryProvider } from "@/providers/QueryProvider";
 import { Toaster } from "sonner";
-import { Header } from "@/components/navigation/header";
-import { Footer } from "@/components/navigation/footer";
 import { RouteTransitionBoundary } from "@/components/navigation/RouteTransitionBoundary";
+import ClientLayout from "@/components/navigation/clientLayout";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -46,9 +45,7 @@ export default async function RootLayout({
           <NextIntlClientProvider messages={messages}>
             <div className="min-h-screen">
               <RouteTransitionBoundary />
-              <Header />
-              {children}
-              <Footer />
+              <ClientLayout>{children}</ClientLayout>
             </div>
             <Toaster position="top-center" richColors />
           </NextIntlClientProvider>

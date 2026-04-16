@@ -1,0 +1,65 @@
+import Image from 'next/image'
+
+import { cn } from '@/lib/utils'
+import Link from 'next/link'
+
+export const AUTH_HERO_IMAGE_SRC = '/images/herobg.jpg'
+export const AUTH_LOGO_SRC = '/images/Logo.svg'
+
+export const AUTH_HERO_TITLE = 'Biznesinizi Doğru İnsanlarla Birləşdirin'
+export const AUTH_HERO_DESCRIPTION =
+  'Comelson şirkətləri bir araya gətirərək əməkdaşlıq, tərəfdaşlıq və yeni imkanlar üçün güclü bir biznes şəbəkəsi yaradır.'
+
+export interface AuthSplitLayoutProps {
+  children: React.ReactNode
+  mainClassName?: string
+}
+
+export function AuthSplitLayout({ children, mainClassName }: AuthSplitLayoutProps) {
+  return (
+    <section className="min-h-screen w-full bg-white">
+      <div className="grid min-h-screen w-full grid-cols-1 lg:grid-cols-[minmax(0,720px)_minmax(0,1fr)]">
+        <aside className="relative hidden min-h-screen overflow-hidden lg:block">
+          <Image
+            src={AUTH_HERO_IMAGE_SRC}
+            alt=""
+            fill
+            priority
+            className="object-cover object-center"
+            sizes="720px"
+          />
+          <div className="absolute inset-0 bg-[rgba(6,28,52,0.48)]" aria-hidden />
+
+          <Link href="/" className="absolute left-[65px] top-[67px]">
+            <Image
+              src={AUTH_LOGO_SRC}
+              alt="Comelson"
+              width={200}
+              height={56}
+              priority
+              className="h-14 w-auto"
+            />
+          </Link>
+
+          <div className="absolute left-[65px] top-1/2 w-[592px] -translate-y-1/2">
+            <div className="flex flex-col gap-7">
+              <h1 className="text-balance text-[48px] font-semibold leading-[64px] text-white">
+                {AUTH_HERO_TITLE}
+              </h1>
+              <p className="w-[520px] text-base leading-6 text-[#eaf1fa]">{AUTH_HERO_DESCRIPTION}</p>
+            </div>
+          </div>
+        </aside>
+
+        <main
+          className={cn(
+            'flex min-h-screen items-center justify-center px-4 py-12 sm:px-6 lg:px-12',
+            mainClassName
+          )}
+        >
+          {children}
+        </main>
+      </div>
+    </section>
+  )
+}

@@ -102,13 +102,6 @@ export function Footer() {
             </span>
             <p className="text-[14px] leading-5">Copyright | All Rights Reserved</p>
           </div>
-
-          <p className="text-[14px] leading-5 text-black md:text-right">
-            <Link href="#" className="underline underline-offset-2">
-              Markup Agency
-            </Link>{' '}
-            tərəfindən hazırlanmışdır.
-          </p>
         </div>
       </Container>
     </footer>
