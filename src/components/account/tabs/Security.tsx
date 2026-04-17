@@ -64,12 +64,7 @@ export default function Security({ userEmail }: SecurityProps) {
 
   return (
     <form className="flex flex-col gap-8" onSubmit={handleSubmit} noValidate>
-      <div
-        className="flex size-[120px] shrink-0 items-center justify-center rounded-full border border-[#eaf1fa] bg-[#e6eff6] text-[32px] font-medium leading-10 text-[#6b6e71]"
-        aria-hidden
-      >
-        AF
-      </div>
+
 
       {formError ? (
         <p

@@ -7,6 +7,7 @@ import {
   Bold,
   Camera,
   ChevronDown,
+  ChevronLeft,
   Code,
   ImageIcon,
   Italic,
@@ -116,14 +117,26 @@ export default function EditCampain({
 
   return (
     <div className="flex w-full flex-col bg-white pb-12" data-name="edit-company">
+      <div className="flex shrink-0 items-center gap-3 border-b border-[#eaf1fa] px-8 py-6">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="flex size-6 shrink-0 items-center justify-center rounded-md text-[#1d212a] transition-colors hover:bg-[#f4fafd]"
+          aria-label="Geri"
+        >
+          <ChevronLeft className="size-6" aria-hidden />
+        </button>
+        <h2 className="text-2xl font-medium leading-8 text-[#1d212a]">
+          Şirkəti redaktə et
+        </h2>
+      </div>
+
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col gap-12 px-6 pt-8 "
+        className="flex flex-col gap-12 px-6 pt-8 sm:px-12"
       >
         <section className="flex flex-col gap-8">
-          <h3 className="text-2xl font-medium leading-8 text-[#14171a]">
-            Şirkət detalları
-          </h3>
+         
 
           <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:gap-5">
             <label className="relative flex size-[120px] shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-full border border-[#e6eff6] bg-white p-2.5">

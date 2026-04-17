@@ -17,16 +17,17 @@ import { getProfileQuery } from '@/services/auth/queries'
 import { logoutAction } from '@/services/auth/serveractions'
 
 import Container from '../shared/container'
-import CampainsList, { AddCompanyButton } from './tabs/campains/CampainsList'
-import İnfoAccount from './tabs/İnfoAccount'
+import CampainsList from './tabs/campains/CampainsList'
+import InfoAccount from './tabs/İnfoAccount'
 import Security from './tabs/Security'
+import TenderList from './tabs/tenders/TenderList'
 
 type AccountTab = 'account' | 'security' | 'companies' | 'tenders'
 
 const TAB_LABELS: Record<AccountTab, string> = {
   account: 'Hesab məlumatları',
   security: 'Təhlükəsizlik',
-  companies: 'Şirkətim',
+  companies: 'Şirkətlərim',
   tenders: 'Tenderlərim',
 }
 
@@ -104,7 +105,9 @@ export default function AccountPage() {
   const profileUser = profile?.user ?? null
 
   const [activeTab, setActiveTab] = useState<AccountTab>('account')
-  const [companiesView, setCompaniesView] = useState<'list' | 'create' | 'edit'>('list')
+  const [companiesView, setCompaniesView] = useState<
+    'list' | 'create' | 'edit' | 'detail'
+  >('list')
   const [logoutOpen, setLogoutOpen] = useState(false)
   const [logoutPending, setLogoutPending] = useState(false)
 
@@ -246,17 +249,11 @@ export default function AccountPage() {
           <div className="flex min-h-0 h-full min-w-0 flex-col">
             <AccountMainPanel
               title={TAB_LABELS[activeTab]}
-              hideHeader={
-                activeTab === 'companies' && companiesView === 'create'
-              }
-              headerAction={
-                activeTab === 'companies' && companiesView === 'list' ? (
-                  <AddCompanyButton onClick={() => setCompaniesView('create')} />
-                ) : undefined
-              }
+              hideHeader={activeTab === 'companies' || activeTab === 'tenders'}
+              headerAction={undefined}
             >
               {activeTab === 'account' ? (
-                <İnfoAccount
+                <InfoAccount
                   user={profileUser}
                   isLoading={profileLoading}
                   isError={profileError}
@@ -272,6 +269,7 @@ export default function AccountPage() {
                   onViewChange={setCompaniesView}
                 />
               ) : null}
+              {activeTab === 'tenders' ? <TenderList /> : null}
             </AccountMainPanel>
           </div>
         </div>

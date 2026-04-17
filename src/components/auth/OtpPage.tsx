@@ -182,7 +182,7 @@ export default function OtpPage() {
   return (
     <AuthSplitLayout mainClassName="items-start justify-center py-6 sm:py-8">
       <div className="w-full h-full  max-w-[498px] shrink-0">
-        <div className=" h-full flex flex-col gap-8 justify-around">
+        <div className=" h-full flex flex-col gap-8 justify-around pb-0 md:pb-25">
           <Link
             href={backHref}
             className="inline-flex w-fit items-center gap-3 rounded-xl px-1 py-2 text-base font-medium leading-6 text-[#64717c]"

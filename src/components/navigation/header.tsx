@@ -15,7 +15,7 @@ import { heroNavigationItems } from '@/utils/static'
 
 import Container from '../shared/container'
 import LanguageSelector from '../shared/language-selector'
-import { HeaderUserMenu, UserMenuPanel } from './header-user-menu'
+import { HeaderUserMenu } from './header-user-menu'
 
 export function Header() {
   const t = useTranslations('navigation')
@@ -81,10 +81,29 @@ export function Header() {
   }, [pathname])
 
   useEffect(() => {
-    document.body.style.overflow = isMobileMenuOpen ? 'hidden' : ''
+    if (!isMobileMenuOpen) return
+
+    const scrollY = window.scrollY
+    const html = document.documentElement
+    const body = document.body
+
+    html.style.overflow = 'hidden'
+    body.style.overflow = 'hidden'
+    body.style.position = 'fixed'
+    body.style.top = `-${scrollY}px`
+    body.style.left = '0'
+    body.style.right = '0'
+    body.style.width = '100%'
 
     return () => {
-      document.body.style.overflow = ''
+      html.style.overflow = ''
+      body.style.overflow = ''
+      body.style.position = ''
+      body.style.top = ''
+      body.style.left = ''
+      body.style.right = ''
+      body.style.width = ''
+      window.scrollTo(0, scrollY)
     }
   }, [isMobileMenuOpen])
 
@@ -321,14 +340,20 @@ export function Header() {
                 )}
                 aria-hidden
               />
-              <div className="hidden items-center gap-5 lg:flex">
+              <div className="flex items-center gap-3 lg:gap-5">
                 {!isAuthed ? (
                   <>
-                    <Link href="/login" className={secondaryCtaClass}>
+                    <Link
+                      href="/login"
+                      className={cn(secondaryCtaClass, 'hidden lg:inline-flex')}
+                    >
                       <LogIn className="size-6 shrink-0" aria-hidden />
                       {t('loginCta')}
                     </Link>
-                    <Link href="/register" className={primaryCtaClass}>
+                    <Link
+                      href="/register"
+                      className={cn(primaryCtaClass, 'hidden lg:inline-flex')}
+                    >
                       <span>{t('headerCta')}</span>
                       <ArrowRight className="size-5 shrink-0" aria-hidden />
                     </Link>
@@ -492,24 +517,7 @@ export function Header() {
                     ))}
                   </div>
 
-                  {isAuthed && profileUser ? (
-                    <div className="flex flex-col gap-3">
-                      <Suspense
-                        fallback={
-                          <div
-                            className="h-40 animate-pulse rounded-2xl bg-white/10"
-                            aria-hidden
-                          />
-                        }
-                      >
-                        <UserMenuPanel
-                          user={profileUser}
-                          lightOnDark={showHeroGlass}
-                          onNavigate={() => setIsMobileMenuOpen(false)}
-                        />
-                      </Suspense>
-                    </div>
-                  ) : (
+                  {isAuthed && profileUser ? null : (
                     <div className="grid grid-cols-2 gap-3">
                       <Link
                         href="/login"

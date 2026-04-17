@@ -8,7 +8,14 @@ import {
   LogOut,
 } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
-import { useEffect, useMemo, useRef, useState, useTransition } from 'react'
+import {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  useTransition,
+} from 'react'
 import { useTranslations } from 'next-intl'
 
 import { Link, usePathname, useRouter } from '@/i18n/navigation'
@@ -234,6 +241,8 @@ type HeaderUserMenuProps = {
 export function HeaderUserMenu({ user }: HeaderUserMenuProps) {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const [open, setOpen] = useState(false)
+  const [isNarrow, setIsNarrow] = useState(false)
+  const [popoverTop, setPopoverTop] = useState(0)
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
@@ -241,6 +250,28 @@ export function HeaderUserMenu({ user }: HeaderUserMenuProps) {
     () => resolveAuthMediaUrl(user.image),
     [user.image]
   )
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 1023px)')
+    const apply = () => setIsNarrow(mq.matches)
+    apply()
+    mq.addEventListener('change', apply)
+    return () => mq.removeEventListener('change', apply)
+  }, [])
+
+  useLayoutEffect(() => {
+    if (!open || !isNarrow || !containerRef.current) return
+
+    function updateTop() {
+      const el = containerRef.current
+      if (!el) return
+      setPopoverTop(el.getBoundingClientRect().bottom + 8)
+    }
+
+    updateTop()
+    window.addEventListener('resize', updateTop)
+    return () => window.removeEventListener('resize', updateTop)
+  }, [open, isNarrow])
 
   useEffect(() => {
     setOpen(false)
@@ -303,10 +334,20 @@ export function HeaderUserMenu({ user }: HeaderUserMenuProps) {
 
       {open ? (
         <div
-          className="absolute right-0 top-full z-50 pt-2 animate-in fade-in-0 slide-in-from-top-1 duration-200"
           role="menu"
+          className={cn(
+            'z-[60] animate-in fade-in-0 slide-in-from-top-1 duration-200',
+            isNarrow
+              ? 'fixed left-4 right-4 max-h-[min(70vh,calc(100dvh-96px))] overflow-y-auto'
+              : 'absolute right-0 top-full pt-2'
+          )}
+          style={isNarrow ? { top: popoverTop } : undefined}
         >
-          <div className="w-[min(calc(100vw-32px),320px)]">
+          <div
+            className={cn(
+              !isNarrow && 'w-[min(calc(100vw-32px),320px)]'
+            )}
+          >
             <UserMenuPanel user={user} onNavigate={() => setOpen(false)} />
           </div>
         </div>

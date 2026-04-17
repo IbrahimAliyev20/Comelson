@@ -17,7 +17,7 @@ import { authKeys } from '@/services/auth/keys'
 import type { AuthProfileUser } from '@/services/auth/types'
 import { updateProfileAction } from '@/services/auth/serveractions'
 
-type İnfoAccountProps = {
+type InfoAccountProps = {
   user: AuthProfileUser | null
   isLoading: boolean
   isError: boolean
@@ -33,12 +33,12 @@ function initialsFromName(name: string): string {
 }
 
 /** Hesab məlumatları — GET /auth/profile; POST /auth/profile/update (multipart) */
-export default function İnfoAccount({
+export default function InfoAccount({
   user,
   isLoading,
   isError,
   onRetry,
-}: İnfoAccountProps) {
+}: InfoAccountProps) {
   const queryClient = useQueryClient()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [isPending, startTransition] = useTransition()

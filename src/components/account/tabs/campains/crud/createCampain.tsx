@@ -102,13 +102,11 @@ export default function CreateCampain({
 
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col gap-12 px-6 pt-8 sm:px-12"
+        className="flex flex-col gap-12 px sm:px-12"
       >
         {/* Şirkət detalları */}
-        <section className="flex flex-col gap-8">
-          <h3 className="text-2xl font-medium leading-8 text-[#14171a]">
-            Şirkət detalları
-          </h3>
+        <section className="flex flex-col gap-8 py-5">
+      
 
           <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:gap-5">
             <label className="relative flex size-[120px] shrink-0 cursor-pointer flex-col items-center justify-center rounded-full border border-[#eaf1fa] bg-[#e6eff6] p-2.5">

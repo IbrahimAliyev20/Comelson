@@ -47,7 +47,7 @@ export default function ForgetPasswordPage() {
 
   return (
     <AuthSplitLayout mainClassName="items-start justify-center py-6 sm:py-8">
-      <div className="flex h-full w-full max-w-[490px] flex-col justify-around gap-8">
+      <div className="flex h-full w-full max-w-[490px] flex-col justify-around pb-0 md:pb-25 gap-8">
         <div>
           <Link
             href="/login"
