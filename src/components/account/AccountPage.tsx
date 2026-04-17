@@ -1,7 +1,6 @@
 'use client'
 
 import {
-  ChevronDown,
   CircleUser,
   FileText,
   LogOut,
@@ -18,7 +17,7 @@ import { getProfileQuery } from '@/services/auth/queries'
 import { logoutAction } from '@/services/auth/serveractions'
 
 import Container from '../shared/container'
-import CampainsList from './tabs/campains/CampainsList'
+import CampainsList, { AddCompanyButton } from './tabs/campains/CampainsList'
 import İnfoAccount from './tabs/İnfoAccount'
 import Security from './tabs/Security'
 
@@ -65,22 +64,25 @@ function AccountMainPanel({
   title,
   children,
   hideHeader = false,
+  headerAction,
 }: {
   title: string
   children?: ReactNode
   hideHeader?: boolean
+  headerAction?: ReactNode
 }) {
   return (
     <div className="flex h-full min-h-0 min-w-0 flex-col overflow-hidden rounded-xl border border-[#eaf1fa] bg-white">
       {!hideHeader ? (
-        <div className="flex shrink-0 items-center border-b border-[#eaf1fa] px-8 py-6">
+        <div className="flex shrink-0 items-center justify-between gap-4 border-b border-[#eaf1fa] px-8 py-6">
           <h2 className="text-2xl font-medium leading-8 text-[#1d212a]">{title}</h2>
+          {headerAction}
         </div>
       ) : null}
       <div
         className={cn(
           'min-h-0 flex-1 overflow-y-auto bg-white',
-          hideHeader ? 'p-0' : 'px-8 pb-8 pt-8 sm:px-12'
+          hideHeader ? 'p-0' : 'px-8 pb-8 pt-8 '
         )}
       >
         {children}
@@ -102,8 +104,7 @@ export default function AccountPage() {
   const profileUser = profile?.user ?? null
 
   const [activeTab, setActiveTab] = useState<AccountTab>('account')
-  const [companiesOpen, setCompaniesOpen] = useState(false)
-  const [companiesView, setCompaniesView] = useState<'list' | 'create'>('list')
+  const [companiesView, setCompaniesView] = useState<'list' | 'create' | 'edit'>('list')
   const [logoutOpen, setLogoutOpen] = useState(false)
   const [logoutPending, setLogoutPending] = useState(false)
 
@@ -181,53 +182,27 @@ export default function AccountPage() {
                   </span>
                 </button>
 
-                <div className="flex flex-col gap-0">
-                  <div className={navRowShell(activeTab === 'companies')}>
-                    <button
-                      type="button"
-                      onClick={() => setActiveTab('companies')}
-                      className="flex min-w-0 flex-1 items-center gap-3.5 text-left"
-                    >
-                      <CompaniesNavIcon
-                        className={
-                          activeTab === 'companies' ? iconActive : iconInactive
-                        }
-                      />
-                      <span
-                        className={cn(
-                          'min-w-0 flex-1 truncate',
-                          activeTab === 'companies' ? activeLabel : inactiveLabel
-                        )}
-                      >
-                        Şirkətlərim
-                      </span>
-                    </button>
-                    <button
-                      type="button"
-                      aria-expanded={companiesOpen}
-                      aria-label="Alt menyunu açın və ya bağlayın"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        setCompaniesOpen((v) => !v)
-                      }}
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('companies')}
+                  className={cn(navRowShell(activeTab === 'companies'), 'text-left')}
+                >
+                  <span className="flex min-w-0 flex-1 items-center gap-3.5">
+                    <CompaniesNavIcon
+                      className={
+                        activeTab === 'companies' ? iconActive : iconInactive
+                      }
+                    />
+                    <span
                       className={cn(
-                        'flex shrink-0 p-1 text-[#6b6e71] transition-colors hover:opacity-80',
-                        activeTab === 'companies' && 'text-[#0f477d]'
+                        'min-w-0 flex-1 truncate',
+                        activeTab === 'companies' ? activeLabel : inactiveLabel
                       )}
                     >
-                      <ChevronDown
-                        className={cn(
-                          'size-6 transition-transform',
-                          companiesOpen && 'rotate-180'
-                        )}
-                        aria-hidden
-                      />
-                    </button>
-                  </div>
-                  {companiesOpen ? (
-                    <div className="ml-3 mt-1 border-l border-[#eaf1fa] py-1 pl-4" />
-                  ) : null}
-                </div>
+                      Şirkətlərim
+                    </span>
+                  </span>
+                </button>
 
                 <button
                   type="button"
@@ -273,6 +248,11 @@ export default function AccountPage() {
               title={TAB_LABELS[activeTab]}
               hideHeader={
                 activeTab === 'companies' && companiesView === 'create'
+              }
+              headerAction={
+                activeTab === 'companies' && companiesView === 'list' ? (
+                  <AddCompanyButton onClick={() => setCompaniesView('create')} />
+                ) : undefined
               }
             >
               {activeTab === 'account' ? (

@@ -20,6 +20,8 @@ import {
 } from 'lucide-react'
 import type { ComponentType, ReactNode } from 'react'
 import { useState } from 'react'
+import PhoneInput from 'react-phone-input-2'
+import 'react-phone-input-2/lib/style.css'
 
 import { cn } from '@/lib/utils'
 
@@ -70,6 +72,7 @@ export default function CreateCampain({
   onSubmit,
 }: CreateCampainProps) {
   const [about, setAbout] = useState('')
+  const [phone, setPhone] = useState<string>('')
 
   const handleCancel = () => {
     onCancel?.()
@@ -222,23 +225,27 @@ export default function CreateCampain({
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-x-8">
             <div className="flex flex-col gap-2">
               <FieldLabel>Telefon nömrəsi</FieldLabel>
-              <div className="flex gap-2">
-                <NativeSelect
-                  name="phonePrefix"
-                  defaultValue="+994"
-                  className="w-[112px] shrink-0 lg:w-[120px]"
-                  aria-label="Ölkə kodu"
-                >
-                  <option value="+994">+994</option>
-                  <option value="+90">+90</option>
-                </NativeSelect>
-                <input
-                  name="phone"
-                  type="tel"
-                  placeholder="Telefon nömrəsini daxil edin"
-                  className={cn(inputClass, 'min-w-0 flex-1')}
-                />
-              </div>
+              <input type="hidden" name="phone" value={phone} />
+              <PhoneInput
+                country="az"
+                value={phone}
+                onChange={(value) => setPhone(value)}
+                placeholder="Nömrənizi daxil edin"
+                inputStyle={{
+                  width: '100%',
+                  height: '48px',
+                  borderRadius: '12px',
+                  border: '1px solid #d1d5db',
+                  fontSize: '16px',
+                  paddingLeft: '48px',
+                }}
+                buttonStyle={{
+                  border: '1px solid #d1d5db',
+                  borderRadius: '12px 0 0 12px',
+                  backgroundColor: 'transparent',
+                }}
+                containerStyle={{ width: '100%' }}
+              />
             </div>
             <label className="flex flex-col gap-2">
               <FieldLabel>Email</FieldLabel>

@@ -323,10 +323,16 @@ export function Header() {
               />
               <div className="hidden items-center gap-5 lg:flex">
                 {!isAuthed ? (
-                  <Link href="/login" className={secondaryCtaClass}>
-                    <LogIn className="size-6 shrink-0" aria-hidden />
-                    {t('loginCta')}
-                  </Link>
+                  <>
+                    <Link href="/login" className={secondaryCtaClass}>
+                      <LogIn className="size-6 shrink-0" aria-hidden />
+                      {t('loginCta')}
+                    </Link>
+                    <Link href="/register" className={primaryCtaClass}>
+                      <span>{t('headerCta')}</span>
+                      <ArrowRight className="size-5 shrink-0" aria-hidden />
+                    </Link>
+                  </>
                 ) : profileUser ? (
                   <Suspense
                     fallback={
@@ -339,10 +345,6 @@ export function Header() {
                     <HeaderUserMenu user={profileUser} />
                   </Suspense>
                 ) : null}
-                <Link href="/contact" className={primaryCtaClass}>
-                  <span>{t('headerCta')}</span>
-                  <ArrowRight className="size-5 shrink-0" aria-hidden />
-                </Link>
               </div>
 
               <button
@@ -506,16 +508,6 @@ export function Header() {
                           onNavigate={() => setIsMobileMenuOpen(false)}
                         />
                       </Suspense>
-                      <Link
-                        href="/contact"
-                        className={cn(
-                          primaryCtaClass,
-                          'w-full justify-center text-sm sm:text-base'
-                        )}
-                      >
-                        <span className="truncate">{t('headerCta')}</span>
-                        <ArrowRight className="size-5 shrink-0" aria-hidden />
-                      </Link>
                     </div>
                   ) : (
                     <div className="grid grid-cols-2 gap-3">
