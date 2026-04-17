@@ -7,7 +7,6 @@ import { useQuery } from '@tanstack/react-query'
 import { useLocale, useTranslations } from 'next-intl'
 
 import { Link, usePathname } from '@/i18n/navigation'
-import { routing } from '@/i18n/routing'
 import { cn } from '@/lib/utils'
 import { getProfileQuery } from '@/services/auth/queries'
 import { getSettingsQuery } from '@/services/settings/queries'
@@ -328,9 +327,11 @@ export function Header() {
               </nav>
             </div>
 
-            <div className="flex shrink-0 items-center gap-3 lg:gap-5">
-              <div className="hidden lg:block">
-                <LanguageSelector variant={showHeroGlass ? "onDark" : "default"} />
+            <div className="flex min-w-0 shrink-0 items-center gap-2 sm:gap-3 lg:gap-5">
+              <div className="flex min-w-0 shrink-0 items-center">
+                <LanguageSelector
+                  variant={showHeroGlass ? 'onDark' : 'default'}
+                />
               </div>
 
               <div
@@ -340,7 +341,7 @@ export function Header() {
                 )}
                 aria-hidden
               />
-              <div className="flex items-center gap-3 lg:gap-5">
+              <div className="flex min-w-0 items-center gap-2 lg:gap-5">
                 {!isAuthed ? (
                   <>
                     <Link
@@ -379,10 +380,10 @@ export function Header() {
                 aria-controls="mobile-header-menu"
                 onClick={() => setIsMobileMenuOpen((prev) => !prev)}
                 className={cn(
-                  "inline-flex h-10 w-10 items-center justify-center rounded-full border transition-colors lg:hidden",
+                  'inline-flex size-11 shrink-0 items-center justify-center rounded-full border-2 transition-colors lg:hidden',
                   showHeroGlass
-                    ? "border-white/20 bg-white/10 text-white"
-                    : "border-[#E5E6E5] bg-white text-[#161E17]"
+                    ? 'border-white/20 bg-white/10 text-white'
+                    : 'border-[#E5E6E5] bg-white text-[#161E17]'
                 )}
               >
                 {isMobileMenuOpen ? (
@@ -487,61 +488,38 @@ export function Header() {
                   })}
                 </nav>
 
-                <div className={cn('h-px', showHeroGlass ? 'bg-white/10' : 'bg-black/10')} />
-
-                <div className="flex flex-col gap-3">
-                  <div
-                    className={cn(
-                      'grid grid-cols-2 gap-2 rounded-2xl p-1',
-                      showHeroGlass ? 'border border-white/10 bg-white/5' : 'border border-black/10 bg-black/[0.02]'
-                    )}
-                  >
-                    {routing.locales.map((code) => (
-                      <Link
-                        key={code}
-                        href={pathname}
-                        locale={code}
-                        className={cn(
-                          "rounded-xl px-3 py-2 text-center text-sm transition-colors",
-                          code === locale
-                            ? showHeroGlass
-                              ? "bg-white text-[#0f477d] font-medium"
-                              : "bg-[#0f477d] text-white font-medium"
-                            : showHeroGlass
-                              ? "text-white/90 hover:bg-white/10"
-                              : "text-[#14171A]/80 hover:bg-black/5 hover:text-[#14171A]"
-                        )}
-                      >
-                        {code.toUpperCase()}
-                      </Link>
-                    ))}
-                  </div>
-
-                  {isAuthed && profileUser ? null : (
+                {!isAuthed ? (
+                  <>
+                    <div
+                      className={cn(
+                        'h-px',
+                        showHeroGlass ? 'bg-white/10' : 'bg-black/10'
+                      )}
+                    />
                     <div className="grid grid-cols-2 gap-3">
-                      <Link
-                        href="/login"
-                        className={cn(
-                          secondaryCtaClass,
-                          'w-full text-sm sm:text-base'
-                        )}
-                      >
-                        <LogIn className="size-5 shrink-0 sm:size-6" aria-hidden />
-                        <span className="truncate">{t('loginCta')}</span>
-                      </Link>
-                      <Link
-                        href="/contact"
-                        className={cn(
-                          primaryCtaClass,
-                          'w-full text-sm sm:text-base'
-                        )}
-                      >
-                        <span className="truncate">{t('headerCta')}</span>
-                        <ArrowRight className="size-5 shrink-0" aria-hidden />
-                      </Link>
-                    </div>
-                  )}
-                </div>
+                    <Link
+                      href="/login"
+                      className={cn(
+                        secondaryCtaClass,
+                        'w-full text-sm sm:text-base'
+                      )}
+                    >
+                      <LogIn className="size-5 shrink-0 sm:size-6" aria-hidden />
+                      <span className="truncate">{t('loginCta')}</span>
+                    </Link>
+                    <Link
+                      href="/contact"
+                      className={cn(
+                        primaryCtaClass,
+                        'w-full text-sm sm:text-base'
+                      )}
+                    >
+                      <span className="truncate">{t('headerCta')}</span>
+                      <ArrowRight className="size-5 shrink-0" aria-hidden />
+                    </Link>
+                  </div>
+                  </>
+                ) : null}
               </div>
             </Container>
           </div>

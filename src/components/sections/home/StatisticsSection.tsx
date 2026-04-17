@@ -63,8 +63,8 @@ export default async function StatisticsSection({ statistics }: { statistics: St
                     />
                   </div>
 
-                  <div className="flex w-[178px] min-w-0 shrink-0 flex-col gap-[14px]">
-                    <p className="text-base font-medium leading-6 text-[#636d73]">
+                  <div className="flex w-[178px] min-w-0  shrink-0 flex-col gap-[14px]">
+                    <p className="text-base font-medium  leading-6 text-[#636d73]">
                       {item.labelKey}
                     </p>
                     <p className="text-[40px] font-semibold leading-[56px] text-black">
