@@ -19,7 +19,7 @@ export default async function MembersPage() {
 
   const members = queryClient.getQueryData(getMembersQuery(locale).queryKey)?.data;
   const activities = queryClient.getQueryData(getActivitiesQuery(locale).queryKey)?.data;
-  const countries = queryClient.getQueryData(getCountriesQuery(locale).queryKey)?.data;
+  const countries = queryClient.getQueryData(getCountriesQuery(locale).queryKey);
   const heroData = queryClient.getQueryData(getBreadcrumbsQuery(locale).queryKey);
   const hero = heroData?.data?.find((x) => x.name?.toLowerCase?.() === 'members');
   const title = hero?.title || 'Üzvlərimiz';

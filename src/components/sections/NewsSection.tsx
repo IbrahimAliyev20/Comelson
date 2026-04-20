@@ -103,8 +103,8 @@ export default function NewsSection({
             })}
           </div>
 
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
-            <div className="relative w-full sm:max-w-[380px]">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between md:gap-6">
+            <div className="relative w-full md:max-w-[380px]">
               <Search
                 className="absolute left-3 top-1/2 size-5 -translate-y-1/2 text-[#889097]"
                 aria-hidden
@@ -122,7 +122,7 @@ export default function NewsSection({
 
             <button
               type="button"
-              className="inline-flex h-12 w-full items-center justify-between gap-2 rounded-xl border border-[#dadee2] bg-white px-4 text-base leading-6 text-[#32393f] sm:w-[200px]"
+              className="inline-flex h-12 w-full items-center justify-between gap-2 rounded-xl border border-[#dadee2] bg-white px-4 text-base leading-6 text-[#32393f] md:w-[200px]"
               aria-label={t('news.filterDate')}
             >
               <span>{t('news.filterDate')}</span>
@@ -130,7 +130,7 @@ export default function NewsSection({
             </button>
           </div>
 
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {isLoading ? (
               <div className="col-span-full py-10 text-center text-sm text-[#6b6e71]">Loading...</div>
             ) : isError ? (

@@ -33,19 +33,19 @@ export default async function StatisticsSection({ statistics }: { statistics: St
       />
 
       <Container className="relative z-10">
-        <div className="flex flex-col items-start justify-between gap-12 lg:flex-row lg:gap-10">
-          <div className="flex w-full max-w-[585px] flex-col gap-8">
+        <div className="flex flex-col items-center justify-between gap-12 lg:flex-row lg:gap-10">
+          <div className="flex w-full flex-col gap-8  lg:max-w-[585px]">
             <h2 className="text-balance text-3xl font-semibold leading-tight text-white md:text-[40px] md:leading-[56px]">
               <span>{t('statsTitlePrefix')} </span>
               <span className="text-[#3bbae9]">{t('statsTitleAccent')} </span>
               <span>{t('statsTitleSuffix')}</span>
             </h2>
-            <p className="max-w-[557px] text-base leading-6 text-[#d9d9d9]">
+            <p className="md:w-full lg:max-w-[557px] text-base leading-6 text-[#d9d9d9]">
               {t('statsBody')}
             </p>
           </div>
 
-          <div className="flex w-full max-w-[619px] flex-col gap-6 lg:flex-row lg:items-start lg:gap-[27px]">
+          <div className="grid w-full grid-cols-1 gap-6 md:grid-cols-2 md:items-start lg:flex lg:max-w-[619px] lg:gap-[27px]">
             <div className="flex w-full flex-col gap-6 self-stretch lg:max-w-[296px]">
               {STATS_COL_LEFT.map((item, idx) => (
                 <div
@@ -75,7 +75,7 @@ export default async function StatisticsSection({ statistics }: { statistics: St
               ))}
             </div>
 
-            <div className="flex w-full flex-col gap-6 self-stretch pt-0 lg:max-w-[296px] lg:pt-24">
+            <div className="flex w-full flex-col gap-6 self-stretch pt-0 md:pt-0 lg:max-w-[296px] lg:pt-24">
               {STATS_COL_RIGHT.map((item, idx) => (
                 <div
                   key={`right-${item.iconSrc}-${idx}`}

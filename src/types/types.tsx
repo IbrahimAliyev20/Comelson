@@ -136,6 +136,14 @@ export interface BlogResponse {
 }
 
 export interface CountryResponse {
+  id: number;
+  name: string;
+  flag: string; 
+}
+
+/** GET /company-categories — siyahı elementi */
+export interface CompanyCategoryResponse {
+  id: number;
   name: string;
 }
 
@@ -153,14 +161,106 @@ export interface MemberResponse {
     email: string;
     phone: string;
     activity: {
-      id: number;
-      name: string;
+        id: number;
+        name: string;
     };
     country: {
-      id: number;
-      name: string;
+        id: number;
+        name: string;
     };
     meta_title: string;
     meta_keywords: string;
     meta_description: string;
+}
+
+export interface CompanyResponse {
+  id: number;
+  name: string;
+  voen: string;
+  category: {
+    id: number;
+    name: string;
+  };
+  country: {
+    id: number;
+    name: string;
+    flag: string;
+  };
+  description: string;
+  logo_url: string;
+  phone: string;
+  email: string;
+  address: string;
+  website: string;
+  instagram: string;
+  facebook: string;
+  linkedin: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ApiPaginationLinks {
+  first: string | null;
+  last: string | null;
+  prev: string | null;
+  next: string | null;
+}
+
+export interface ApiPaginationMetaLink {
+  url: string | null;
+  label: string;
+  active: boolean;
+}
+
+export interface ApiPaginationMeta {
+  current_page: number;
+  from: number | null;
+  last_page: number;
+  links: ApiPaginationMetaLink[];
+  path: string;
+  per_page: number;
+  to: number | null;
+  total: number;
+}
+
+export interface PaginatedApiResponse<T> {
+  data: T[];
+  links: ApiPaginationLinks;
+  meta: ApiPaginationMeta;
+}
+
+/** POST /companies — multipart/form-data (logo faylı ilə) */
+export interface CreateCompanyPayload {
+  name: string;
+  voen: string;
+  category_id: number;
+  country_id: number;
+  description: string;
+  phone: string;
+  email: string;
+  address: string;
+  website: string;
+  instagram: string;
+  facebook: string;
+  linkedin: string;
+  /** Şirkət loqosu — server `logo` açarı ilə gözləyir */
+  logo?: File | Blob | null;
+}
+
+/** Hesab → Şirkətlərim — siyahı / detal / redaktə kartı */
+export interface CompanyCard {
+  id: string;
+  name: string;
+  category: string;
+  description: string;
+  logo: string;
+  voen?: string;
+  country?: string;
+  phone?: string;
+  email?: string;
+  address?: string;
+  website?: string;
+  instagram?: string;
+  facebook?: string;
+  linkedin?: string;
 }

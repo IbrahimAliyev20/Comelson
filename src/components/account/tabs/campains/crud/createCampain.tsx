@@ -18,12 +18,18 @@ import {
   Table2,
   Underline,
 } from 'lucide-react'
+import { useLocale } from 'next-intl'
 import type { ComponentType, ReactNode } from 'react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import PhoneInput from 'react-phone-input-2'
 import 'react-phone-input-2/lib/style.css'
+import { toast } from 'sonner'
 
 import { cn } from '@/lib/utils'
+import { postCompanyMutation } from '@/services/companies/mutations'
+import { getCompanyCategoriesQuery } from '@/services/company-categories/queries'
+import { getCountriesQuery } from '@/services/members/queries'
 
 const inputClass =
   'h-12 w-full rounded-lg border border-[#ebeff4] bg-[#f4fafd] px-4 text-sm text-[#1d212a] outline-none placeholder:text-[#889097] focus:border-[#0f477d]/40 focus:ring-4 focus:ring-[#0f477d]/10'
@@ -59,29 +65,140 @@ function NativeSelect({
   )
 }
 
+function escapeHtmlPlain(text: string): string {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+}
+
+function normalizePhone(raw: string): string {
+  const t = raw.trim()
+  if (!t) return ''
+  return t.startsWith('+') ? t : `+${t}`
+}
+
 /** Figma 459:6806 — Şirkət əlavə et */
 export type CreateCampainProps = {
   onBack: () => void
   onCancel?: () => void
-  onSubmit?: () => void
+  /** API uğuru — siyahını yeniləmək üçün */
+  onSuccess?: () => void
 }
 
 export default function CreateCampain({
   onBack,
   onCancel,
-  onSubmit,
+  onSuccess,
 }: CreateCampainProps) {
+  const locale = useLocale()
+  const { data: countries = [], isLoading: countriesLoading } = useQuery(
+    getCountriesQuery(locale)
+  )
+  const { data: categories = [], isLoading: categoriesLoading } = useQuery(
+    getCompanyCategoriesQuery(locale)
+  )
   const [about, setAbout] = useState('')
   const [phone, setPhone] = useState<string>('')
+  const [categoryId, setCategoryId] = useState('')
+  const [countryId, setCountryId] = useState('')
+  const [logoFile, setLogoFile] = useState<File | null>(null)
+  const [logoPreviewUrl, setLogoPreviewUrl] = useState<string>('')
+
+  useEffect(() => {
+    if (!logoFile) {
+      setLogoPreviewUrl('')
+      return
+    }
+
+    const url = URL.createObjectURL(logoFile)
+    setLogoPreviewUrl(url)
+    return () => {
+      URL.revokeObjectURL(url)
+    }
+  }, [logoFile])
+
+  const createMutation = useMutation({
+    ...postCompanyMutation(),
+    onSuccess: (res) => {
+      if (!res?.status) {
+        toast.error(res?.message || 'Əlavə edilmədi')
+        return
+      }
+      toast.success('Şirkət əlavə olundu')
+      onSuccess?.()
+    },
+    onError: () => {
+      toast.error('Şirkət əlavə edilmədi')
+    },
+  })
 
   const handleCancel = () => {
     onCancel?.()
     onBack()
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    onSubmit?.()
+    const form = e.currentTarget
+    const name = String(
+      (form.elements.namedItem('companyName') as HTMLInputElement)?.value ?? ''
+    ).trim()
+    const voen = String(
+      (form.elements.namedItem('voen') as HTMLInputElement)?.value ?? ''
+    ).trim()
+    const email = String(
+      (form.elements.namedItem('email') as HTMLInputElement)?.value ?? ''
+    ).trim()
+    const address = String(
+      (form.elements.namedItem('address') as HTMLInputElement)?.value ?? ''
+    ).trim()
+    const website = String(
+      (form.elements.namedItem('website') as HTMLInputElement)?.value ?? ''
+    ).trim()
+    const instagram = String(
+      (form.elements.namedItem('instagram') as HTMLInputElement)?.value ?? ''
+    ).trim()
+    const facebook = String(
+      (form.elements.namedItem('facebook') as HTMLInputElement)?.value ?? ''
+    ).trim()
+    const linkedin = String(
+      (form.elements.namedItem('linkedin') as HTMLInputElement)?.value ?? ''
+    ).trim()
+
+    if (!categoryId || !countryId) {
+      toast.error('Kateqoriya və ölkə seçin')
+      return
+    }
+    if (!name || !voen || !email) {
+      toast.error('Məcburi sahələri doldurun')
+      return
+    }
+
+    const description =
+      about.trim().length > 0
+        ? `<p>${escapeHtmlPlain(about)}</p>`
+        : '<p></p>'
+
+    createMutation.mutate({
+      locale,
+      body: {
+        name,
+        voen,
+        category_id: Number(categoryId),
+        country_id: Number(countryId),
+        description,
+        phone: normalizePhone(phone),
+        email,
+        address,
+        website,
+        instagram,
+        facebook,
+        linkedin,
+        logo: logoFile ?? undefined,
+      },
+    })
   }
 
   return (
@@ -102,20 +219,33 @@ export default function CreateCampain({
 
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col gap-12 px sm:px-12"
+        className="flex flex-col gap-12 px-6 sm:px-12"
       >
         {/* Şirkət detalları */}
         <section className="flex flex-col gap-8 py-5">
       
 
           <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:gap-5">
-            <label className="relative flex size-[120px] shrink-0 cursor-pointer flex-col items-center justify-center rounded-full border border-[#eaf1fa] bg-[#e6eff6] p-2.5">
+            <label className="relative flex size-[120px] shrink-0 cursor-pointer flex-col items-center justify-center overflow-hidden rounded-full border border-[#eaf1fa] bg-[#e6eff6] p-2.5">
               <input
                 type="file"
                 accept="image/jpeg,image/png,image/jpg"
                 className="sr-only"
+                onChange={(ev) => {
+                  const f = ev.target.files?.[0]
+                  setLogoFile(f ?? null)
+                }}
               />
-              <Camera className="size-9 text-[#6b6e71]" aria-hidden />
+              {logoPreviewUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={logoPreviewUrl}
+                  alt=""
+                  className="size-full object-cover"
+                />
+              ) : (
+                <Camera className="size-9 text-[#6b6e71]" aria-hidden />
+              )}
               <span className="sr-only">Logo yüklə</span>
             </label>
             <div className="flex min-w-0 flex-col gap-2.5">
@@ -151,23 +281,40 @@ export default function CreateCampain({
             </label>
             <div className="flex flex-col gap-2">
               <FieldLabel>Kateqoriya</FieldLabel>
-              <NativeSelect name="category" defaultValue="">
+              <NativeSelect
+                name="category"
+                value={categoryId}
+                onChange={(e) => setCategoryId(e.target.value)}
+                required
+                disabled={categoriesLoading}
+              >
                 <option value="" disabled>
-                  Kateqoriyanı seçin
+                  {categoriesLoading ? 'Yüklənir…' : 'Kateqoriyanı seçin'}
                 </option>
-                <option value="construction">Tikinti</option>
-                <option value="it">İT</option>
-                <option value="trade">Ticarət</option>
+                {categories.map((c) => (
+                  <option key={c.id} value={String(c.id)}>
+                    {c.name}
+                  </option>
+                ))}
               </NativeSelect>
             </div>
             <div className="flex flex-col gap-2">
               <FieldLabel>Ölkə</FieldLabel>
-              <NativeSelect name="country" defaultValue="">
+              <NativeSelect
+                name="country"
+                value={countryId}
+                onChange={(e) => setCountryId(e.target.value)}
+                required
+                disabled={countriesLoading}
+              >
                 <option value="" disabled>
-                  Ölkəni seçin
+                  {countriesLoading ? 'Yüklənir…' : 'Ölkəni seçin'}
                 </option>
-                <option value="az">Azərbaycan</option>
-                <option value="tr">Türkiyə</option>
+                {countries.map((c) => (
+                  <option key={c.id} value={String(c.id)}>
+                    {c.name}
+                  </option>
+                ))}
               </NativeSelect>
             </div>
           </div>
@@ -322,9 +469,10 @@ export default function CreateCampain({
           </button>
           <button
             type="submit"
-            className="inline-flex h-12 flex-1 items-center justify-center rounded-2xl bg-[#0f477d] px-6 text-base font-medium leading-6 text-white transition-colors hover:bg-[#0c3a66] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+            disabled={createMutation.isPending}
+            className="inline-flex h-12 flex-1 items-center justify-center rounded-2xl bg-[#0f477d] px-6 text-base font-medium leading-6 text-white transition-colors hover:bg-[#0c3a66] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:opacity-60"
           >
-            Əlavə et
+            {createMutation.isPending ? 'Göndərilir…' : 'Əlavə et'}
           </button>
         </div>
       </form>

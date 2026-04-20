@@ -58,7 +58,7 @@ export default async function MemberDetailPage({
 
             <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
               <div className="flex items-center gap-6">
-                <div className="relative size-[96px] overflow-hidden rounded-full border border-[#f1f2f6] sm:size-[120px]">
+                <div className="relative aspect-square size-[96px] shrink-0 overflow-hidden rounded-full border border-[#f1f2f6] sm:size-[120px]">
                   <Image
                     src={company.image}
                     alt={company.company}
@@ -69,7 +69,7 @@ export default async function MemberDetailPage({
                 </div>
 
                 <div className="flex min-w-0 flex-col gap-1">
-                  <p className="truncate text-2xl font-semibold leading-8 text-[#1d212a] sm:text-[32px] sm:leading-[44px]">
+                  <p className="break-words text-2xl font-semibold leading-8 text-[#1d212a] sm:text-[32px] sm:leading-[44px]">
                     {company.company}
                   </p>
                   <p className="text-base leading-6 text-[#6b6e71]">

@@ -18,12 +18,19 @@ import {
   Table2,
   Underline,
 } from 'lucide-react'
+import { useLocale } from 'next-intl'
 import type { ComponentType, ReactNode } from 'react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import PhoneInput from 'react-phone-input-2'
 import 'react-phone-input-2/lib/style.css'
+import { toast } from 'sonner'
 
 import { cn } from '@/lib/utils'
+import { getCompanyCategoriesQuery } from '@/services/company-categories/queries'
+import { updateCompanyMutation } from '@/services/companies/mutations'
+import { getCompanyQuery } from '@/services/companies/queries'
+import { getCountriesQuery } from '@/services/members/queries'
 
 const inputClass =
   'h-12 w-full rounded-lg border border-[#ebeff4] bg-[#f4fafd] px-4 text-sm font-medium text-[#1d212a] outline-none placeholder:text-[#889097] focus:border-[#0f477d]/40 focus:ring-4 focus:ring-[#0f477d]/10'
@@ -47,10 +54,24 @@ export type EditableCompany = {
   linkedin?: string
 }
 
+function escapeHtmlPlain(text: string): string {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+}
+
+function normalizePhone(raw: string): string {
+  const t = raw.trim()
+  if (!t) return ''
+  return t.startsWith('+') ? t : `+${t}`
+}
+
 export type EditCampainProps = {
   company: EditableCompany
   onCancel: () => void
-  onSubmit?: (company: EditableCompany) => void
+  onSuccess?: () => void
 }
 
 function FieldLabel({ children }: { children: ReactNode }) {
@@ -85,12 +106,41 @@ function NativeSelect({
 export default function EditCampain({
   company,
   onCancel,
-  onSubmit,
+  onSuccess,
 }: EditCampainProps) {
+  const locale = useLocale()
+  const companyId = Number(company.id)
+
+  const { data: countries = [], isLoading: countriesLoading } = useQuery(
+    getCountriesQuery(locale)
+  )
+  const { data: categories = [], isLoading: categoriesLoading } = useQuery(
+    getCompanyCategoriesQuery(locale)
+  )
+  const [categoryId, setCategoryId] = useState('')
+  const [countryId, setCountryId] = useState('')
+  const [logoFile, setLogoFile] = useState<File | null>(null)
+  const [logoPreviewUrl, setLogoPreviewUrl] = useState<string>('')
+
+  const updateMutation = useMutation({
+    ...updateCompanyMutation(),
+    onSuccess: (res) => {
+      if (!res?.status) {
+        toast.error(res?.message || 'Yadda saxlanılmadı')
+        return
+      }
+      toast.success('Yadda saxlanıldı')
+      onSuccess?.()
+    },
+    onError: () => {
+      toast.error('Yadda saxlanılmadı')
+    },
+  })
+
   const [form, setForm] = useState<EditableCompany>({
     ...company,
     voen: company.voen ?? '12345678',
-    country: company.country ?? 'Azərbaycan',
+    country: company.country,
     phone: company.phone ?? '',
     email: company.email ?? 'info@comelson.az',
     address: company.address ?? 'Bakı, Azərbaycan, Əhmədli',
@@ -99,6 +149,46 @@ export default function EditCampain({
     facebook: company.facebook ?? 'https://facebook.com/comelson',
     linkedin: company.linkedin ?? 'https://linkedin.com/comelson',
   })
+
+  const { data: companyDetailResponse } = useQuery({
+    ...getCompanyQuery({ locale, id: companyId }),
+    enabled: Number.isFinite(companyId) && companyId > 0,
+  })
+
+  useEffect(() => {
+    const d = companyDetailResponse?.data
+    if (!d) return
+
+    setCategoryId(String(d.category?.id ?? ''))
+    setCountryId(String(d.country?.id ?? ''))
+
+    setForm((prev) => ({
+      ...prev,
+      name: d.name ?? prev.name,
+      voen: d.voen ?? prev.voen,
+      category: d.category?.name ?? prev.category,
+      country: d.country?.name ?? prev.country,
+      description: d.description ?? prev.description,
+      logo: d.logo_url ?? prev.logo,
+      phone: d.phone ?? prev.phone,
+      email: d.email ?? prev.email,
+      address: d.address ?? prev.address,
+      website: d.website ?? prev.website,
+      instagram: d.instagram ?? prev.instagram,
+      facebook: d.facebook ?? prev.facebook,
+      linkedin: d.linkedin ?? prev.linkedin,
+    }))
+  }, [companyDetailResponse])
+
+  useEffect(() => {
+    if (!logoFile) {
+      setLogoPreviewUrl('')
+      return
+    }
+    const url = URL.createObjectURL(logoFile)
+    setLogoPreviewUrl(url)
+    return () => URL.revokeObjectURL(url)
+  }, [logoFile])
 
   const handleChange =
     (field: keyof EditableCompany) =>
@@ -112,7 +202,39 @@ export default function EditCampain({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    onSubmit?.(form)
+    const id = companyId
+    if (Number.isNaN(id)) {
+      toast.error('Şirkət ID düzgün deyil')
+      return
+    }
+    if (!categoryId) {
+      toast.error('Kateqoriya seçin')
+      return
+    }
+    if (!countryId) {
+      toast.error('Ölkə seçin')
+      return
+    }
+    const description = `<p>${escapeHtmlPlain(form.description)}</p>`
+    updateMutation.mutate({
+      locale,
+      id,
+      body: {
+        name: form.name,
+        voen: form.voen ?? '',
+        category_id: Number(categoryId),
+        country_id: Number(countryId),
+        description,
+        phone: normalizePhone(form.phone ?? ''),
+        email: form.email ?? '',
+        address: form.address ?? '',
+        website: form.website ?? '',
+        instagram: form.instagram ?? '',
+        facebook: form.facebook ?? '',
+        linkedin: form.linkedin ?? '',
+        logo: logoFile ?? undefined,
+      },
+    })
   }
 
   return (
@@ -144,10 +266,14 @@ export default function EditCampain({
                 type="file"
                 accept="image/jpeg,image/png,image/jpg"
                 className="sr-only"
+                onChange={(ev) => {
+                  const f = ev.target.files?.[0]
+                  setLogoFile(f ?? null)
+                }}
               />
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={form.logo}
+                src={logoPreviewUrl || form.logo}
                 alt={form.name}
                 className="size-full rounded-full object-cover"
               />
@@ -194,23 +320,44 @@ export default function EditCampain({
               <FieldLabel>Kateqoriya</FieldLabel>
               <NativeSelect
                 name="category"
-                value={form.category}
-                onChange={handleChange('category')}
+                value={categoryId}
+                onChange={(e) => {
+                  const v = e.target.value
+                  setCategoryId(v)
+                  const cat = categories.find((c) => String(c.id) === v)
+                  setForm((prev) => ({
+                    ...prev,
+                    category: cat?.name ?? prev.category,
+                  }))
+                }}
+                disabled={categoriesLoading}
               >
-                <option value="Networking">Networking</option>
-                <option value="IT&Marketing">IT&Marketing</option>
-                <option value="Tikinti">Tikinti</option>
+                <option value="" disabled>
+                  {categoriesLoading ? 'Yüklənir…' : 'Kateqoriyanı seçin'}
+                </option>
+                {categories.map((c) => (
+                  <option key={c.id} value={String(c.id)}>
+                    {c.name}
+                  </option>
+                ))}
               </NativeSelect>
             </div>
             <div className="flex flex-col gap-2">
               <FieldLabel>Ölkə</FieldLabel>
               <NativeSelect
                 name="country"
-                value={form.country}
-                onChange={handleChange('country')}
+                value={countryId}
+                onChange={(e) => setCountryId(e.target.value)}
+                disabled={countriesLoading}
               >
-                <option value="Azərbaycan">Azərbaycan</option>
-                <option value="Türkiyə">Türkiyə</option>
+                <option value="" disabled>
+                  {countriesLoading ? 'Yüklənir…' : 'Ölkəni seçin'}
+                </option>
+                {countries.map((c) => (
+                  <option key={c.id} value={String(c.id)}>
+                    {c.name}
+                  </option>
+                ))}
               </NativeSelect>
             </div>
           </div>
@@ -383,9 +530,10 @@ export default function EditCampain({
           </button>
           <button
             type="submit"
-            className="inline-flex h-12 flex-1 items-center justify-center rounded-2xl bg-[#0f477d] px-6 text-base font-medium leading-6 text-white transition-colors hover:bg-[#0c3a66] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+            disabled={updateMutation.isPending}
+            className="inline-flex h-12 flex-1 items-center justify-center rounded-2xl bg-[#0f477d] px-6 text-base font-medium leading-6 text-white transition-colors hover:bg-[#0c3a66] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:opacity-60"
           >
-            Yadda saxla
+            {updateMutation.isPending ? 'Saxlanılır…' : 'Yadda saxla'}
           </button>
         </div>
       </form>

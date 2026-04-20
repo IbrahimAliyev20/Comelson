@@ -132,9 +132,9 @@ export default function AccountPage() {
   return (
     <div className="min-h-[calc(100vh-80px)] bg-[#F8FAFC] py-8 max-sm:py-5">
       <Container >
-        <div className="grid min-h-[min(872px,calc(100vh-160px))] grid-cols-1 gap-2 lg:grid-cols-[288px_minmax(0,1fr)] lg:grid-rows-1 lg:items-stretch lg:gap-2">
+        <div className="grid min-h-[min(872px,calc(100vh-160px))] grid-cols-1 gap-2 md:grid-cols-[240px_minmax(0,1fr)] md:grid-rows-1 md:items-stretch md:gap-2 lg:grid-cols-[288px_minmax(0,1fr)]">
           {/* Sidebar — Figma: 288px, rounded 12px, border #eaf1fa */}
-          <aside className="flex h-full min-h-0 w-full flex-col rounded-xl border border-[#eaf1fa] bg-white px-6 py-8">
+          <aside className="flex h-full min-h-0 w-full flex-col rounded-xl border border-[#eaf1fa] bg-white px-4 py-6 md:px-5 md:py-7 lg:px-6 lg:py-8">
             <p className="mb-8 text-2xl font-medium leading-8 text-[#14171a]">Hesabım</p>
 
             <nav className="flex flex-col gap-4">
@@ -276,7 +276,7 @@ export default function AccountPage() {
       </Container>
 
       {logoutOpen ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-6">
           <button
             type="button"
             aria-label="Bağla"

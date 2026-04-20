@@ -12,6 +12,13 @@ import {
 } from 'react'
 import { toast } from 'sonner'
 
+import {
+  authFormFlexGrow,
+  authMainMobileStickyFooter,
+  authMobileStickySubmit,
+  authPageColumn,
+  authUpperBlockGrow,
+} from '@/components/auth/auth-layout-classes'
 import { AuthSplitLayout } from '@/components/auth/AuthSplitLayout'
 import { Link, useRouter } from '@/i18n/navigation'
 import {
@@ -180,111 +187,110 @@ export default function OtpPage() {
   }
 
   return (
-    <AuthSplitLayout mainClassName="items-start justify-center py-6 sm:py-8">
-      <div className="w-full h-full  max-w-[498px] shrink-0">
-        <div className=" h-full flex flex-col gap-8 justify-around pb-0 md:pb-25">
-          <Link
-            href={backHref}
-            className="inline-flex w-fit items-center gap-3 rounded-xl px-1 py-2 text-base font-medium leading-6 text-[#64717c]"
-          >
-            <ChevronLeft className="h-6 w-6 shrink-0" aria-hidden />
-            Geri
-          </Link>
+    <AuthSplitLayout mainClassName={authMainMobileStickyFooter}>
+      <div className={cn(authPageColumn, 'gap-4 sm:gap-6 md:pb-25')}>
+        <Link
+          href={backHref}
+          className="inline-flex w-fit shrink-0 items-center gap-2 rounded-xl px-1 py-1 text-base font-medium leading-6 text-[#64717c] sm:gap-3 sm:py-2"
+        >
+          <ChevronLeft className="h-6 w-6 shrink-0" aria-hidden />
+          Geri
+        </Link>
 
-          <div className="flex flex-col gap-10">
-            <div className="flex flex-col gap-4">
-              <h2 className="text-[40px] font-semibold leading-[56px] text-[#14171a]">
-                OTP təsdiq
-              </h2>
-              <p className="max-w-[461px] text-base leading-6 text-[#6b6e71]">
-                Zəhmət olmasa,{' '}
-                <span className="font-medium text-[#14171a]">
-                  {emailFromQuery || '—'}
-                </span>{' '}
-                email adresinə göndərilən OTP kodunu daxil edin.
-              </p>
-            </div>
+        <div className={cn(authFormFlexGrow, 'gap-6 sm:gap-8')}>
+          <div className="flex flex-col gap-3 sm:gap-4">
+            <h2 className="text-2xl font-semibold leading-8 text-[#14171a] sm:text-[28px] sm:leading-9">
+              OTP təsdiq
+            </h2>
+            <p className="max-w-[461px] text-base leading-6 text-[#6b6e71]">
+              Zəhmət olmasa,{' '}
+              <span className="font-medium break-all text-[#14171a]">
+                {emailFromQuery || '—'}
+              </span>{' '}
+              email adresinə göndərilən OTP kodunu daxil edin.
+            </p>
+          </div>
 
-            <div className="flex flex-col gap-12">
-              <div className="flex flex-col items-center gap-9">
-                <div className="flex flex-wrap items-center justify-center gap-3">
-                  {otp.map((val, idx) => {
-                    const isActive =
-                      otp[idx] === '' && (idx === 0 || otp[idx - 1] !== '')
+          <div className={cn(authUpperBlockGrow, 'gap-6 sm:gap-9')}>
+            <div className="flex flex-col items-center gap-6 sm:gap-9">
+              <div className="grid w-full grid-cols-6 gap-1.5 sm:gap-2 md:max-w-md md:mx-auto">
+                {otp.map((val, idx) => {
+                  const isActive =
+                    otp[idx] === '' && (idx === 0 || otp[idx - 1] !== '')
 
-                    return (
-                      <input
-                        key={idx}
-                        ref={(el) => {
-                          inputsRef.current[idx] = el
-                        }}
-                        inputMode="numeric"
-                        autoComplete={idx === 0 ? 'one-time-code' : 'off'}
-                        aria-label={`OTP digit ${idx + 1}`}
-                        value={val}
-                        onChange={(e) => handleChange(idx, e.target.value)}
-                        onKeyDown={(e) => handleKeyDown(idx, e)}
-                        onPaste={idx === 0 ? handlePaste : undefined}
-                        className={cn(
-                          'h-[60px] w-[64px] shrink-0 rounded-lg border bg-[#f4fafd] text-center text-[20px] font-medium leading-7 text-[#1d212a] outline-none',
-                          isActive ? 'border-[#0f477d]' : 'border-[#ebeff4]'
-                        )}
-                        maxLength={1}
-                      />
-                    )
-                  })}
-                </div>
-
-                <p className="text-sm font-medium leading-5 text-[#1d212a]">
-                  {displayTime}
-                </p>
-
-                <div className="flex flex-wrap items-start justify-center gap-2 text-base leading-6">
-                  <span className="text-[#64717c]">Kodu əldə etmədiniz?</span>
-                  <button
-                    type="button"
-                    onClick={() => void handleResend()}
-                    className="inline-flex items-center gap-2 font-medium text-[#0f477d] underline underline-offset-2 disabled:opacity-50"
-                    disabled={secondsLeft > 0 || isResending || !emailFromQuery}
-                  >
-                    {isResending ? (
-                      <Loader2
-                        className="size-4 shrink-0 animate-spin"
-                        aria-hidden
-                      />
-                    ) : null}
-                    Yenidən göndər
-                  </button>
-                </div>
+                  return (
+                    <input
+                      key={idx}
+                      ref={(el) => {
+                        inputsRef.current[idx] = el
+                      }}
+                      inputMode="numeric"
+                      autoComplete={idx === 0 ? 'one-time-code' : 'off'}
+                      aria-label={`OTP digit ${idx + 1}`}
+                      value={val}
+                      onChange={(e) => handleChange(idx, e.target.value)}
+                      onKeyDown={(e) => handleKeyDown(idx, e)}
+                      onPaste={idx === 0 ? handlePaste : undefined}
+                      className={cn(
+                        'h-12 min-w-0 rounded-lg border bg-[#f4fafd] text-center text-base font-medium leading-6 text-[#1d212a] outline-none sm:h-[56px] sm:text-lg md:h-[60px] md:text-[20px] md:leading-7',
+                        isActive ? 'border-[#0f477d]' : 'border-[#ebeff4]'
+                      )}
+                      maxLength={1}
+                    />
+                  )
+                })}
               </div>
 
-              <button
-                type="button"
-                disabled={!canSubmit || isPending}
-                aria-disabled={!canSubmit || isPending}
-                onClick={handleOtpConfirm}
-                className={cn(
-                  'inline-flex h-12 w-full min-w-0 items-center justify-center gap-2 rounded-2xl px-4 text-base font-medium leading-6 transition-colors sm:gap-4 sm:px-6',
-                  canSubmit && !isPending
-                    ? 'bg-[#0f477d] text-white hover:bg-[#0c3a66]'
-                    : 'bg-[#889097] text-[#dadee2]',
-                  isPending && 'cursor-wait'
-                )}
-              >
-                {isPending ? (
-                  <>
+              <p className="text-sm font-medium leading-5 text-[#1d212a]">
+                {displayTime}
+              </p>
+
+              <div className="flex flex-wrap items-start justify-center gap-2 text-center text-base leading-6">
+                <span className="text-[#64717c]">Kodu əldə etmədiniz?</span>
+                <button
+                  type="button"
+                  onClick={() => void handleResend()}
+                  className="inline-flex items-center gap-2 font-medium text-[#0f477d] underline underline-offset-2 disabled:opacity-50"
+                  disabled={secondsLeft > 0 || isResending || !emailFromQuery}
+                >
+                  {isResending ? (
                     <Loader2
-                      className="size-5 shrink-0 animate-spin"
+                      className="size-4 shrink-0 animate-spin"
                       aria-hidden
                     />
-                    <span>Gözləyin…</span>
-                  </>
-                ) : (
-                  <span className="min-w-0 text-center">Təsdiq et</span>
-                )}
-              </button>
+                  ) : null}
+                  Yenidən göndər
+                </button>
+              </div>
             </div>
           </div>
+
+          <button
+            type="button"
+            disabled={!canSubmit || isPending}
+            aria-disabled={!canSubmit || isPending}
+            onClick={handleOtpConfirm}
+            className={cn(
+              'inline-flex h-12 w-full min-w-0 items-center justify-center gap-2 rounded-2xl px-4 text-base font-medium leading-6 transition-colors sm:gap-4 sm:px-6',
+              authMobileStickySubmit,
+              canSubmit && !isPending
+                ? 'bg-[#0f477d] text-white hover:bg-[#0c3a66]'
+                : 'bg-[#889097] text-[#dadee2]',
+              isPending && 'cursor-wait'
+            )}
+          >
+            {isPending ? (
+              <>
+                <Loader2
+                  className="size-5 shrink-0 animate-spin"
+                  aria-hidden
+                />
+                <span>Gözləyin…</span>
+              </>
+            ) : (
+              <span className="min-w-0 text-center">Təsdiq et</span>
+            )}
+          </button>
         </div>
       </div>
     </AuthSplitLayout>

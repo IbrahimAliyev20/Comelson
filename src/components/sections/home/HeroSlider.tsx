@@ -92,31 +92,31 @@ export default function HeroSlider({
         aria-hidden
       />
 
-      <div className="relative z-10 flex w-full flex-1 flex-col justify-start gap-6 md:justify-between  lg:gap-[32px]">
-        <div className="flex max-w-[628px] flex-col gap-7 md:gap-12 lg:gap-[56px]">
-          <div className="relative min-h-[230px] sm:min-h-[260px] md:min-h-[300px] lg:min-h-[320px]">
+      <div className="relative z-10 flex w-full flex-1 flex-col justify-start gap-10 md:gap-5 lg:gap-[32px]">
+        <div className="flex max-w-[628px] flex-col gap-8 md:max-w-[760px] md:gap-8 lg:gap-[56px]">
+          <div className="relative min-h-[270px] sm:min-h-[260px] md:min-h-[300px] lg:min-h-[320px]">
             {normalizedSlides.map((slide, index) => (
               <div
                 key={`${slide.title}-${index}`}
                 className={cn(
-                  'absolute inset-0 flex flex-col gap-5 transition-all duration-500 ease-out sm:gap-6',
+                  'absolute inset-0 flex flex-col gap-7 transition-all duration-500 ease-out sm:gap-6',
                   index === activeIndex
                     ? 'translate-y-0 opacity-100'
                     : 'pointer-events-none translate-y-4 opacity-0'
                 )}
                 aria-hidden={index !== activeIndex}
               >
-                <h1 className="max-w-[14ch] text-balance text-[34px] font-bold leading-[1.08] tracking-[-0.03em] text-white sm:text-5xl sm:leading-[1.04] md:max-w-[12ch] md:text-[56px] md:leading-[1.08] lg:max-w-[680px] lg:text-[64px] lg:leading-[80px]">
+                <h1 className="max-w-[14ch] text-balance text-[34px] font-bold leading-[1.08] tracking-[-0.03em] text-white sm:text-5xl sm:leading-[1.04] md:max-w-[17ch] md:text-[64px] md:leading-[1.02] lg:max-w-[680px] lg:text-[64px] lg:leading-[80px]">
                   {slide.title}
                 </h1>
-                <p className="max-w-[620px] text-sm leading-6 text-[#d8dfea] sm:text-base sm:leading-7 md:max-w-[540px] lg:max-w-full lg:leading-6">
+                <p className="max-w-[620px] text-sm leading-7 text-[#d8dfea] sm:text-base sm:leading-7 md:max-w-[620px] md:text-[17px] md:leading-8 lg:max-w-full lg:leading-6">
                   {slide.description}
                 </p>
                 <a
                   href={normalizeUrl(slide.btn_link)}
                   target={slide.btn_link.startsWith('/') ? undefined : '_blank'}
                   rel={slide.btn_link.startsWith('/') ? undefined : 'noopener noreferrer'}
-                  className="mt-2 inline-flex h-11 w-[60%] items-center justify-center gap-3 rounded-2xl bg-white px-5 text-sm font-medium leading-6 text-[#0f477d] transition-all hover:opacity-90 sm:mt-3 sm:h-12 sm:w-fit sm:px-6 sm:text-base lg:h-12 lg:gap-4 lg:px-6"
+                  className="mt-5 inline-flex h-[54px] w-[70%] items-center justify-center gap-3 rounded-2xl bg-white px-6 text-base font-medium leading-6 text-[#0f477d] transition-all hover:opacity-90 sm:mt-5 sm:h-[52px] sm:w-fit sm:px-6 sm:text-base md:h-14 md:min-w-[220px] md:gap-4 md:px-8 md:text-[17px] lg:h-12 lg:min-w-0 lg:px-6"
                 >
                   {slide.btn || fallback.cta}
                   <ArrowRight className="size-5 shrink-0 sm:size-6" aria-hidden />
@@ -146,7 +146,7 @@ export default function HeroSlider({
         </div>
 
         <div
-          className="mt-8 hidden justify-center gap-2 md:flex lg:mt-[32px]"
+          className="mt-5 hidden justify-center gap-2 md:flex lg:mt-[32px]"
           aria-hidden
         >
           {normalizedSlides.map((slide, index) => (

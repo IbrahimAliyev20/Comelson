@@ -29,7 +29,7 @@ export default async function NewsHomeSection({ blogs }: { blogs: BlogResponse[]
   if (list.length === 0) return null
 
   return (
-    <section className="bg-white py-8  md:py-[60px]">
+    <section className="bg-[#F4F6FA] py-8  md:py-[60px]">
       <Container>
         <div className="flex flex-col gap-8">
           <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-end">
@@ -40,19 +40,19 @@ export default async function NewsHomeSection({ blogs }: { blogs: BlogResponse[]
 
             <Link
               href={`/${locale}/news`}
-              className="inline-flex h-12 shrink-0 items-center justify-center gap-3 rounded-2xl px-6 py-3 text-base font-medium leading-6 text-black transition-opacity hover:opacity-80"
+              className="hidden h-12 shrink-0 items-center justify-center gap-3 rounded-2xl px-6 py-3 text-base font-medium leading-6 text-black transition-opacity hover:opacity-80 lg:inline-flex"
             >
               {t('blogCta')}
               <ArrowRight className="size-6 shrink-0" aria-hidden />
             </Link>
           </div>
 
-          <div className="flex flex-col gap-6 lg:flex-row lg:flex-wrap lg:gap-6">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
             {list.map((post) => (
               <Link
                 key={post.slug}
                 href={`/${locale}/news/${post.slug}`}
-                className="group flex w-full max-w-[421px] flex-col gap-4 rounded-2xl border border-[#e5e6e5] bg-white p-2 pb-5 transition-shadow hover:shadow-md lg:shrink-0"
+                className="group flex w-full max-w-none flex-col gap-4 rounded-2xl border border-[#e5e6e5] bg-white p-2 pb-5 transition-shadow hover:shadow-md"
               >
                 <div className="relative h-[320px] w-full overflow-hidden rounded-xl">
                   <Image
@@ -91,6 +91,16 @@ export default async function NewsHomeSection({ blogs }: { blogs: BlogResponse[]
                 </div>
               </Link>
             ))}
+          </div>
+
+          <div className="flex justify-center lg:hidden">
+            <Link
+              href={`/${locale}/news`}
+              className="inline-flex h-12 items-center justify-center gap-3 rounded-2xl px-6 py-3 text-base font-medium leading-6 text-black transition-opacity hover:opacity-80"
+            >
+              {t('blogCta')}
+              <ArrowRight className="size-6 shrink-0" aria-hidden />
+            </Link>
           </div>
         </div>
       </Container>

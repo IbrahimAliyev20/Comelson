@@ -42,12 +42,10 @@ export default async function AboutHomeSection({ about }: { about: AboutResponse
     <section className="bg-[#F8FAFC] py-8 md:py-[60px]">
       <Container>
         <div className="flex flex-col items-start justify-between gap-10 md:gap-12 lg:flex-row lg:gap-8 xl:gap-16">
-          <div className="flex w-full max-w-[585px] flex-col gap-6 md:gap-8">
-            <h2 className="max-w-[24ch] text-balance text-[32px] font-semibold leading-[1.1] tracking-[-0.03em] text-[#14171a] md:max-w-[12ch] md:text-[40px] md:leading-[48px] lg:max-w-none lg:leading-[56px]">
-              {about?.title}
-            </h2>
+          <div className="flex w-full flex-col gap-6 md:gap-8 lg:max-w-[585px]">
+            <h2 className="text-balance text-[32px] font-semibold leading-[1.1] tracking-[-0.03em] text-[#14171a] md:text-[40px] md:leading-[48px] lg:leading-[56px]" dangerouslySetInnerHTML={{ __html: about?.title ?? '' }} />
             <div className="flex flex-col gap-4">
-              <p className="max-w-[557px]  line-clamp-4 lg:line-clamp-none text-sm font-normal leading-6 text-[#64717c] md:text-base">
+              <p className="text-sm font-normal leading-6 text-[#64717c] md:text-base">
                 {about?.short_desciption}
               </p>
               <Link

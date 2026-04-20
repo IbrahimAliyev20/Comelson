@@ -25,18 +25,9 @@ export default async function MembersHomeSection( { members }: { members: Member
               <span className="text-[#6b6e71]">{t('membersTitleAccent')}</span>
             </h2>
 
-            {/* Mobile CTA under title (same style as Tenders) */}
             <Link
               href={`/${locale}/members`}
-              className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-medium leading-5 text-[#0f477d] transition-opacity hover:opacity-80 min-[400px]:h-12 min-[400px]:w-auto min-[400px]:gap-3 min-[400px]:px-6 min-[400px]:py-3 min-[400px]:text-base min-[400px]:leading-6 sm:hidden"
-            >
-              {t('membersCta')}
-              <ChevronRight className="size-5 shrink-0 min-[400px]:size-6" aria-hidden />
-            </Link>
-
-            <Link
-              href={`/${locale}/members`}
-              className="hidden h-11 w-full shrink-0 items-center justify-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-medium leading-5 text-[#0f477d] transition-opacity hover:opacity-80 min-[400px]:h-12 min-[400px]:w-auto min-[400px]:gap-3 min-[400px]:px-6 min-[400px]:py-3 min-[400px]:text-base min-[400px]:leading-6 sm:inline-flex"
+              className="hidden h-11 w-full shrink-0 items-center justify-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-medium leading-5 text-[#0f477d] transition-opacity hover:opacity-80 min-[400px]:h-12 min-[400px]:w-auto min-[400px]:gap-3 min-[400px]:px-6 min-[400px]:py-3 min-[400px]:text-base min-[400px]:leading-6 lg:inline-flex"
             >
               {t('membersCta')}
               <ChevronRight className="size-5 shrink-0 min-[400px]:size-6" aria-hidden />
@@ -44,7 +35,7 @@ export default async function MembersHomeSection( { members }: { members: Member
           </div>
 
           {/* Mobile/tablet */}
-          <div className="lg:hidden">
+          <div className="md:hidden">
             {list.length === 1 ? (
               <Link
                 href={`/${locale}/members/${list[0]!.slug}`}
@@ -67,12 +58,12 @@ export default async function MembersHomeSection( { members }: { members: Member
           </div>
 
           {/* Desktop: keep grid */}
-          <div className="hidden grid-cols-1 gap-5 sm:grid-cols-2 lg:grid lg:grid-cols-5">
+          <div className="hidden md:grid md:grid-cols-3 md:gap-5 xl:grid-cols-5">
             {list.map((member) => (
               <Link
                 key={member.slug}
                 href={`/${locale}/members/${member.slug}`}
-                className="group flex h-[160px] items-center justify-center overflow-hidden rounded-[10px] border border-[#e8eaed] bg-white p-6 transition-shadow hover:shadow-[0_14px_40px_rgba(15,71,125,0.10)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0f477d]/40"
+                className="group flex h-[160px] items-center justify-center overflow-hidden rounded-[10px] border border-[#e8eaed] bg-white p-6 transition-shadow hover:shadow-[0_14px_40px_rgba(15,71,125,0.10)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0f477d]/40 md:h-[180px] lg:h-[160px]"
               >
                 <Image
                   src={member.image}
@@ -84,6 +75,16 @@ export default async function MembersHomeSection( { members }: { members: Member
                 />
               </Link>
             ))}
+          </div>
+
+          <div className="flex justify-center lg:hidden">
+            <Link
+              href={`/${locale}/members`}
+              className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-medium leading-5 text-[#0f477d] transition-opacity hover:opacity-80 min-[400px]:h-12 min-[400px]:w-auto min-[400px]:gap-3 min-[400px]:px-6 min-[400px]:py-3 min-[400px]:text-base min-[400px]:leading-6"
+            >
+              {t('membersCta')}
+              <ChevronRight className="size-5 shrink-0 min-[400px]:size-6" aria-hidden />
+            </Link>
           </div>
         </div>
       </Container>

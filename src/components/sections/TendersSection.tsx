@@ -59,8 +59,8 @@ export default function TendersSection() {
             Tender Elanları
           </h1>
 
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <div className="relative w-full lg:max-w-[420px]">
+          <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between lg:items-center">
+            <div className="relative w-full md:max-w-[320px] lg:max-w-[420px]">
               <Search
                 className="absolute left-3 top-1/2 size-5 -translate-y-1/2 text-[#889097]"
                 aria-hidden
@@ -76,7 +76,7 @@ export default function TendersSection() {
               />
             </div>
 
-            <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-3 lg:w-auto">
+            <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-3 md:w-auto md:min-w-[560px] lg:w-auto">
               <Select
                 value={status}
                 onValueChange={(v) => setStatus(v as StatusFilter)}

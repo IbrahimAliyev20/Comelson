@@ -257,7 +257,7 @@ export function HeaderUserMenu({
   )
 
   useEffect(() => {
-    const mq = window.matchMedia('(max-width: 1023px)')
+    const mq = window.matchMedia('(max-width: 767px)')
     const apply = () => setIsNarrow(mq.matches)
     apply()
     mq.addEventListener('change', apply)

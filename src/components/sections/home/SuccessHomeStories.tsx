@@ -2,8 +2,8 @@
 
 import { ArrowRight } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { useState } from 'react'
 import Image from 'next/image'
+import { useEffect, useRef, useState } from 'react'
 
 import Container from '@/components/shared/container'
 import { Link } from '@/i18n/navigation'
@@ -51,9 +51,37 @@ export default function SuccessHomeStories({
 }) {
   const t = useTranslations('home')
   const [active, setActive] = useState(0)
+  const [isPaused, setIsPaused] = useState(false)
+  const intervalRef = useRef<number | null>(null)
   const stories = successStories ?? []
+  const hasStories = stories.length > 0
 
-  if (stories.length === 0) return null
+  useEffect(() => {
+    if (stories.length <= 1) return
+    if (isPaused) return
+    if (typeof window === 'undefined') return
+
+    const prefersReducedMotion = window.matchMedia?.(
+      '(prefers-reduced-motion: reduce)'
+    )?.matches
+    if (prefersReducedMotion) return
+
+    const clear = () => {
+      if (intervalRef.current) window.clearInterval(intervalRef.current)
+      intervalRef.current = null
+    }
+
+    const tick = () => {
+      if (document.visibilityState === 'hidden') return
+      setActive((v) => (v + 1) % stories.length)
+    }
+
+    clear()
+    intervalRef.current = window.setInterval(tick, 7000)
+    return clear
+  }, [isPaused, stories.length])
+
+  if (!hasStories) return null
 
   const slide = stories[active]
   const embedSrc = getEmbedSrc(slide.link)
@@ -71,16 +99,22 @@ export default function SuccessHomeStories({
 
             <Link
               href="/success-stories"
-              className="inline-flex h-12 shrink-0 items-center justify-center gap-3 rounded-2xl px-6 py-3 text-base font-medium leading-6 text-black transition-opacity hover:opacity-80"
+              className="hidden h-12 shrink-0 items-center justify-center gap-3 rounded-2xl px-6 py-3 text-base font-medium leading-6 text-[#14171a] transition-colors hover:text-[#0f477d] lg:inline-flex"
             >
               {t('successStoriesCta')}
-              <ArrowRight className="size-6 shrink-0" aria-hidden />
+              <ArrowRight className="size-6 shrink-0 transition-colors" aria-hidden />
             </Link>
           </div>
 
-          <div className="flex flex-col items-center gap-8 overflow-hidden rounded-2xl">
-            <div className="flex w-full flex-col gap-8 lg:flex-row lg:items-stretch lg:gap-12 ">
-              <div className="relative aspect-video w-full flex-1 overflow-hidden rounded-xl lg:aspect-auto lg:h-[426px] lg:min-h-[426px]">
+          <div
+            className="flex flex-col items-center gap-8 overflow-hidden rounded-2xl"
+            onMouseEnter={() => setIsPaused(true)}
+            onMouseLeave={() => setIsPaused(false)}
+            onFocusCapture={() => setIsPaused(true)}
+            onBlurCapture={() => setIsPaused(false)}
+          >
+            <div className="flex w-full flex-col gap-8 md:flex-row md:items-stretch md:gap-8 lg:gap-12 ">
+              <div className="relative aspect-video w-full flex-1 overflow-hidden rounded-xl md:aspect-auto md:min-h-[360px] lg:h-[426px] lg:min-h-[426px]">
                 {embedSrc ? (
                   <iframe
                     key={slide.slug}
@@ -95,7 +129,7 @@ export default function SuccessHomeStories({
                 ) : null}
               </div>
 
-              <div className="flex w-full shrink-0 flex-col rounded-[14px] bg-[#f4f6fa] p-6 sm:p-8 lg:h-[426px] lg:w-[min(100%,680px)] lg:max-w-[680px]">
+              <div className="flex w-full shrink-0 flex-col rounded-[14px] bg-[#f4f6fa] p-6 sm:p-8 md:max-w-[46%] lg:h-[426px] lg:w-[min(100%,680px)] lg:max-w-[680px]">
                 <div className="flex min-h-0 flex-1 flex-col justify-between gap-8">
                   <div className="flex flex-col gap-8">
                     <div className="flex items-center gap-4">
@@ -143,6 +177,16 @@ export default function SuccessHomeStories({
                     }`}
                   />
                 ))}
+            </div>
+
+            <div className="flex justify-center lg:hidden">
+              <Link
+                href="/success-stories"
+                className="inline-flex h-12 items-center justify-center gap-3 rounded-2xl px-6 py-3 text-base font-medium leading-6 text-[#14171a] transition-colors hover:text-[#0f477d]"
+              >
+                {t('successStoriesCta')}
+                <ArrowRight className="size-6 shrink-0 transition-colors" aria-hidden />
+              </Link>
             </div>
           </div>
         </div>

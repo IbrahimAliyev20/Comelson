@@ -5,6 +5,13 @@ import { useSearchParams } from 'next/navigation'
 import { type FormEvent, useEffect, useMemo, useState, useTransition } from 'react'
 import { toast } from 'sonner'
 
+import {
+  authFormFlexGrow,
+  authMainMobileStickyFooter,
+  authMobileStickySubmit,
+  authPageColumn,
+  authUpperBlockGrow,
+} from '@/components/auth/auth-layout-classes'
 import { AuthSplitLayout } from '@/components/auth/AuthSplitLayout'
 import { Link, useRouter } from '@/i18n/navigation'
 import {
@@ -144,35 +151,33 @@ export default function NewPasswordPage() {
 
   return (
     <>
-    <AuthSplitLayout mainClassName="items-start justify-center py-6 sm:py-8">
-      <div className="flex w-full h-full max-w-[490px] flex-col justify-around pb-0 md:pb-25 gap-8">
-        <div>
-          <Link
-            href={backToOtpHref}
-            className="inline-flex w-fit items-center gap-3 rounded-xl px-1 py-2 text-base font-medium leading-6 text-[#64717c]"
-          >
-            <ChevronLeft className="h-6 w-6 shrink-0" aria-hidden />
-            Geri
-          </Link>
-        </div>
+    <AuthSplitLayout mainClassName={authMainMobileStickyFooter}>
+      <div className={cn(authPageColumn, 'gap-4 sm:gap-6 md:pb-25')}>
+        <Link
+          href={backToOtpHref}
+          className="inline-flex w-fit shrink-0 items-center gap-2 rounded-xl px-1 py-1 text-base font-medium leading-6 text-[#64717c] sm:gap-3 sm:py-2"
+        >
+          <ChevronLeft className="h-6 w-6 shrink-0" aria-hidden />
+          Geri
+        </Link>
 
         <form
-          className="flex flex-col gap-12"
+          className={cn(authFormFlexGrow, 'gap-6 sm:gap-8')}
           onSubmit={handleSubmit}
           noValidate
         >
-          {formError ? (
-            <p
-              className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800"
-              role="alert"
-            >
-              {formError}
-            </p>
-          ) : null}
+          <div className={cn(authUpperBlockGrow, 'gap-6 sm:gap-8')}>
+            {formError ? (
+              <p
+                className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800"
+                role="alert"
+              >
+                {formError}
+              </p>
+            ) : null}
 
-          <div className="flex flex-col gap-10">
-            <div className="flex flex-col gap-4">
-              <h2 className="text-[40px] font-semibold leading-[56px] text-[#14171a]">
+            <div className="flex flex-col gap-3 sm:gap-4">
+              <h2 className="text-2xl font-semibold leading-8 text-[#14171a] sm:text-[28px] sm:leading-9">
                 Yeni şifrə
               </h2>
               <ul className="list-disc space-y-1.5 pl-6 text-base leading-6 text-[#64717c]">
@@ -293,6 +298,7 @@ export default function NewPasswordPage() {
             aria-disabled={!canSubmit || isPending}
             className={cn(
               'inline-flex h-12 w-full min-w-0 items-center justify-center gap-2 rounded-2xl px-4 text-base font-medium leading-6 transition-colors sm:gap-4 sm:px-6',
+              authMobileStickySubmit,
               canSubmit && !isPending
                 ? 'bg-[#0f477d] text-white hover:bg-[#0c3a66]'
                 : 'bg-[#889097] text-[#dadee2]',

@@ -1,67 +1,22 @@
 'use client'
 import { MoreVertical, PencilIcon, Plus, Trash2 } from 'lucide-react'
+import { useLocale } from 'next-intl'
 import type { ReactNode } from 'react'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 
 import { cn } from '@/lib/utils'
+import { companyResponseToCard } from '@/services/companies/company-card-map'
+import { deleteCompanyMutation } from '@/services/companies/mutations'
+import { getCompaniesQuery } from '@/services/companies/queries'
+import type { CompanyCard } from '@/types/types'
 
 import CreateCampain from './crud/createCampain'
 import CampainsDetail from './crud/CampainsDetail'
 import EditCampain from './crud/editCampain'
 
-export type CompanyCard = {
-  id: string
-  name: string
-  category: string
-  description: string
-  logo: string
-  voen?: string
-  country?: string
-  phone?: string
-  email?: string
-  address?: string
-  website?: string
-  instagram?: string
-  facebook?: string
-  linkedin?: string
-}
-
-const DEMO_COMPANIES: CompanyCard[] = [
-  {
-    id: 'comelson-mmc',
-    name: 'Comelson MMC',
-    category: 'Networking',
-    description:
-      'Şirkətə özəl veb sayt hazırlanması, SEO və SMM xidmətləri həyata keçiririk. Bizimlə əlaqə saxlayın və onlayn mövcudluğunuzu birlikdə artıraq!',
-    logo: 'https://www.figma.com/api/mcp/asset/39672e3b-85b5-4299-8f4c-bd93347a99c3',
-    voen: '12345678',
-    country: 'Azərbaycan',
-    phone: '70 777 77 77',
-    email: 'info@comelson.az',
-    address: 'Bakı, Azərbaycan, Əhmədli',
-    website: 'https://comelson.az',
-    instagram: 'https://instagram.com/comelson',
-    facebook: 'https://facebook.com/comelson',
-    linkedin: 'https://linkedin.com/company/comelson',
-  },
-  {
-    id: 'markup-agency',
-    name: 'Markup Agency',
-    category: 'IT&Marketing',
-    description:
-      'Şirkətə özəl veb sayt hazırlanması, SEO və SMM xidmətləri həyata keçiririk. Bizimlə əlaqə saxlayın və onlayn mövcudluğunuzu birlikdə artıraq!',
-    logo: 'https://www.figma.com/api/mcp/asset/6d560330-2bc7-4857-b190-270be5a06e12',
-    voen: '87654321',
-    country: 'Azərbaycan',
-    phone: '55 444 22 11',
-    email: 'hello@markup.agency',
-    address: 'Bakı, Azərbaycan, Nərimanov',
-    website: 'https://markup.agency',
-    instagram: 'https://instagram.com/markup.agency',
-    facebook: 'https://facebook.com/markup.agency',
-    linkedin: 'https://linkedin.com/company/markup-agency',
-  },
-]
+export type { CompanyCard }
 
 function EmptyCompanyState({ onAdd }: { onAdd: () => void }) {
   return (
@@ -286,30 +241,61 @@ function BuildingInBadge({ className }: { className?: string }) {
 export type CampainsListProps = {
   view: 'list' | 'create' | 'edit' | 'detail'
   onViewChange: (view: 'list' | 'create' | 'edit' | 'detail') => void
-  companies?: CompanyCard[]
 }
 
 export default function CampainsList({
   view,
   onViewChange,
-  companies = DEMO_COMPANIES,
 }: CampainsListProps) {
-  const [items, setItems] = useState<CompanyCard[]>(companies)
-  const [selectedCompany, setSelectedCompany] = useState<CompanyCard | null>(
-    items[0] ?? null
+  const locale = useLocale()
+  const queryClient = useQueryClient()
+  const { data, isLoading, isError, refetch } = useQuery(
+    getCompaniesQuery({ locale })
   )
 
-  useEffect(() => {
-    setItems(companies)
-  }, [companies])
+  const items = useMemo(
+    () => data?.data?.map(companyResponseToCard) ?? [],
+    [data]
+  )
+
+  const [selectedCompany, setSelectedCompany] = useState<CompanyCard | null>(
+    null
+  )
 
   useEffect(() => {
     if (selectedCompany) return
     setSelectedCompany(items[0] ?? null)
   }, [items, selectedCompany])
 
+  const deleteMutation = useMutation({
+    ...deleteCompanyMutation(),
+    onSuccess: (res) => {
+      if (!res?.status) {
+        toast.error(res?.message || 'Xəta baş verdi')
+        return
+      }
+      toast.success('Şirkət silindi')
+      void queryClient.invalidateQueries({ queryKey: ['companies'] })
+    },
+    onError: () => {
+      toast.error('Şirkət silinmədi')
+    },
+  })
+
+  const invalidateCompanies = () => {
+    void queryClient.invalidateQueries({ queryKey: ['companies'] })
+  }
+
   if (view === 'create') {
-    return <CreateCampain onBack={() => onViewChange('list')} />
+    return (
+      <CreateCampain
+        onBack={() => onViewChange('list')}
+        onSuccess={() => {
+          invalidateCompanies()
+          onViewChange('list')
+        }}
+      />
+    )
   }
 
   if (view === 'edit' && selectedCompany) {
@@ -317,11 +303,8 @@ export default function CampainsList({
       <EditCampain
         company={selectedCompany}
         onCancel={() => onViewChange('list')}
-        onSubmit={(company) => {
-          setSelectedCompany(company)
-          setItems((prev) =>
-            prev.map((x) => (x.id === company.id ? { ...x, ...company } : x))
-          )
+        onSuccess={() => {
+          invalidateCompanies()
           onViewChange('list')
         }}
       />
@@ -330,6 +313,29 @@ export default function CampainsList({
 
   if (view === 'detail' && selectedCompany) {
     return <CampainsDetail company={selectedCompany} onBack={() => onViewChange('list')} />
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col gap-4 px-6 py-12 sm:px-12">
+        <p className="text-center text-sm text-[#6b6e71]">Yüklənir…</p>
+      </div>
+    )
+  }
+
+  if (isError) {
+    return (
+      <div className="flex flex-col items-center gap-4 px-6 py-12 sm:px-12">
+        <p className="text-center text-sm text-[#6b6e71]">Yükləmə alınmadı</p>
+        <button
+          type="button"
+          onClick={() => void refetch()}
+          className="rounded-2xl bg-[#e6eff6] px-6 py-3 text-sm font-medium text-[#0f477d]"
+        >
+          Yenidən cəhd et
+        </button>
+      </div>
+    )
   }
 
   if (items.length === 0) {
@@ -360,7 +366,9 @@ export default function CampainsList({
             onDelete={(item) => {
               const ok = window.confirm('Şirkəti silmək istəyirsiniz?')
               if (!ok) return
-              setItems((prev) => prev.filter((x) => x.id !== item.id))
+              const id = Number(item.id)
+              if (Number.isNaN(id)) return
+              deleteMutation.mutate({ locale, id })
               setSelectedCompany((prev) => (prev?.id === item.id ? null : prev))
             }}
           />

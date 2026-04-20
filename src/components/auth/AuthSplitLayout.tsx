@@ -18,8 +18,8 @@ export interface AuthSplitLayoutProps {
 export function AuthSplitLayout({ children, mainClassName }: AuthSplitLayoutProps) {
   return (
     <section className="min-h-screen w-full bg-white">
-      <div className="grid min-h-screen w-full grid-cols-1 lg:grid-cols-[minmax(0,720px)_minmax(0,1fr)]">
-        <aside className="relative hidden min-h-screen overflow-hidden lg:block">
+      <div className="grid min-h-screen w-full grid-cols-1 xl:grid-cols-[minmax(0,720px)_minmax(0,1fr)]">
+        <aside className="relative hidden min-h-screen overflow-hidden xl:block">
           <Image
             src={AUTH_HERO_IMAGE_SRC}
             alt=""
@@ -53,7 +53,7 @@ export function AuthSplitLayout({ children, mainClassName }: AuthSplitLayoutProp
 
         <main
           className={cn(
-            'flex min-h-screen items-center justify-center px-4 py-12 sm:px-6 lg:px-12',
+            'flex min-h-screen items-center justify-center px-4 py-12 sm:px-6 md:px-10 lg:px-12',
             mainClassName
           )}
         >

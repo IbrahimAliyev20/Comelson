@@ -4,6 +4,13 @@ import { ChevronLeft, Loader2 } from 'lucide-react'
 import { type FormEvent, useState, useTransition } from 'react'
 import { toast } from 'sonner'
 
+import {
+  authFormFlexGrow,
+  authMainMobileStickyFooter,
+  authMobileStickySubmit,
+  authPageColumn,
+  authUpperBlockGrow,
+} from '@/components/auth/auth-layout-classes'
 import { AuthSplitLayout } from '@/components/auth/AuthSplitLayout'
 import { Link, useRouter } from '@/i18n/navigation'
 import { OTP_FLOW_FORGOT_PASSWORD, buildOtpSearchParams } from '@/lib/auth/otp-flow'
@@ -46,21 +53,19 @@ export default function ForgetPasswordPage() {
   }
 
   return (
-    <AuthSplitLayout mainClassName="items-start justify-center py-6 sm:py-8">
-      <div className="flex h-full w-full max-w-[490px] flex-col justify-around pb-0 md:pb-25 gap-8">
-        <div>
-          <Link
-            href="/login"
-            className="inline-flex w-fit items-center gap-3 rounded-xl px-1 py-2 text-base font-medium leading-6 text-[#64717c]"
-          >
-            <ChevronLeft className="h-6 w-6 shrink-0" aria-hidden />
-            Geri
-          </Link>
-        </div>
+    <AuthSplitLayout mainClassName={authMainMobileStickyFooter}>
+      <div className={cn(authPageColumn, 'gap-4 sm:gap-6 md:pb-25')}>
+        <Link
+          href="/login"
+          className="inline-flex w-fit shrink-0 items-center gap-2 rounded-xl px-1 py-1 text-base font-medium leading-6 text-[#64717c] sm:gap-3 sm:py-2"
+        >
+          <ChevronLeft className="h-6 w-6 shrink-0" aria-hidden />
+          Geri
+        </Link>
 
-        <div className="flex flex-col gap-10">
-          <div className="flex flex-col gap-4">
-            <h2 className="text-[40px] font-semibold leading-[56px] text-[#14171a]">
+        <div className="flex min-h-0 flex-1 flex-col gap-6 sm:gap-8 md:flex-none">
+          <div className="flex flex-col gap-3 sm:gap-4">
+            <h2 className="text-2xl font-semibold leading-8 text-[#14171a] sm:text-[28px] sm:leading-9">
               Şifrəmi unutmuşam
             </h2>
             <p className="max-w-[461px] text-base leading-6 text-[#6b6e71]">
@@ -70,34 +75,36 @@ export default function ForgetPasswordPage() {
           </div>
 
           <form
-            className="flex w-full flex-col gap-12"
+            className={cn(authFormFlexGrow, 'gap-8 sm:gap-10')}
             onSubmit={handleSubmit}
             noValidate
           >
-            {formError ? (
-              <p
-                className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800"
-                role="alert"
-              >
-                {formError}
-              </p>
-            ) : null}
+            <div className={cn(authUpperBlockGrow, 'gap-8 sm:gap-10')}>
+              {formError ? (
+                <p
+                  className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800"
+                  role="alert"
+                >
+                  {formError}
+                </p>
+              ) : null}
 
-            <label className="flex flex-col gap-2">
-              <span className="px-1 text-sm leading-6 text-[#1d212a]">Email</span>
-              <input
-                type="email"
-                name="email"
-                autoComplete="email"
-                placeholder="Email adresinizi daxil edin"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className={cn(
-                  'h-12 w-full rounded-lg border border-[#ebeff4] bg-[#f4fafd] px-4 text-sm text-[#1d212a] outline-none placeholder:text-[#6b7277] focus:border-[#0f477d]/40 focus:ring-4 focus:ring-[#0f477d]/10',
-                  email ? 'font-medium' : 'font-normal'
-                )}
-              />
-            </label>
+              <label className="flex flex-col gap-2">
+                <span className="px-1 text-sm leading-6 text-[#1d212a]">Email</span>
+                <input
+                  type="email"
+                  name="email"
+                  autoComplete="email"
+                  placeholder="Email adresinizi daxil edin"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className={cn(
+                    'h-12 w-full rounded-lg border border-[#ebeff4] bg-[#f4fafd] px-4 text-sm text-[#1d212a] outline-none placeholder:text-[#6b7277] focus:border-[#0f477d]/40 focus:ring-4 focus:ring-[#0f477d]/10',
+                    email ? 'font-medium' : 'font-normal'
+                  )}
+                />
+              </label>
+            </div>
 
             <button
               type="submit"
@@ -105,6 +112,7 @@ export default function ForgetPasswordPage() {
               aria-disabled={!canSubmit || isPending}
               className={cn(
                 'inline-flex h-12 w-full min-w-0 items-center justify-center gap-2 rounded-2xl px-4 text-base font-medium leading-6 transition-colors sm:gap-4 sm:px-6',
+                authMobileStickySubmit,
                 canSubmit && !isPending
                   ? 'bg-[#0f477d] text-white hover:bg-[#0c3a66]'
                   : 'bg-[#889097] text-[#dadee2]',

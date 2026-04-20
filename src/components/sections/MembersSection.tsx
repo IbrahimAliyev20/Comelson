@@ -64,8 +64,8 @@ export default function MembersSection({
     <section className="bg-[#f8fafc] py-8 md:py-[70px]">
       <Container>
         <div className="flex flex-col gap-10">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <div className="relative w-full lg:max-w-[380px]">
+          <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between lg:items-center">
+            <div className="relative w-full md:max-w-[320px] lg:max-w-[380px]">
               <Search
                 className="absolute left-3 top-1/2 size-5 -translate-y-1/2 text-[#889097]"
                 aria-hidden
@@ -84,7 +84,7 @@ export default function MembersSection({
               />
             </div>
 
-            <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2 lg:w-auto lg:grid-cols-2 lg:gap-4">
+            <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2 md:w-auto md:min-w-[380px] lg:grid-cols-2 lg:gap-4">
               <Select
                 value={country ?? 'all'}
                 onValueChange={(v) => {
@@ -156,7 +156,7 @@ export default function MembersSection({
           </div>
 
           <div className="flex flex-col items-center gap-10">
-            <div className="grid w-full grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid w-full grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 lg:gap-6">
               {shown.map((company) => (
                 <div
                   key={company.slug}
@@ -164,13 +164,13 @@ export default function MembersSection({
                 >
                   <div className="flex w-full flex-col gap-4">
                     <div className="flex w-full items-center gap-4">
-                      <div className="relative size-20 overflow-hidden rounded-[56px] border border-[#f1f2f6]">
+                      <div className="relative size-16 shrink-0 overflow-hidden rounded-[56px] border border-[#f1f2f6]">
                         <Image
                           src={company.image}
                           alt={company.company}
                           fill
                           className="object-cover"
-                          sizes="80px"
+                          sizes="64px"
                         />
                       </div>
                       <div className="flex min-w-0 flex-1 flex-col gap-2">

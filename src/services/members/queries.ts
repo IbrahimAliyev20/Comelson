@@ -1,12 +1,12 @@
-import { queryOptions } from "@tanstack/react-query";
-import { getActivities, getCountries, getMember, getMembers } from "./api";
+import { queryOptions } from '@tanstack/react-query'
 
+import { getActivities, getAllCountries, getMember, getMembers } from './api'
 
 const getCountriesQuery = (locale: string) => {
-    return queryOptions({
-        queryKey: ["countries", locale],
-        queryFn: () => getCountries(locale),
-    });
+  return queryOptions({
+    queryKey: ['countries', 'all', locale] as const,
+    queryFn: () => getAllCountries(locale),
+  })
 }
 
 

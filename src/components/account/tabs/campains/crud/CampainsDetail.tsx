@@ -2,7 +2,7 @@ import { ChevronLeft } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
 
-import type { CompanyCard } from '../CampainsList'
+import type { CompanyCard } from '@/types/types'
 
 function FieldRow({
   label,

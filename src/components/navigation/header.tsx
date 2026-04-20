@@ -230,7 +230,7 @@ export function Header() {
               'flex items-center justify-between py-5 md:py-6'
             )}
           >
-            <div className="flex min-w-0 items-center gap-8 lg:gap-[90px]">
+            <div className="flex min-w-0 items-center gap-6 md:gap-8 lg:gap-[90px]">
               <Link href="/" className="shrink-0">
                 <div className="relative h-9 w-[158px] md:h-[35px]">
                   <Image
@@ -345,7 +345,7 @@ export function Header() {
               </nav>
             </div>
 
-            <div className="flex min-w-0 shrink-0 items-center gap-2 sm:gap-3 lg:gap-5">
+            <div className="flex min-w-0 shrink-0 items-center gap-2 sm:gap-3 md:gap-4 lg:gap-5">
               <div className="flex min-w-0 shrink-0 items-center ">
                 <LanguageSelector
                   variant={showHeroGlass ? 'onDark' : 'default'}
@@ -354,7 +354,7 @@ export function Header() {
 
               <div
                 className={cn(
-                  'hidden h-6 w-px lg:block',
+                  'hidden h-6 w-px md:block',
                   showHeroGlass ? 'bg-[#6b6e71]' : 'bg-[#e5e6e5]'
                 )}
                 aria-hidden
@@ -535,8 +535,7 @@ export function Header() {
                         'w-full text-sm sm:text-base'
                       )}
                     >
-                      <span className="truncate">{t('headerCta')}</span>
-                      <ArrowRight className="size-5 shrink-0" aria-hidden />
+                      <span>{t('headerCta')}</span>
                     </Link>
                   </div>
                   </>

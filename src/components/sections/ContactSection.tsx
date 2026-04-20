@@ -109,7 +109,7 @@ export default function ContactSection({ contact }: { contact: ContactResponse |
               {t('contact.methodsTitle')}
             </h2>
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:gap-6">
               <div className="rounded-xl border border-[#eaf1fa] bg-white px-6 py-7">
                 <div className="flex items-center gap-6">
                   <div className="flex size-12 items-center justify-center rounded-full bg-[#0f477d] text-white">
@@ -160,9 +160,9 @@ export default function ContactSection({ contact }: { contact: ContactResponse |
             </div>
           </div>
 
-          <div className="rounded-xl border border-[#eaf1fa] bg-white px-4 py-6 sm:px-10 sm:py-9">
-            <div className="flex flex-col gap-8 lg:flex-row lg:items-stretch lg:gap-[72px]">
-              <div className="w-full max-w-[500px]">
+          <div className="rounded-xl border border-[#eaf1fa] bg-white px-4 py-6 sm:px-8 sm:py-8 lg:px-10 lg:py-9">
+            <div className="flex flex-col gap-8 md:flex-row md:items-stretch md:gap-8 lg:gap-[72px]">
+              <div className="w-full max-w-[500px] md:max-w-none md:flex-1">
                 <h3 className="mb-6 text-balance text-2xl font-semibold leading-tight text-[#1d212a] sm:mb-8 sm:text-[32px] sm:leading-[40px]">
                   {t('contact.formTitle')}
                 </h3>
@@ -254,7 +254,7 @@ export default function ContactSection({ contact }: { contact: ContactResponse |
                 </form>
               </div>
 
-              <div className="relative min-h-[320px] flex-1 overflow-hidden rounded-xl bg-[#e6eff6]">
+              <div className="relative min-h-[320px] flex-1 overflow-hidden rounded-xl bg-[#e6eff6] md:min-h-[420px]">
                 {contact?.map && <iframe
                   title="Map"
                   className="absolute inset-0 h-full w-full"

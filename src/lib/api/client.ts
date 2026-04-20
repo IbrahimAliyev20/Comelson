@@ -97,8 +97,12 @@ export const post = async <T>(url: string, data?: unknown, config?: AxiosRequest
 }
 
 /** Multipart — interceptor `Content-Type`-u silir ki, boundary avtomatik qoyulsun */
-export const postForm = async <T>(url: string, data: FormData): Promise<T> => {
-  const response = await client.post<T>(url, data)
+export const postForm = async <T>(
+  url: string,
+  data: FormData,
+  config?: AxiosRequestConfig
+): Promise<T> => {
+  const response = await client.post<T>(url, data, config)
   return response.data
 }
 
