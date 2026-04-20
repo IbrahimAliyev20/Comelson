@@ -79,7 +79,7 @@ export default function SuccessHomeStories({
           </div>
 
           <div className="flex flex-col items-center gap-8 overflow-hidden rounded-2xl">
-            <div className="flex w-full flex-col gap-8 lg:flex-row lg:items-stretch lg:gap-12">
+            <div className="flex w-full flex-col gap-8 lg:flex-row lg:items-stretch lg:gap-12 ">
               <div className="relative aspect-video w-full flex-1 overflow-hidden rounded-xl lg:aspect-auto lg:h-[426px] lg:min-h-[426px]">
                 {embedSrc ? (
                   <iframe
@@ -131,18 +131,18 @@ export default function SuccessHomeStories({
               role="tablist"
               aria-label={t('successStoriesSliderLabel')}
             >
-              {stories.map((_, index) => (
-                <button
-                  key={index}
-                  type="button"
-                  role="tab"
-                  aria-selected={active === index}
-                  onClick={() => setActive(index)}
-                  className={`h-[3px] w-10 rounded-[1px] transition-colors ${
-                    active === index ? 'bg-[#0f477d]' : 'bg-[#0f477d]/32'
-                  }`}
-                />
-              ))}
+                {stories.map((_, index) => (
+                  <button
+                    key={index}
+                    type="button"
+                    role="tab"
+                    aria-selected={active === index}
+                    onClick={() => setActive(index)}
+                    className={`h-[3px] w-10 rounded-[1px] transition-colors ${
+                      active === index ? 'bg-[#0f477d]' : 'bg-[#0f477d]/32'
+                    }`}
+                  />
+                ))}
             </div>
           </div>
         </div>

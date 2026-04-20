@@ -49,7 +49,7 @@ function useAccountTabActive() {
 
 const itemBase =
   'flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-normal leading-5 transition-colors'
-const itemInactive = 'text-[#14171a] hover:bg-black/[0.04]'
+const itemInactive = 'text-[#14171a] hover:bg-[#e6eff6]'
 const itemActive = 'bg-[#e6eff6] font-medium text-[#0f477d]'
 
 type UserMenuPanelProps = {
@@ -215,9 +215,10 @@ export function UserMenuPanel({
           onClick={handleLogout}
           className={cn(
             itemBase,
-            itemInactive,
-            'w-full disabled:opacity-60',
-            lightOnDark && 'text-white/90 hover:bg-white/10'
+            'w-full disabled:opacity-60 cursor-pointer',
+            lightOnDark
+              ? 'text-white/90 hover:bg-white/10'
+              : 'text-[#14171a] hover:bg-[#fde8e8]'
           )}
         >
           <LogOut
@@ -236,9 +237,13 @@ export function UserMenuPanel({
 
 type HeaderUserMenuProps = {
   user: AuthProfileUser
+  variant?: 'default' | 'onDark'
 }
 
-export function HeaderUserMenu({ user }: HeaderUserMenuProps) {
+export function HeaderUserMenu({
+  user,
+  variant = 'default',
+}: HeaderUserMenuProps) {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const [open, setOpen] = useState(false)
   const [isNarrow, setIsNarrow] = useState(false)
@@ -306,14 +311,21 @@ export function HeaderUserMenu({ user }: HeaderUserMenuProps) {
     }
   }, [open])
 
+  const isOnDark = variant === 'onDark'
+
   return (
-    <div ref={containerRef} className="relative shrink-0">
+    <div ref={containerRef} className="relative shrink-0 ">
       <button
         type="button"
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        className="relative flex size-11 shrink-0 items-center justify-center rounded-full border-2 border-white/90 outline-none ring-offset-2 transition-opacity hover:opacity-95 focus-visible:ring-2 focus-visible:ring-white/60"
+        className={cn(
+          'relative flex size-11 shrink-0 items-center justify-center rounded-full border-2 outline-none ring-offset-2 transition-opacity hover:opacity-95 focus-visible:ring-2 cursor-pointer',
+          isOnDark
+            ? 'border-white/90 focus-visible:ring-white/60'
+            : 'border-[#e6eff6] focus-visible:ring-[#e6eff6]'
+        )}
       >
         {avatarUrl ? (
           // eslint-disable-next-line @next/next/no-img-element

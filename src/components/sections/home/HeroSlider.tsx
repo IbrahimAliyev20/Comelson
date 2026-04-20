@@ -92,7 +92,7 @@ export default function HeroSlider({
         aria-hidden
       />
 
-      <div className="relative z-10 flex w-full flex-1 flex-col justify-start gap-6 md:justify-between md:gap-14 lg:gap-[72px]">
+      <div className="relative z-10 flex w-full flex-1 flex-col justify-start gap-6 md:justify-between  lg:gap-[32px]">
         <div className="flex max-w-[628px] flex-col gap-7 md:gap-12 lg:gap-[56px]">
           <div className="relative min-h-[230px] sm:min-h-[260px] md:min-h-[300px] lg:min-h-[320px]">
             {normalizedSlides.map((slide, index) => (
@@ -106,7 +106,7 @@ export default function HeroSlider({
                 )}
                 aria-hidden={index !== activeIndex}
               >
-                <h1 className="max-w-[14ch] text-balance text-[34px] font-semibold leading-[1.08] tracking-[-0.03em] text-white sm:text-5xl sm:leading-[1.04] md:max-w-[12ch] md:text-[56px] md:leading-[1.08] lg:max-w-[680px] lg:text-[64px] lg:leading-[80px]">
+                <h1 className="max-w-[14ch] text-balance text-[34px] font-bold leading-[1.08] tracking-[-0.03em] text-white sm:text-5xl sm:leading-[1.04] md:max-w-[12ch] md:text-[56px] md:leading-[1.08] lg:max-w-[680px] lg:text-[64px] lg:leading-[80px]">
                   {slide.title}
                 </h1>
                 <p className="max-w-[620px] text-sm leading-6 text-[#d8dfea] sm:text-base sm:leading-7 md:max-w-[540px] lg:max-w-full lg:leading-6">
@@ -116,7 +116,7 @@ export default function HeroSlider({
                   href={normalizeUrl(slide.btn_link)}
                   target={slide.btn_link.startsWith('/') ? undefined : '_blank'}
                   rel={slide.btn_link.startsWith('/') ? undefined : 'noopener noreferrer'}
-                  className="inline-flex h-11 w-[60%] items-center justify-center gap-3 rounded-2xl bg-white px-5 text-sm font-medium leading-6 text-[#0f477d] transition-all hover:opacity-90 sm:h-12 sm:w-fit sm:px-6 sm:text-base lg:h-12 lg:gap-4 lg:px-6"
+                  className="mt-2 inline-flex h-11 w-[60%] items-center justify-center gap-3 rounded-2xl bg-white px-5 text-sm font-medium leading-6 text-[#0f477d] transition-all hover:opacity-90 sm:mt-3 sm:h-12 sm:w-fit sm:px-6 sm:text-base lg:h-12 lg:gap-4 lg:px-6"
                 >
                   {slide.btn || fallback.cta}
                   <ArrowRight className="size-5 shrink-0 sm:size-6" aria-hidden />

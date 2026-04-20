@@ -9,10 +9,10 @@ const getEventCategoriesQuery = (locale: string) => {
     });
 }
 
-const getEventsQuery = (locale: string, category_id: number) => {
+const getEventsQuery = (locale: string) => {
     return queryOptions({
-        queryKey: ["events", locale, category_id],
-        queryFn: () => getEvents(locale, category_id),
+        queryKey: ["events", locale],
+        queryFn: () => getEvents(locale),
     });
 }
 

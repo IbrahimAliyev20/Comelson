@@ -16,17 +16,17 @@ export default function StroiesCardSections({
   if (stories.length === 0) return null
 
   return (
-    <section className="bg-[#f8fafc] py-8 md:py-[70px]">
+    <section className="bg-[#f8fafc]  py-8 md:py-[70px]">
       <Container>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {stories.map((story, idx) => (
             <Link
               key={`${story.slug}-${idx}`}
               href={`/success-stories/${story.slug}`}
-              className="group flex w-full flex-col items-start rounded-[14px] border border-[#eaf1fa] bg-white p-6 transition-shadow hover:shadow-[0_14px_40px_rgba(15,71,125,0.10)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0f477d]/40"
+              className="group flex w-full flex-col items-start rounded-[14px] border border-[#eaf1fa] bg-white hover:bg-[#EDF1F7] p-6 transition-shadow  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0f477d]/40"
             >
-              <div className="flex w-full flex-col gap-10">
-                <div className="flex w-full flex-col gap-8">
+              <div className="flex w-full flex-col  h-full gap-10">
+                <div className="flex w-full flex-col justify-between h-full gap-8">
                   <div className="flex items-center gap-4">
                     <div className="relative size-16 overflow-hidden rounded-full">
                       <Image
@@ -42,7 +42,7 @@ export default function StroiesCardSections({
                     </p>
                   </div>
 
-                  <blockquote className="line-clamp-4 text-xl font-medium leading-8 text-[#32393f] sm:text-2xl sm:leading-8">
+                  <blockquote className="line-clamp-3 text-xl font-medium leading-8 text-[#32393f] sm:text-2xl sm:leading-8">
                     {story.comment}
                   </blockquote>
 

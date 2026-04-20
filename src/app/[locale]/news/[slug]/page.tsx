@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import { Calendar, Clock, Tag } from 'lucide-react'
+import { Calendar, Clock } from 'lucide-react'
 import { notFound } from 'next/navigation'
 import { headers } from 'next/headers'
 
@@ -118,7 +118,44 @@ export default async function NewsDetailPage({
               </div>
 
               <div className="inline-flex items-center gap-2 rounded-lg border border-[#dadee2] bg-white px-2.5 py-2 text-sm leading-5 text-[#1d212a]">
-                <Tag className="size-5" aria-hidden />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  className="size-5 text-[#1d212a]"
+                  aria-hidden
+                >
+                  <path
+                    d="M3.33337 3.33337H8.33337V8.33337H3.33337V3.33337Z"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M11.6667 3.33337H16.6667V8.33337H11.6667V3.33337Z"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M3.33337 11.6667H8.33337V16.6667H3.33337V11.6667Z"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M11.6667 14.1667C11.6667 14.8297 11.9301 15.4656 12.3989 15.9345C12.8678 16.4033 13.5037 16.6667 14.1667 16.6667C14.8297 16.6667 15.4656 16.4033 15.9345 15.9345C16.4033 15.4656 16.6667 14.8297 16.6667 14.1667C16.6667 13.5037 16.4033 12.8678 15.9345 12.3989C15.4656 11.9301 14.8297 11.6667 14.1667 11.6667C13.5037 11.6667 12.8678 11.9301 12.3989 12.3989C11.9301 12.8678 11.6667 13.5037 11.6667 14.1667Z"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
                 {post.category?.name}
               </div>
 
@@ -130,7 +167,7 @@ export default async function NewsDetailPage({
               ) : null}
 
               <div className="inline-flex items-center gap-2 rounded-lg border border-[#dadee2] bg-white px-2.5 py-2 text-sm leading-5 text-[#1d212a]">
-                <span>Share</span>
+                <span >Paylaş</span>
                 <div className="flex items-center gap-1.5 text-[#1d212a]">
                   <a
                     className="hover:opacity-70"
@@ -182,7 +219,8 @@ export default async function NewsDetailPage({
           {related.length > 0 ? (
             <div className="flex flex-col gap-6 sm:gap-9">
               <p className="text-balance text-2xl font-semibold leading-tight text-[#6b6e71] sm:text-[40px] sm:leading-[56px]">
-                <span>Picked</span>
+                <span className="text-[#6b6e71]">Sizin üçün </span> 
+                <span className="text-[#14171a]"  >Seçdiklərimiz</span>
               </p>
 
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">

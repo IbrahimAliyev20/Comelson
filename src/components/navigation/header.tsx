@@ -36,7 +36,9 @@ export function Header() {
   const showSpacer = !isGlassMode
 
   const { data: settingsResponse } = useQuery(getSettingsQuery(locale))
-  const siteLogoSrc = settingsResponse?.siteLogo || '/images/Logo.svg'
+  const siteLogoSrc = showHeroGlass
+    ? settingsResponse?.siteDarkLogo ?? '/images/Logo.svg'
+    : (settingsResponse?.siteLogo ?? '/images/Logo.svg')
 
   const { data: profileResponse, isSuccess: profileOk } = useQuery({
     ...getProfileQuery(),
@@ -159,9 +161,14 @@ export function Header() {
 
   /** Figma 90:2830 — Secondary (#e6eff6) + Primary (#0f477d) */
   const secondaryCtaClass =
-    'inline-flex h-12 items-center justify-center gap-4 rounded-2xl bg-[#e6eff6] px-6 text-base font-medium leading-6 text-[#0f477d] transition-opacity hover:opacity-90'
+    'inline-flex h-11 items-center justify-center gap-4 rounded-2xl bg-[#e6eff6] px-6 text-base font-medium leading-6 text-[#0f477d] transition-opacity hover:opacity-90'
   const primaryCtaClass =
-    'inline-flex h-12 items-center justify-center gap-4 rounded-2xl bg-[#0f477d] px-6 text-base font-medium leading-6 text-white transition-opacity hover:opacity-90'
+    'inline-flex h-11 items-center justify-center gap-4 rounded-2xl bg-[#0f477d] px-6 text-base font-medium leading-6 text-white transition-opacity hover:opacity-90'
+
+  function isDesktopNavActive(href: string) {
+    if (href === '/') return pathname === '/'
+    return pathname === href || pathname.startsWith(`${href}/`)
+  }
 
   function openAboutDropdown() {
     if (aboutCloseTimeoutRef.current) {
@@ -220,32 +227,38 @@ export function Header() {
         <Container>
           <div
             className={cn(
-              'flex items-center justify-between',
-              showHeroGlass ? 'py-4' : 'py-[16px]'
+              'flex items-center justify-between py-5 md:py-6'
             )}
           >
             <div className="flex min-w-0 items-center gap-8 lg:gap-[90px]">
               <Link href="/" className="shrink-0">
-                <Image
-                  src={siteLogoSrc}
-                  alt="Comelson"
-                  width={158}
-                  height={52}
-                  priority
-                  className="h-9 w-auto md:h-[35px]"
-                />
+                <div className="relative h-9 w-[158px] md:h-[35px]">
+                  <Image
+                    src={siteLogoSrc}
+                    alt="Comelson"
+                    fill
+                    priority
+                    sizes="158px"
+                    className="object-contain"
+                  />
+                </div>
               </Link>
 
               <nav className="hidden lg:flex items-center gap-5" aria-label="Primary">
                 {heroNavigationItems.map((item) => {
                   if (item.key !== 'about' || !item.hasDropdown) {
+                    const isActive = isDesktopNavActive(item.href)
                     return (
                       <Link
                         key={item.key}
                         href={item.href}
                         className={cn(
-                          'inline-flex items-center gap-1 px-2 py-1 text-sm font-normal leading-5 transition-colors hover:opacity-80',
-                          showHeroGlass ? 'text-white' : 'text-[#14171A] hover:text-[#14171A]'
+                          'relative inline-flex items-center gap-1 px-2 py-4 text-sm font-normal leading-5 transition-colors hover:opacity-80',
+                          showHeroGlass ? 'text-white' : 'text-[#14171A] hover:text-[#14171A]',
+                          isActive &&
+                            (showHeroGlass
+                              ? 'after:absolute after:left-2 after:right-2 after:-bottom-1 after:h-[2px] after:rounded-full after:bg-white'
+                              : 'after:absolute after:left-2 after:right-2 after:-bottom-1 after:h-[2px] after:rounded-full after:bg-[#0f477d]')
                         )}
                       >
                         {t(`heroNav.${item.key}`)}
@@ -261,14 +274,19 @@ export function Header() {
                       onMouseEnter={openAboutDropdown}
                       onMouseLeave={closeAboutDropdownSoon}
                     >
+                      {/** active underline for "About" parent when on about pages */}
                       <button
                         type="button"
                         aria-haspopup="menu"
                         aria-expanded={isAboutDropdownOpen}
                         onClick={() => setIsAboutDropdownOpen((v) => !v)}
                         className={cn(
-                          'inline-flex items-center gap-1 px-2 py-1 text-sm font-normal leading-5 transition-colors hover:opacity-80',
-                          showHeroGlass ? 'text-white' : 'text-[#14171A] hover:text-[#14171A]'
+                          'relative inline-flex items-center gap-1 px-2 py-1 text-sm font-normal leading-5 transition-colors hover:opacity-80',
+                          showHeroGlass ? 'text-white' : 'text-[#14171A] hover:text-[#14171A]',
+                          isDesktopNavActive(item.href) &&
+                            (showHeroGlass
+                              ? 'after:absolute after:left-2 after:right-2 after:-bottom-1 after:h-[2px] after:rounded-full after:bg-white'
+                              : 'after:absolute after:left-2 after:right-2 after:-bottom-1 after:h-[2px] after:rounded-full after:bg-[#0f477d]')
                         )}
                       >
                         {t('heroNav.about')}
@@ -328,7 +346,7 @@ export function Header() {
             </div>
 
             <div className="flex min-w-0 shrink-0 items-center gap-2 sm:gap-3 lg:gap-5">
-              <div className="flex min-w-0 shrink-0 items-center">
+              <div className="flex min-w-0 shrink-0 items-center ">
                 <LanguageSelector
                   variant={showHeroGlass ? 'onDark' : 'default'}
                 />
@@ -346,14 +364,14 @@ export function Header() {
                   <>
                     <Link
                       href="/login"
-                      className={cn(secondaryCtaClass, 'hidden lg:inline-flex')}
+                      className={cn(secondaryCtaClass, 'hidden lg:inline-flex cursor-pointer')}
                     >
                       <LogIn className="size-6 shrink-0" aria-hidden />
                       {t('loginCta')}
                     </Link>
                     <Link
                       href="/register"
-                      className={cn(primaryCtaClass, 'hidden lg:inline-flex')}
+                      className={cn(primaryCtaClass, 'hidden lg:inline-flex cursor-pointer')}
                     >
                       <span>{t('headerCta')}</span>
                       <ArrowRight className="size-5 shrink-0" aria-hidden />
@@ -368,7 +386,10 @@ export function Header() {
                       />
                     }
                   >
-                    <HeaderUserMenu user={profileUser} />
+                    <HeaderUserMenu
+                      user={profileUser}
+                      variant={showHeroGlass ? 'onDark' : 'default'}
+                    />
                   </Suspense>
                 ) : null}
               </div>

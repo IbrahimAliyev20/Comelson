@@ -67,19 +67,19 @@ export default async function MembersHomeSection( { members }: { members: Member
           </div>
 
           {/* Desktop: keep grid */}
-          <div className="hidden grid-cols-1 gap-5 sm:grid-cols-2 lg:grid lg:grid-cols-4">
+          <div className="hidden grid-cols-1 gap-5 sm:grid-cols-2 lg:grid lg:grid-cols-5">
             {list.map((member) => (
               <Link
                 key={member.slug}
                 href={`/${locale}/members/${member.slug}`}
-                className="group flex h-[188px] items-center justify-center overflow-hidden rounded-[10px] border border-[#e8eaed] bg-white p-6 transition-shadow hover:shadow-[0_14px_40px_rgba(15,71,125,0.10)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0f477d]/40"
+                className="group flex h-[160px] items-center justify-center overflow-hidden rounded-[10px] border border-[#e8eaed] bg-white p-6 transition-shadow hover:shadow-[0_14px_40px_rgba(15,71,125,0.10)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0f477d]/40"
               >
                 <Image
                   src={member.image}
                   alt={member.company}
                   width={360}
                   height={240}
-                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+                  className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-[1.02]"
                   sizes="(max-width: 1024px) 100vw, 360px"
                 />
               </Link>

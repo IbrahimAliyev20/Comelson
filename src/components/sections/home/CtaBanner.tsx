@@ -10,7 +10,7 @@ export default async function CtaBanner() {
     <section className="bg-white py-8 md:py-[60px]">
         <div className="relative overflow-hidden  ">
           <Image
-            src="/images/ctabg.png"
+            src="/images/ctabg.jpg"
             alt=""
             fill
             className="object-cover"

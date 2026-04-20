@@ -10,9 +10,9 @@ const getEventCategories = async (locale: string) => {
 }
 
 
-const getEvents = async (locale: string, category_id: number) => {
+const getEvents = async (locale: string) => {
   const response = await get<ApiResponse<EventResponse[]>>('/events', {
-    params: { locale, category_id }
+    params: { locale }
   })
     return response
   }

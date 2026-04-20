@@ -8,6 +8,13 @@ import { z } from 'zod'
 import { toast } from 'sonner'
 
 import Container from '@/components/shared/container'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { postContactFormMutation } from '@/services/contact/mutations'
 import { ContactResponse } from '@/types/types'
 
@@ -64,6 +71,13 @@ export default function ContactSection({ contact }: { contact: ContactResponse |
 
   const isSubmitting = mutation.isPending
   const canSubmit = name.trim().length > 0 && email.trim().length > 0 && topic !== '' && message.trim().length > 0
+  const selectItemCheckedClass =
+    'data-[state=checked]:bg-[#e6eff6] data-[state=checked]:text-[#0f477d] data-[state=checked]:[&_svg]:!text-[#0f477d]'
+  const fieldLabelClass = 'px-1 text-sm leading-6 text-[#1d212a]'
+  const fieldClass =
+    'h-12 w-full rounded-[8px] border border-[#ebeff4] bg-[#f4fafd] px-4 text-sm leading-5 text-[#32393f] outline-none placeholder:text-[#6b7277] focus:border-[#d7e6ef] focus:bg-[#f4fafd]'
+  const fieldTextareaClass =
+    'h-[80px] w-full resize-none rounded-[8px] border border-[#ebeff4] bg-[#f4fafd] px-4 py-[14px] text-sm leading-5 text-[#32393f] outline-none placeholder:text-[#6b7277] focus:border-[#d7e6ef] focus:bg-[#f4fafd]'
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -155,20 +169,20 @@ export default function ContactSection({ contact }: { contact: ContactResponse |
 
                 <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
                   <div className="flex flex-col gap-2">
-                    <label className="px-1 text-sm leading-6 text-[#1d212a]">
+                    <label className={fieldLabelClass}>
                       {t('contact.nameLabel')}
                     </label>
                     <input
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       disabled={isSubmitting}
-                      className="h-12 w-full rounded-lg border border-[#b5b8bb] px-4 text-sm text-[#14171a] outline-none placeholder:text-[#889097] focus:border-[#0f477d]"
+                      className={fieldClass}
                       placeholder={t('contact.namePlaceholder')}
                     />
                   </div>
 
                   <div className="flex flex-col gap-2">
-                    <label className="px-1 text-sm leading-6 text-[#1d212a]">
+                    <label className={fieldLabelClass}>
                       {t('contact.emailLabel')}
                     </label>
                     <input
@@ -176,45 +190,49 @@ export default function ContactSection({ contact }: { contact: ContactResponse |
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       disabled={isSubmitting}
-                      className="h-12 w-full rounded-lg border border-[#b5b8bb] px-4 text-sm text-[#14171a] outline-none placeholder:text-[#889097] focus:border-[#0f477d]"
+                      className={fieldClass}
                       placeholder={t('contact.emailPlaceholder')}
                     />
                   </div>
 
                   <div className="flex flex-col gap-2">
-                    <label className="px-1 text-sm leading-6 text-[#1d212a]">
+                    <label className={fieldLabelClass}>
                       {t('contact.topicLabel')}
                     </label>
-                    <div className="relative">
-                      <select
-                        value={topic}
-                        onChange={(e) => setTopic(e.target.value as TopicKey | '')}
-                        disabled={isSubmitting}
-                        className="h-12 w-full appearance-none rounded-lg border border-[#b5b8bb] bg-white px-4 pr-10 text-sm text-[#14171a] outline-none focus:border-[#0f477d]"
-                      >
-                        <option value="" disabled>
-                          {t('contact.topicPlaceholder')}
-                        </option>
-                        <option value="membership">{t('contact.topics.membership')}</option>
-                        <option value="tender">{t('contact.topics.tender')}</option>
-                        <option value="partnership">{t('contact.topics.partnership')}</option>
-                        <option value="support">{t('contact.topics.support')}</option>
-                      </select>
-                      <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#14171a]/70">
-                        ▾
-                      </span>
-                    </div>
+                    <Select
+                      value={topic}
+                      onValueChange={(v) => setTopic(v as TopicKey | '')}
+                      disabled={isSubmitting}
+                    >
+                      <SelectTrigger className="h-12 w-full rounded-[8px] border-[#ebeff4] bg-[#f4fafd] px-4 text-sm leading-5 text-[#32393f] focus:border-[#d7e6ef] focus:bg-[#f4fafd] focus:ring-0 focus:ring-offset-0 focus-visible:ring-0">
+                        <SelectValue placeholder={t('contact.topicPlaceholder')} />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-xl border-[#ebeff4] bg-white">
+                        <SelectItem value="membership" className={selectItemCheckedClass}>
+                          {t('contact.topics.membership')}
+                        </SelectItem>
+                        <SelectItem value="tender" className={selectItemCheckedClass}>
+                          {t('contact.topics.tender')}
+                        </SelectItem>
+                        <SelectItem value="partnership" className={selectItemCheckedClass}>
+                          {t('contact.topics.partnership')}
+                        </SelectItem>
+                        <SelectItem value="support" className={selectItemCheckedClass}>
+                          {t('contact.topics.support')}
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   <div className="flex flex-col gap-2">
-                    <label className="px-1 text-sm leading-6 text-[#1d212a]">
+                    <label className={fieldLabelClass}>
                       {t('contact.messageLabel')}
                     </label>
                     <textarea
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
                       disabled={isSubmitting}
-                      className="min-h-[120px] w-full resize-none rounded-lg border border-[#b5b8bb] px-4 py-3 text-sm text-[#14171a] outline-none placeholder:text-[#889097] focus:border-[#0f477d]"
+                      className={fieldTextareaClass}
                       placeholder={t('contact.messagePlaceholder')}
                     />
                   </div>
@@ -252,4 +270,3 @@ export default function ContactSection({ contact }: { contact: ContactResponse |
     </section>
   )
 }
-

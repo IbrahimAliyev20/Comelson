@@ -11,13 +11,13 @@ export default async function EventsPage() {
   await Promise.all([
 
     queryClient.prefetchQuery(getEventCategoriesQuery(locale)),
-    queryClient.prefetchQuery(getEventsQuery(locale, 1)),
+    queryClient.prefetchQuery(getEventsQuery(locale)),
     queryClient.prefetchQuery(getBreadcrumbsQuery(locale))
   
   ]);
 
   const eventCategoriesData = queryClient.getQueryData(getEventCategoriesQuery(locale).queryKey);
-  const eventsData = queryClient.getQueryData(getEventsQuery(locale, 1).queryKey);
+  const eventsData = queryClient.getQueryData(getEventsQuery(locale).queryKey);
   const heroData = queryClient.getQueryData(getBreadcrumbsQuery(locale).queryKey);
   const hero = heroData?.data?.find((x) => x.name?.toLowerCase?.() === 'events');
   const title = hero?.title || 'Tədbirlər və Forumlar';

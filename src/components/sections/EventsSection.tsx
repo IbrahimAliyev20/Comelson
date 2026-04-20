@@ -2,15 +2,14 @@
 
 import Image from 'next/image'
 import { Calendar, ChevronDown } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useLocale } from 'next-intl'
 import { useQuery } from '@tanstack/react-query'
 
 import Container from '@/components/shared/container'
 import { Link } from '@/i18n/navigation'
-import { cn } from '@/lib/utils'
 import { getEventsQuery } from '@/services/events/queries'
-import { EventCategoriesResponse, EventResponse } from '@/types/types'
+import { EventResponse } from '@/types/types'
 
 function formatEventDate(value: string, locale: string) {
   const date = new Date(value)
@@ -19,47 +18,17 @@ function formatEventDate(value: string, locale: string) {
 }
 
 export default function EventsSection({
-  eventCategories,
   events
 }: {
-  eventCategories: EventCategoriesResponse[] | undefined
   events: EventResponse[] | undefined
 }) {
   const locale = useLocale()
-  const categories = useMemo(() => eventCategories ?? [], [eventCategories])
   const initialEvents = useMemo(() => events ?? [], [events])
-
-  const tabs = useMemo(() => {
-    return categories.map((category, index) => {
-      return {
-        key: category.slug || `${category.name}-${index}`,
-        label: category.name,
-        categoryId: category.id ?? index + 1
-      }
-    })
-  }, [categories])
-
-  const initialTabKey = tabs[0]?.key ?? 'default-tab'
-  const [activeTabKey, setActiveTabKey] = useState<string>(() => initialTabKey)
   const [visible, setVisible] = useState(9)
 
-  const activeTab = useMemo(() => {
-    return tabs.find((tab) => tab.key === activeTabKey) ?? tabs[0]
-  }, [activeTabKey, tabs])
-
-  const categoryId = activeTab?.categoryId ?? 1
-  
-  useEffect(() => {
-    if (!tabs.some((tab) => tab.key === activeTabKey)) {
-      setActiveTabKey(initialTabKey)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tabs.length, initialTabKey, activeTabKey])
-
   const eventsQuery = useQuery({
-    ...getEventsQuery(locale, categoryId),
-    initialData: activeTabKey === initialTabKey ? { status: true, message: '', data: initialEvents } : undefined,
-    enabled: Number.isFinite(categoryId)
+    ...getEventsQuery(locale),
+    initialData: { status: true, message: '', data: initialEvents },
   })
 
   const list = eventsQuery.data?.data ?? []
@@ -73,32 +42,6 @@ export default function EventsSection({
     <section className="bg-[#f8fafc] py-8 md:py-[70px]">
       <Container>
         <div className="flex flex-col items-center gap-10">
-          <div className="w-full border-b border-[#dadee2]">
-            <div className="flex items-center">
-              {tabs.map((x) => {
-                const isActive = activeTabKey === x.key
-                return (
-                  <button
-                    key={x.key}
-                    type="button"
-                    onClick={() => {
-                      setActiveTabKey(x.key)
-                      setVisible(9)
-                    }}
-                    className={cn(
-                      'inline-flex items-center justify-center border-b-2 px-5 pb-3 pt-2 text-base font-medium leading-6 transition-colors',
-                      isActive
-                        ? 'border-[#0f477d] text-[#0f477d]'
-                        : 'border-transparent text-[#6b6e71]'
-                    )}
-                  >
-                    {x.label}
-                  </button>
-                )
-              })}
-            </div>
-          </div>
-
           <div className="grid w-full grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {isLoading ? (
               <div className="col-span-full py-10 text-center text-sm text-[#6b6e71]">Loading...</div>

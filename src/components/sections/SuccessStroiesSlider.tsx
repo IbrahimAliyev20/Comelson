@@ -1,9 +1,8 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 import Container from '../shared/container'
 import { SuccessStoriesResponse } from '@/types/types'
@@ -51,11 +50,18 @@ export default function SuccessStroiesSlider({
 }) {
   const t = useTranslations('home')
   const stories = successStories ?? []
+  const hasStories = stories.length > 0
   const [active, setActive] = useState(0)
+  const [isPaused, setIsPaused] = useState(false)
+  const intervalRef = useRef<number | null>(null)
 
-  const slide = stories[active]
-  const canPrev = active > 0
-  const canNext = active < stories.length - 1
+  const slide = hasStories ? stories[active] ?? stories[0] : undefined
+
+  function goTo(index: number) {
+    if (stories.length === 0) return
+    const nextIndex = ((index % stories.length) + stories.length) % stories.length
+    setActive(nextIndex)
+  }
 
   const title = useMemo(() => {
     return {
@@ -65,14 +71,43 @@ export default function SuccessStroiesSlider({
     } as const
   }, [])
 
-  if (stories.length === 0) return null
+  useEffect(() => {
+    if (stories.length <= 1) return
+    if (isPaused) return
+    if (typeof window === 'undefined') return
+
+    const prefersReducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches
+    if (prefersReducedMotion) return
+
+    const clear = () => {
+      if (intervalRef.current) window.clearInterval(intervalRef.current)
+      intervalRef.current = null
+    }
+
+    const tick = () => {
+      if (document.visibilityState === 'hidden') return
+      setActive((v) => (v + 1) % stories.length)
+    }
+
+    clear()
+    intervalRef.current = window.setInterval(tick, 4000)
+    return clear
+  }, [isPaused, stories.length])
+
+  if (!hasStories || !slide) return null
 
   const normalizedLink = normalizeExternalUrl(slide.link)
   const embedSrc = getEmbedSrc(slide.link) ?? normalizedLink
 
   return (
     <Container>
-      <div className="flex flex-col gap-10 sm:gap-12">
+      <div
+        className="flex flex-col gap-10 sm:gap-12"
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
+        onFocusCapture={() => setIsPaused(true)}
+        onBlurCapture={() => setIsPaused(false)}
+      >
         <div className="flex items-center justify-between">
           <h1 className="text-balance text-3xl font-semibold leading-tight text-[#14171a] sm:text-[40px] sm:leading-[56px]">
             <span>{title.black}</span>
@@ -134,25 +169,15 @@ export default function SuccessStroiesSlider({
           </div>
 
           <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setActive((v) => Math.max(0, v - 1))}
-              disabled={!canPrev}
-              aria-label="Previous"
-              className={cn(
-                'inline-flex size-12 cursor-pointer items-center justify-center rounded-full border border-[#eaf1fa] bg-[#e6eff6] transition-opacity',
-                canPrev ? 'hover:opacity-80' : 'opacity-40'
-              )}
+            <div
+              className="flex items-center gap-2"
+              aria-label={t('successStoriesSliderLabel')}
             >
-              <ChevronLeft className="size-7 text-[#0f477d]" aria-hidden />
-            </button>
-
-            <div className="flex items-center gap-2" aria-label={t('successStoriesSliderLabel')}>
               {stories.map((_, index) => (
                 <button
                   key={index}
                   type="button"
-                  onClick={() => setActive(index)}
+                  onClick={() => goTo(index)}
                   className={cn(
                     'h-[4px] rounded-full transition-all',
                     index === active ? 'w-10 bg-[#0f477d]' : 'w-6 bg-[#c7d8e8]'
@@ -161,19 +186,6 @@ export default function SuccessStroiesSlider({
                 />
               ))}
             </div>
-
-            <button
-              type="button"
-              onClick={() => setActive((v) => Math.min(stories.length - 1, v + 1))}
-              disabled={!canNext}
-              aria-label="Next"
-              className={cn(
-                'inline-flex size-12 cursor-pointer items-center justify-center rounded-full border border-[#eaf1fa] bg-[#e6eff6] transition-opacity',
-                canNext ? 'hover:opacity-80' : 'opacity-40'
-              )}
-            >
-              <ChevronRight className="size-7 text-[#0f477d]" aria-hidden />
-            </button>
           </div>
         </div>
       </div>

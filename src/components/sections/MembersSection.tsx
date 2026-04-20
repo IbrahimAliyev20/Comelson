@@ -57,6 +57,8 @@ export default function MembersSection({
 
   const shown = filtered.slice(0, visible)
   const canLoadMore = visible < filtered.length
+  const filterControlClass =
+    '!h-12 rounded-xl border-[#dadee2] bg-white text-[#32393f] focus-visible:ring-0'
 
   return (
     <section className="bg-[#f8fafc] py-8 md:py-[70px]">
@@ -75,7 +77,10 @@ export default function MembersSection({
                   setVisible(9)
                 }}
                 placeholder="Axtarın.."
-                className="h-12 rounded-xl border-[#dadee2] bg-white pl-10 pr-3 text-sm text-[#32393f] placeholder:text-[#889097] focus-visible:ring-0"
+                className={cn(
+                  filterControlClass,
+                  'pl-10 pr-3 text-sm placeholder:text-[#889097]'
+                )}
               />
             </div>
 
@@ -87,13 +92,27 @@ export default function MembersSection({
                   setVisible(9)
                 }}
               >
-                <SelectTrigger className="h-12 w-full rounded-xl border-[#dadee2] bg-white px-3.5 text-base leading-6 text-[#32393f] sm:w-[180px]">
+                <SelectTrigger
+                  className={cn(
+                    filterControlClass,
+                    'w-full px-3.5 text-base leading-6 sm:w-[180px]'
+                  )}
+                >
                   <SelectValue placeholder="Ölkələr" />
                 </SelectTrigger>
                 <SelectContent className="rounded-xl">
-                  <SelectItem value="all">Ölkələr</SelectItem>
+                  <SelectItem
+                    value="all"
+                    className="data-[state=checked]:bg-[#e6eff6] data-[state=checked]:text-[#0f477d] data-[state=checked]:[&_svg]:!text-[#0f477d]"
+                  >
+                    Ölkələr
+                  </SelectItem>
                   {countryOptions.map((item) => (
-                    <SelectItem key={item.name} value={item.name}>
+                    <SelectItem
+                      key={item.name}
+                      value={item.name}
+                      className="data-[state=checked]:bg-[#e6eff6] data-[state=checked]:text-[#0f477d] data-[state=checked]:[&_svg]:!text-[#0f477d]"
+                    >
                       {item.name}
                     </SelectItem>
                   ))}
@@ -107,13 +126,27 @@ export default function MembersSection({
                   setVisible(9)
                 }}
               >
-                <SelectTrigger className="h-12 w-full rounded-xl border-[#dadee2] bg-white px-3.5 text-base leading-6 text-[#32393f] sm:w-[180px]">
+                <SelectTrigger
+                  className={cn(
+                    filterControlClass,
+                    'w-full px-3.5 text-base leading-6 sm:w-[180px]'
+                  )}
+                >
                   <SelectValue placeholder="Fəaliyyət sahəsi" />
                 </SelectTrigger>
                 <SelectContent className="rounded-xl">
-                  <SelectItem value="all">Fəaliyyət sahəsi</SelectItem>
+                  <SelectItem
+                    value="all"
+                    className="data-[state=checked]:bg-[#e6eff6] data-[state=checked]:text-[#0f477d] data-[state=checked]:[&_svg]:!text-[#0f477d]"
+                  >
+                    Fəaliyyət sahəsi
+                  </SelectItem>
                   {industryOptions.map((item) => (
-                    <SelectItem key={item.name} value={item.name}>
+                    <SelectItem
+                      key={item.name}
+                      value={item.name}
+                      className="data-[state=checked]:bg-[#e6eff6] data-[state=checked]:text-[#0f477d] data-[state=checked]:[&_svg]:!text-[#0f477d]"
+                    >
                       {item.name}
                     </SelectItem>
                   ))}

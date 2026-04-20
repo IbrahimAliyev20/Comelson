@@ -35,6 +35,9 @@ export default function TendersSection() {
   const [status, setStatus] = useState<StatusFilter>('active')
   const [category, setCategory] = useState<string | null>(null)
 
+  const filterControlClass =
+    '!h-12 rounded-xl border-[#dadee2] bg-white text-[#32393f] focus-visible:ring-0'
+
   const categories = useMemo(() => {
     const set = new Set(tendersHomeRows.map((x) => x.category))
     return Array.from(set)
@@ -66,7 +69,10 @@ export default function TendersSection() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Axtarın.."
-                className="h-12 rounded-xl border-[#dadee2] bg-white pl-10 pr-3 text-sm text-[#32393f] placeholder:text-[#889097] focus-visible:ring-0"
+                className={cn(
+                  filterControlClass,
+                  'pl-10 pr-3 text-sm placeholder:text-[#889097]'
+                )}
               />
             </div>
 
@@ -75,13 +81,33 @@ export default function TendersSection() {
                 value={status}
                 onValueChange={(v) => setStatus(v as StatusFilter)}
               >
-                <SelectTrigger className="h-12 w-full rounded-xl border-[#dadee2] bg-white px-3.5 text-base leading-6 text-[#32393f] sm:w-[180px]">
+                <SelectTrigger
+                  className={cn(
+                    filterControlClass,
+                    'w-full px-3.5 text-base leading-6 sm:w-[180px]'
+                  )}
+                >
                   <SelectValue placeholder="Aktiv elanlar" />
                 </SelectTrigger>
                 <SelectContent className="rounded-xl">
-                  <SelectItem value="active">Aktiv elanlar</SelectItem>
-                  <SelectItem value="closed">Bitmiş elanlar</SelectItem>
-                  <SelectItem value="all">Hamısı</SelectItem>
+                  <SelectItem
+                    value="active"
+                    className="data-[state=checked]:bg-[#e6eff6] data-[state=checked]:text-[#0f477d] data-[state=checked]:[&_svg]:!text-[#0f477d]"
+                  >
+                    Aktiv elanlar
+                  </SelectItem>
+                  <SelectItem
+                    value="closed"
+                    className="data-[state=checked]:bg-[#e6eff6] data-[state=checked]:text-[#0f477d] data-[state=checked]:[&_svg]:!text-[#0f477d]"
+                  >
+                    Deaktiv elanlar
+                  </SelectItem>
+                  <SelectItem
+                    value="all"
+                    className="data-[state=checked]:bg-[#e6eff6] data-[state=checked]:text-[#0f477d] data-[state=checked]:[&_svg]:!text-[#0f477d]"
+                  >
+                    Hamısı
+                  </SelectItem>
                 </SelectContent>
               </Select>
 
@@ -89,13 +115,27 @@ export default function TendersSection() {
                 value={category ?? 'all'}
                 onValueChange={(v) => setCategory(v === 'all' ? null : v)}
               >
-                <SelectTrigger className="h-12 w-full rounded-xl border-[#dadee2] bg-white px-3.5 text-base leading-6 text-[#32393f] sm:w-[180px]">
+                <SelectTrigger
+                  className={cn(
+                    filterControlClass,
+                    'w-full px-3.5 text-base leading-6 sm:w-[180px]'
+                  )}
+                >
                   <SelectValue placeholder="Kateqoriya" />
                 </SelectTrigger>
                 <SelectContent className="rounded-xl">
-                  <SelectItem value="all">Kateqoriya</SelectItem>
+                  <SelectItem
+                    value="all"
+                    className="data-[state=checked]:bg-[#e6eff6] data-[state=checked]:text-[#0f477d] data-[state=checked]:[&_svg]:!text-[#0f477d]"
+                  >
+                    Kateqoriya
+                  </SelectItem>
                   {categories.map((x) => (
-                    <SelectItem key={x} value={x}>
+                    <SelectItem
+                      key={x}
+                      value={x}
+                      className="data-[state=checked]:bg-[#e6eff6] data-[state=checked]:text-[#0f477d] data-[state=checked]:[&_svg]:!text-[#0f477d]"
+                    >
                       {x}
                     </SelectItem>
                   ))}
@@ -104,7 +144,10 @@ export default function TendersSection() {
 
               <button
                 type="button"
-                className="inline-flex h-12 w-full items-center justify-between rounded-xl border border-[#dadee2] bg-white px-3.5 text-base leading-6 text-[#32393f] sm:w-[180px]"
+                className={cn(
+                  filterControlClass,
+                  'inline-flex w-full items-center justify-between px-3.5 text-base leading-6 sm:w-[180px]'
+                )}
                 aria-label="Tarix"
               >
                 <span>Tarix</span>

@@ -10,6 +10,7 @@ export interface SettingsResponse {
       siteLogo: string;
       siteFooterLogo: string;
       favicon: string;
+      siteDarkLogo: string;
 }
 
 export interface BreadcrumbResponse {
