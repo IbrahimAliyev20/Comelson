@@ -1,6 +1,6 @@
 
 import { get } from '@/lib/api'
-import { EventCategoriesResponse, ApiResponse, EventResponse } from '@/types/types'
+import type { ApiResponse, EventCategoriesResponse, EventResponse } from '@/types/types'
 
 const getEventCategories = async (locale: string) => {
   const response = await get<ApiResponse<EventCategoriesResponse[]>>('/event-categories', {
@@ -10,12 +10,12 @@ const getEventCategories = async (locale: string) => {
 }
 
 
-const getEvents = async (locale: string) => {
+const getEvents = async (locale: string, categoryId?: number | null) => {
   const response = await get<ApiResponse<EventResponse[]>>('/events', {
-    params: { locale }
+    params: { locale, category_id: categoryId ?? undefined },
   })
-    return response
-  }
+  return response
+}
 
 const getEvent = async (locale: string, slug: string) => {
   const response = await get<ApiResponse<EventResponse>>(`/event/${slug}`, {
@@ -24,4 +24,4 @@ const getEvent = async (locale: string, slug: string) => {
   return response
 }
 
-  export { getEventCategories, getEvents, getEvent }
+export { getEventCategories, getEvents, getEvent }

@@ -31,7 +31,7 @@ export default async function EventsPage() {
         title={title}
         description={description}
       />
-      <EventsSection eventCategories={eventCategoriesData?.data} events={eventsData?.data} />
+      <EventsSection events={eventsData?.data} />
     </div>
   )
 }

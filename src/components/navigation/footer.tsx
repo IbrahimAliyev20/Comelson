@@ -5,6 +5,7 @@ import { Search, X, ChevronDown } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { useLocale, useTranslations } from 'next-intl'
 import { useEffect, useMemo, useState } from 'react'
+import Cookies from 'js-cookie'
 
 import { Link } from '@/i18n/navigation'
 import { getContactQuery, getSocialMediaQuery } from '@/services/contact/queries'
@@ -37,6 +38,8 @@ function getFooterNavItems(): FooterNavItem[] {
 }
 
 const FOOTER_NAV_ITEMS = getFooterNavItems()
+
+const COUNTRY_ID_COOKIE = 'country_id'
 
 function matchesAzerbaijan(country: CountryResponse) {
   const value = country.name.trim().toLowerCase()
@@ -156,6 +159,14 @@ export function Footer() {
   const { data: contactResponse } = useQuery(getContactQuery(locale))
   const contact = contactResponse?.data
   const { data: countries = [] } = useQuery(getCountriesQuery(locale))
+
+  useEffect(() => {
+    if (selectedCountryId !== null) return
+    const raw = Cookies.get(COUNTRY_ID_COOKIE)
+    const parsed = raw ? Number(raw) : NaN
+    if (!Number.isFinite(parsed) || parsed <= 0) return
+    setSelectedCountryId(parsed)
+  }, [selectedCountryId])
 
   useEffect(() => {
     if (!countries.length || selectedCountryId !== null) return
@@ -297,6 +308,10 @@ export function Footer() {
           onClose={() => setIsCountryModalOpen(false)}
           onSelect={(country) => {
             setSelectedCountryId(country.id)
+            Cookies.set(COUNTRY_ID_COOKIE, String(country.id), {
+              expires: 365,
+              sameSite: 'lax',
+            })
             setIsCountryModalOpen(false)
           }}
         />
