@@ -2,12 +2,14 @@
 
 import Image from 'next/image'
 import { Search, X, ChevronDown } from 'lucide-react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useLocale, useTranslations } from 'next-intl'
-import { useEffect, useMemo, useState } from 'react'
+import { startTransition, useEffect, useMemo, useState } from 'react'
 import Cookies from 'js-cookie'
+import { useSearchParams } from 'next/navigation'
 
-import { Link } from '@/i18n/navigation'
+import { Link, usePathname, useRouter } from '@/i18n/navigation'
+import { getLocaleForCountry } from '@/lib/utils'
 import { getContactQuery, getSocialMediaQuery } from '@/services/contact/queries'
 import { getCountriesQuery } from '@/services/members/queries'
 import { getSettingsQuery } from '@/services/settings/queries'
@@ -15,6 +17,7 @@ import type { CountryResponse } from '@/types/types'
 import { heroNavigationItems } from '@/utils/static'
 
 import Container from '../shared/container'
+import { Squonk, SquonkContent } from '../ui/squonk'
 
 type FooterNavItem = { href: string; labelKey: string }
 
@@ -146,11 +149,79 @@ function CountryModal({
   )
 }
 
+function CountryFlagCard({
+  country,
+  className = '',
+}: {
+  country: CountryResponse
+  className?: string
+}) {
+  return (
+    <div
+      className={`flex size-full items-center justify-center rounded-[26px] bg-white shadow-[0_14px_34px_rgba(20,23,26,0.14)] ${className}`}
+    >
+      <div className="flex h-full w-full items-center justify-center rounded-[26px] bg-[linear-gradient(180deg,#f9fbfd_0%,#eef4f8_100%)] p-3">
+        <Image
+          src={country.flag}
+          alt={country.name}
+          width={80}
+          height={56}
+          className="h-auto w-full rounded-[18px] object-cover"
+        />
+      </div>
+    </div>
+  )
+}
+
+function CountrySwitchLoadingModal({
+  currentCountry,
+  nextCountry,
+}: {
+  currentCountry: CountryResponse
+  nextCountry: CountryResponse
+}) {
+  return (
+    <div className="fixed inset-0 z-[80] flex items-center justify-center bg-[#14171a]/35 px-4 py-8 backdrop-blur-[6px]">
+      <div className="flex w-full max-w-[320px] flex-col items-center rounded-[28px] bg-white px-6 py-7 text-center shadow-[0_24px_80px_rgba(20,23,26,0.22)]">
+        <Squonk
+          size={92}
+          radius={28}
+          cycleDuration={1800}
+          easing="smooth"
+          className="mb-4 h-[180px] w-full"
+        >
+          <SquonkContent index={0}>
+            <CountryFlagCard country={currentCountry} />
+          </SquonkContent>
+          <SquonkContent index={1}>
+            <CountryFlagCard country={nextCountry} className="ring-1 ring-[#dce6ef]" />
+          </SquonkContent>
+        </Squonk>
+
+        <p className="text-[20px] font-medium leading-7 text-[#1d212a]">Ölkə dəyişdirilir...</p>
+        <p className="mt-2 text-sm leading-6 text-[#6b7280]">
+          {currentCountry.name} ölkəsindən {nextCountry.name} ölkəsinə keçid hazırlanır.
+        </p>
+
+        <div className="mt-5 h-2.5 w-full overflow-hidden rounded-full bg-[#e8eef5]">
+          <div className="h-full w-full animate-[country-loading_1.2s_ease-in-out_infinite] rounded-full bg-[linear-gradient(90deg,#0f477d_0%,#3e8ff5_100%)]" />
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export function Footer() {
   const locale = useLocale()
   const t = useTranslations('navigation')
+  const queryClient = useQueryClient()
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
   const [isCountryModalOpen, setIsCountryModalOpen] = useState(false)
   const [selectedCountryId, setSelectedCountryId] = useState<number | null>(null)
+  const [currentSwitchCountry, setCurrentSwitchCountry] = useState<CountryResponse | null>(null)
+  const [switchingCountry, setSwitchingCountry] = useState<CountryResponse | null>(null)
 
   const { data: settingsResponse } = useQuery(getSettingsQuery(locale))
   const siteFooterLogoSrc = settingsResponse?.siteFooterLogo || '/images/Logo.svg'
@@ -178,8 +249,59 @@ export function Footer() {
     return countries.find((item) => item.id === selectedCountryId) ?? null
   }, [countries, selectedCountryId])
 
+  async function handleCountrySelect(country: CountryResponse) {
+    if (switchingCountry) return
+
+    if (selectedCountry?.id === country.id) {
+      setIsCountryModalOpen(false)
+      return
+    }
+
+    const currentCountry = selectedCountry ?? country
+
+    setIsCountryModalOpen(false)
+    setCurrentSwitchCountry(currentCountry)
+    setSwitchingCountry(country)
+
+    await new Promise((resolve) => window.setTimeout(resolve, 1250))
+
+    Cookies.set(COUNTRY_ID_COOKIE, String(country.id), {
+      expires: 365,
+      sameSite: 'lax',
+    })
+
+    try {
+      const nextLocale = getLocaleForCountry(country.name, country.flag)
+      const query = Object.fromEntries(searchParams.entries())
+
+      if (nextLocale !== locale) {
+        startTransition(() => {
+          router.replace({ pathname, query }, { locale: nextLocale })
+        })
+        return
+      }
+
+      await queryClient.invalidateQueries()
+      setSelectedCountryId(country.id)
+    } finally {
+      setCurrentSwitchCountry(null)
+      setSwitchingCountry(null)
+    }
+  }
+
   return (
     <>
+      <style jsx global>{`
+        @keyframes country-loading {
+          0% {
+            transform: translateX(-100%);
+          }
+          100% {
+            transform: translateX(0%);
+          }
+        }
+      `}</style>
+
       <footer className="bg-white pt-8 sm:pt-10">
         <Container>
           <div className="flex flex-col gap-10 md:flex-row md:items-start md:justify-between">
@@ -306,14 +428,14 @@ export function Footer() {
           countries={countries}
           activeCountry={selectedCountry}
           onClose={() => setIsCountryModalOpen(false)}
-          onSelect={(country) => {
-            setSelectedCountryId(country.id)
-            Cookies.set(COUNTRY_ID_COOKIE, String(country.id), {
-              expires: 365,
-              sameSite: 'lax',
-            })
-            setIsCountryModalOpen(false)
-          }}
+          onSelect={handleCountrySelect}
+        />
+      ) : null}
+
+      {switchingCountry && currentSwitchCountry ? (
+        <CountrySwitchLoadingModal
+          currentCountry={currentSwitchCountry}
+          nextCountry={switchingCountry}
         />
       ) : null}
     </>

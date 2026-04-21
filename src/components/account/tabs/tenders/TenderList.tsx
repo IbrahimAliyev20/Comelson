@@ -11,15 +11,23 @@ import {
   Search,
   Trash2,
 } from 'lucide-react'
+import { useLocale } from 'next-intl'
+import type { ComponentType } from 'react'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import Cookies from 'js-cookie'
+import { toast } from 'sonner'
 
 import { cn } from '@/lib/utils'
-import { tendersHomeRows } from '@/utils/tenders-data'
+import { deleteTenderMutation, postTenderMutation, updateTenderMutation } from '@/services/tenders/mutations'
+import { getTendersQuery } from '@/services/tenders/queries'
+import type { CreateTenderPayload, TenderResponse } from '@/types/types'
 
 import CreateTender, { type CreateTenderForm } from './crud/createTender'
-import Link from 'next/link'
+import EditTender from './crud/editTender'
+import TenderDetail, { type TenderDetailProps } from './crud/TenderDetail'
 
-type TenderListView = 'list' | 'create'
+type TenderListView = 'list' | 'create' | 'edit' | 'detail'
 type TenderStatusFilter = 'all' | 'active'
 
 type TenderListItem = {
@@ -36,16 +44,113 @@ type TenderListItem = {
 const COMPANY_LOGO =
   'https://www.figma.com/api/mcp/asset/c7c6ff5b-0d48-4e4a-b723-979979f11602'
 
-const MOCK_TENDERS: TenderListItem[] = tendersHomeRows.map((item) => ({
-  id: item.id,
-  title: item.buyerName,
-  company: 'Comelson MMC',
-  companyLogo: COMPANY_LOGO,
-  category: item.category,
-  startDate: item.startAt.split(/\s+/)[0] ?? item.startAt,
-  endDate: item.endAt.split(/\s+/)[0] ?? item.endAt,
-  status: item.status,
-}))
+function normalizePlainToHtml(value: string): string {
+  const v = value.trim()
+  if (!v) return '<p>—</p>'
+  if (v.includes('<')) return v
+  return `<p>${v}</p>`
+}
+
+function getCookieNumber(name: string): number | null {
+  const raw = Cookies.get(name)
+  if (!raw) return null
+  const parsed = Number(raw)
+  if (!Number.isFinite(parsed) || parsed <= 0) return null
+  return parsed
+}
+
+function toPositiveNumber(value: string): number | null {
+  const n = Number(value)
+  if (!Number.isFinite(n) || n <= 0) return null
+  return n
+}
+
+/** Form: `YYYY-MM-DDTHH:mm` (datetime-local) → API: `YYYY-MM-DD HH:mm` */
+function inputValueToApiDateTime(value: string): string {
+  if (!value.trim()) return ''
+  return value.replace('T', ' ').slice(0, 16)
+}
+
+/** API: `YYYY-MM-DD HH:mm` → Form: `YYYY-MM-DDTHH:mm` */
+function apiDateTimeToInputValue(api: string): string {
+  if (!api.trim()) return ''
+  const m = api.match(/^(\d{4}-\d{2}-\d{2})[\sT](\d{2}:\d{2})/)
+  if (m) return `${m[1]}T${m[2]}`
+  return api.replace(' ', 'T').slice(0, 16)
+}
+
+function normalizePhone(raw: string): string {
+  const t = raw.trim()
+  if (!t) return ''
+  return t.startsWith('+') ? t : `+${t}`
+}
+
+function formToCreatePayload(form: CreateTenderForm): CreateTenderPayload {
+  const categoryId = toPositiveNumber(form.categoryId) ?? 1
+  const countryId =
+    toPositiveNumber(form.countryId) ?? getCookieNumber('country_id') ?? 1
+  const companyId = toPositiveNumber(form.company) ?? 1
+
+  return {
+    title: form.title,
+    category_id: categoryId,
+    country_id: countryId,
+    start_date: inputValueToApiDateTime(form.startAt),
+    end_date: inputValueToApiDateTime(form.endAt),
+    company_id: companyId,
+    description: normalizePlainToHtml(form.about),
+    required_documents: normalizePlainToHtml(form.requiredDocuments),
+    contact_name: form.fullName,
+    contact_position: form.position,
+    contact_email: form.email,
+    contact_phone: normalizePhone(form.phone),
+    contact_instagram: form.instagram,
+    contact_facebook: form.facebook,
+    contact_linkedin: form.linkedin,
+    contact_twitter: form.twitter,
+    notify_by_email: true,
+  }
+}
+
+function tenderToInitialValues(t: TenderResponse): Partial<CreateTenderForm> {
+  return {
+    title: t.title ?? '',
+    categoryId: String(t.category?.id ?? ''),
+    countryId: '',
+    startAt: apiDateTimeToInputValue(t.start_date ?? ''),
+    endAt: apiDateTimeToInputValue(t.end_date ?? ''),
+    company: String(t.company_id ?? ''),
+    about: t.description ?? '',
+    requiredDocuments: t.required_documents ?? '',
+    fullName: t.contact_name ?? '',
+    position: t.contact_position ?? '',
+    email: t.contact_email ?? '',
+    /** `react-phone-input-2` üçün yalnız rəqəmlər */
+    phone: (t.contact_phone ?? '').replace(/\D/g, ''),
+    instagram: t.contact_instagram ?? '',
+    facebook: t.contact_facebook ?? '',
+    linkedin: t.contact_linkedin ?? '',
+    twitter: t.contact_twitter ?? '',
+  }
+}
+
+function getLocalizedLabel(value: Record<string, string> | undefined, locale: string): string {
+  if (!value) return '—'
+  return value[locale] ?? value.az ?? Object.values(value)[0] ?? '—'
+}
+
+function tenderResponseToListItem(t: TenderResponse, locale: string): TenderListItem {
+  return {
+    id: t.id,
+    title: t.title,
+    company: '—',
+    companyLogo: COMPANY_LOGO,
+    category: getLocalizedLabel(t.category?.name, locale),
+    startDate: t.start_date.split(/\s+/)[0] ?? t.start_date,
+    endDate: t.end_date.split(/\s+/)[0] ?? t.end_date,
+    status: t.is_active ? 'active' : 'closed',
+  }
+}
 
 function AddTenderButton({
   onClick,
@@ -229,10 +334,12 @@ function ShareButton() {
 
 function TenderTable({
   tenders,
+  onOpen,
   onEdit,
   onDelete,
 }: {
   tenders: TenderListItem[]
+  onOpen: (tender: TenderListItem) => void
   onEdit: (tender: TenderListItem) => void
   onDelete: (tender: TenderListItem) => void
 }) {
@@ -322,7 +429,8 @@ function TenderTable({
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-lg border border-[#f2f9ff] bg-white ">
+      {/* NOTE: keep overflow visible so row menus can pop out */}
+      <div className="rounded-lg border border-[#f2f9ff] bg-white">
         <div className="hidden grid-cols-[56px_minmax(220px,1.7fr)_minmax(180px,1.1fr)_128px_128px_48px_116px] items-center gap-3 border-b border-[#eaf1fa] px-6 pb-7 text-sm font-medium leading-5 text-[#64717c] lg:grid">
           <span className="text-center">№</span>
           <span className="text-left">Tender başlığı</span>
@@ -372,12 +480,11 @@ function TenderTable({
                 <div className="flex justify-center">
                   <button
                     type="button"
+                    onClick={() => onOpen(tender)}
                     className="inline-flex items-center justify-center text-[#0f477d] transition-opacity hover:opacity-80"
                     aria-label="Tenderə bax"
                   >
-                    <Link href={`/tenders/${tender.id}`}>
-                      <ChevronRight className="size-6" aria-hidden />
-                    </Link>
+                    <ChevronRight className="size-6" aria-hidden />
                   </button>
                 </div>
 
@@ -403,6 +510,7 @@ function TenderTable({
                   </div>
                   <button
                     type="button"
+                    onClick={() => onOpen(tender)}
                     className="inline-flex items-center justify-center text-[#0f477d]"
                     aria-label="Tenderə bax"
                   >
@@ -453,28 +561,112 @@ function TenderTable({
 }
 
 export default function TenderList() {
+  const locale = useLocale()
+  const queryClient = useQueryClient()
+
   const [view, setView] = useState<TenderListView>('list')
-  /** Demo + istifadəçi əlavələri — ilkin olaraq statik MOCK_TENDERS görünür */
-  const [items, setItems] = useState<TenderListItem[]>(() => [...MOCK_TENDERS])
+  const [selectedTenderId, setSelectedTenderId] = useState<number | null>(null)
+
+  const { data, isLoading, isError, refetch } = useQuery(
+    getTendersQuery({ locale })
+  )
+
+  const tenders = useMemo(() => data?.data ?? [], [data])
+
+  const items = useMemo(() => {
+    return tenders.map((t) => tenderResponseToListItem(t, locale))
+  }, [locale, tenders])
+
+  const selectedTender = useMemo(() => {
+    if (selectedTenderId == null) return null
+    return tenders.find((t) => t.id === selectedTenderId) ?? null
+  }, [selectedTenderId, tenders])
+
+  const createTender = useMutation({
+    ...postTenderMutation(),
+    onSuccess: (res) => {
+      if (!res?.status) {
+        toast.error(res?.message || 'Xəta baş verdi')
+        return
+      }
+      toast.success('Tender yaradıldı')
+      void queryClient.invalidateQueries({ queryKey: ['tenders'] })
+      setView('list')
+    },
+    onError: () => toast.error('Tender yaradılmadı'),
+  })
+
+  const updateTender = useMutation({
+    ...updateTenderMutation(),
+    onSuccess: (res) => {
+      if (!res?.status) {
+        toast.error(res?.message || 'Xəta baş verdi')
+        return
+      }
+      toast.success('Tender yeniləndi')
+      void queryClient.invalidateQueries({ queryKey: ['tenders'] })
+      setView('list')
+      setSelectedTenderId(null)
+    },
+    onError: () => toast.error('Tender yenilənmədi'),
+  })
+
+  const deleteTender = useMutation({
+    ...deleteTenderMutation(),
+    onSuccess: (res) => {
+      if (!res?.status) {
+        toast.error(res?.message || 'Xəta baş verdi')
+        return
+      }
+      toast.success('Tender silindi')
+      void queryClient.invalidateQueries({ queryKey: ['tenders'] })
+    },
+    onError: () => toast.error('Tender silinmədi'),
+  })
 
   if (view === 'create') {
     return (
       <CreateTender
         onBack={() => setView('list')}
         onCancel={() => setView('list')}
-        onSubmit={(data: CreateTenderForm) => {
-          const nextTender: TenderListItem = {
-            id: Date.now(),
-            title: data.title || 'Yeni tender',
-            company: data.company || 'Comelson MMC',
-            companyLogo: COMPANY_LOGO,
-            category: data.category || 'Digər',
-            startDate: data.startAt || '01.10.2026',
-            endDate: data.endAt || '01.11.2026',
-            status: 'active',
-          }
+        onSubmit={(form: CreateTenderForm) => {
+          createTender.mutate({ locale, body: formToCreatePayload(form) })
+        }}
+      />
+    )
+  }
 
-          setItems((prev) => [nextTender, ...prev])
+  if (view === 'edit' && selectedTender) {
+    return (
+      <EditTender
+        initialValues={tenderToInitialValues(selectedTender)}
+        onBack={() => {
+          setSelectedTenderId(null)
+          setView('list')
+        }}
+        onCancel={() => {
+          setSelectedTenderId(null)
+          setView('list')
+        }}
+        onSubmit={(form: CreateTenderForm) => {
+          updateTender.mutate({
+            locale,
+            id: selectedTender.id,
+            body: formToCreatePayload(form),
+          })
+        }}
+      />
+    )
+  }
+
+  if (view === 'detail' && selectedTender) {
+    const TenderDetailView = TenderDetail as unknown as ComponentType<TenderDetailProps>
+    return (
+      <TenderDetailView
+        tender={selectedTender}
+        locale={locale}
+        onBack={() => {
+          setSelectedTenderId(null)
           setView('list')
         }}
       />
@@ -483,25 +675,51 @@ export default function TenderList() {
 
   return (
     <div className="flex h-full min-h-0 w-full flex-col rounded-xl border border-[#eaf1fa] bg-white">
-      <div className="border-b border-[#eaf1fa] px-8 py-6">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#eaf1fa] px-8 py-6">
         <h2 className="text-2xl font-medium leading-8 text-[#1d212a]">
           Tenderlərim
         </h2>
+        {items.length > 0 ? (
+          <AddTenderButton
+            onClick={() => setView('create')}
+            className="w-full sm:w-auto"
+          />
+        ) : null}
       </div>
 
       <div className="flex-1 px-0 py-8 sm:px-8">
-        {items.length === 0 ? (
+        {isLoading ? (
+          <div className="px-6 py-10 text-center text-sm text-[#6b6e71]">
+            Yüklənir…
+          </div>
+        ) : isError ? (
+          <div className="flex flex-col items-center gap-4 px-6 py-10 text-center">
+            <p className="text-sm text-[#6b6e71]">Yükləmə alınmadı</p>
+            <button
+              type="button"
+              onClick={() => void refetch()}
+              className="rounded-2xl bg-[#e6eff6] px-6 py-3 text-sm font-medium text-[#0f477d]"
+            >
+              Yenidən cəhd et
+            </button>
+          </div>
+        ) : items.length === 0 ? (
           <EmptyTenderState onAdd={() => setView('create')} />
         ) : (
           <TenderTable
             tenders={items}
+            onOpen={(tender) => {
+              setSelectedTenderId(tender.id)
+              setView('detail')
+            }}
             onEdit={(tender) => {
-              console.log('Edit tender', tender)
+              setSelectedTenderId(tender.id)
+              setView('edit')
             }}
             onDelete={(tender) => {
               const ok = window.confirm('Tenderi silmək istəyirsiniz?')
               if (!ok) return
-              setItems((prev) => prev.filter((x) => x.id !== tender.id))
+              deleteTender.mutate({ locale, id: tender.id })
             }}
           />
         )}

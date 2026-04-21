@@ -1,5 +1,5 @@
 'use client'
-import { MoreVertical, PencilIcon, Plus, Trash2 } from 'lucide-react'
+import { CheckCircle2, ChevronRight, Clock4, MoreVertical, PencilIcon, Trash2, XCircle } from 'lucide-react'
 import { useLocale } from 'next-intl'
 import type { ReactNode } from 'react'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -17,6 +17,53 @@ import CampainsDetail from './crud/CampainsDetail'
 import EditCampain from './crud/editCampain'
 
 export type { CompanyCard }
+
+type CompanyStatusVariant = {
+  label: string
+  className: string
+  Icon: React.ComponentType<{ className?: string; 'aria-hidden'?: boolean }>
+}
+
+function getCompanyStatusVariant(status?: number): CompanyStatusVariant {
+  // Assumption based on typical API conventions:
+  // 0: pending, 1: approved/active, 2: rejected/blocked (fallback: pending).
+  if (status === 1) {
+    return {
+      label: 'Təsdiqlənib',
+      className: 'bg-[#eaf8ef] text-[#34c759]',
+      Icon: CheckCircle2,
+    }
+  }
+
+  if (status === 2) {
+    return {
+      label: 'İmtina',
+      className: 'bg-[#ffebee] text-[#ff3b30]',
+      Icon: XCircle,
+    }
+  }
+
+  return {
+    label: 'Gözləmədə',
+    className: 'bg-[#fffae5] text-[#ff9500]',
+    Icon: Clock4,
+  }
+}
+
+function CompanyStatusPill({ status }: { status?: number }) {
+  const v = getCompanyStatusVariant(status)
+  return (
+    <div
+      className={cn(
+        'inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl px-6 py-2 text-sm font-medium leading-5',
+        v.className
+      )}
+    >
+      <v.Icon className="size-5 shrink-0" aria-hidden />
+      <span className="font-medium">{v.label}</span>
+    </div>
+  )
+}
 
 function EmptyCompanyState({ onAdd }: { onAdd: () => void }) {
   return (
@@ -57,7 +104,6 @@ export function AddCompanyButton({
         className
       )}
     >
-      <Plus className="size-6 shrink-0" aria-hidden />
       {children ?? 'Şirkət əlavə et'}
     </button>
   )
@@ -110,7 +156,7 @@ function CompanyCardItem({
   const [logoOk, setLogoOk] = useState(true)
 
   return (
-    <article className="relative flex w-full flex-col gap-6 rounded-xl border border-[#eaf1fa] bg-[#fafdff] px-5 py-6">
+    <article className="relative flex w-full flex-col gap-6 rounded-xl border border-[#eaf1fa] bg-[#fafdff] p-5">
       <div ref={menuRef} className="absolute right-4 top-4">
         <button
           type="button"
@@ -118,7 +164,7 @@ function CompanyCardItem({
           aria-haspopup="menu"
           aria-expanded={menuOpen}
           onClick={() => setMenuOpen((v) => !v)}
-          className="inline-flex size-9 items-center justify-center rounded-lg border border-[#eaf1fa] bg-white text-[#6b6e71] transition-colors hover:bg-[#f4fafd]"
+          className="inline-flex size-10 items-center justify-center rounded-lg bg-[#eaf1fa] text-[#6b6e71] transition-colors hover:bg-[#dfe9f7]"
         >
           <MoreVertical className="size-5" aria-hidden />
         </button>
@@ -126,7 +172,7 @@ function CompanyCardItem({
         {menuOpen ? (
           <div
             role="menu"
-            className="absolute right-0 top-full z-20 mt-2 w-44 overflow-hidden rounded-xl border border-[#eaf1fa] bg-white shadow-xl p-3  "
+            className="absolute right-0 top-full z-20 mt-2 w-44 overflow-hidden rounded-xl border border-[#eaf1fa] bg-white p-3 shadow-xl"
           >
             <button
               type="button"
@@ -198,13 +244,20 @@ function CompanyCardItem({
         </p>
       </div>
 
-      <button
-        type="button"
-        onClick={() => onOpen(company)}
-        className="inline-flex h-12 w-full items-center justify-center rounded-2xl bg-[#e6eff6] px-6 text-base font-medium leading-6 text-[#0f477d] transition-colors hover:bg-[#d7e6f2] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f477d]"
-      >
-        Ətraflı bax
-      </button>
+      <div className="flex items-center justify-between gap-4">
+        <div className="w-[249px] max-w-full">
+          <CompanyStatusPill status={company.status} />
+        </div>
+
+        <button
+          type="button"
+          onClick={() => onOpen(company)}
+          className="group inline-flex h-12 items-center justify-center gap-3 rounded-2xl px-2 text-base font-medium leading-6 text-[#0f477d] transition-opacity hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f477d]"
+        >
+          Ətraflı bax
+          <ChevronRight className="size-5 transition-transform group-hover:translate-x-0.5" aria-hidden />
+        </button>
+      </div>
     </article>
   )
 }
@@ -338,42 +391,44 @@ export default function CampainsList({
     )
   }
 
-  if (items.length === 0) {
-    return <EmptyCompanyState onAdd={() => onViewChange('create')} />
-  }
-
   return (
     <div className="flex flex-col gap-6 px-6 pt-8 sm:px-12">
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#eaf1fa] pb-6">
         <h2 className="text-2xl font-medium leading-8 text-[#1d212a]">
           Şirkətlərim
         </h2>
-        <AddCompanyButton onClick={() => onViewChange('create')} />
+        {items.length > 0 ? (
+          <AddCompanyButton onClick={() => onViewChange('create')} />
+        ) : null}
       </div>
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-        {items.map((company) => (
-          <CompanyCardItem
-            key={company.id}
-            company={company}
-            onOpen={(item) => {
-              setSelectedCompany(item)
-              onViewChange('detail')
-            }}
-            onEdit={(item) => {
-              setSelectedCompany(item)
-              onViewChange('edit')
-            }}
-            onDelete={(item) => {
-              const ok = window.confirm('Şirkəti silmək istəyirsiniz?')
-              if (!ok) return
-              const id = Number(item.id)
-              if (Number.isNaN(id)) return
-              deleteMutation.mutate({ locale, id })
-              setSelectedCompany((prev) => (prev?.id === item.id ? null : prev))
-            }}
-          />
-        ))}
-      </div>
+      {items.length === 0 ? (
+        <EmptyCompanyState onAdd={() => onViewChange('create')} />
+      ) : (
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+          {items.map((company) => (
+            <CompanyCardItem
+              key={company.id}
+              company={company}
+              onOpen={(item) => {
+                setSelectedCompany(item)
+                onViewChange('detail')
+              }}
+              onEdit={(item) => {
+                setSelectedCompany(item)
+                onViewChange('edit')
+              }}
+              onDelete={(item) => {
+                const ok = window.confirm('Şirkəti silmək istəyirsiniz?')
+                if (!ok) return
+                const id = Number(item.id)
+                if (Number.isNaN(id)) return
+                deleteMutation.mutate({ locale, id })
+                setSelectedCompany((prev) => (prev?.id === item.id ? null : prev))
+              }}
+            />
+          ))}
+        </div>
+      )}
     </div>
   )
 }

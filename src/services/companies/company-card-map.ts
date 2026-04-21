@@ -16,6 +16,7 @@ export function companyResponseToCard(c: CompanyResponse): CompanyCard {
     category: c.category?.name ?? '—',
     description: plain.length > 0 ? plain : '—',
     logo: c.logo_url,
+    status: c.status,
     voen: c.voen,
     country: c.country?.name ?? undefined,
     phone: c.phone,

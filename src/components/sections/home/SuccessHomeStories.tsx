@@ -99,7 +99,7 @@ export default function SuccessHomeStories({
 
             <Link
               href="/success-stories"
-              className="hidden h-12 shrink-0 items-center justify-center gap-3 rounded-2xl px-6 py-3 text-base font-medium leading-6 text-[#14171a] transition-colors hover:text-[#0f477d] lg:inline-flex"
+              className="  hidden h-12 shrink-0 items-center justify-center gap-3 rounded-2xl px-6 py-3 text-base font-medium leading-6 text-[#14171a] transition-colors hover:text-[#0f477d] lg:inline-flex"
             >
               {t('successStoriesCta')}
               <ArrowRight className="size-6 shrink-0 transition-colors" aria-hidden />

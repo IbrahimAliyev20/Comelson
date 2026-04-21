@@ -5,7 +5,8 @@ import { notFound } from 'next/navigation'
 
 import Container from '@/components/shared/container'
 import { Link } from '@/i18n/navigation'
-import { tendersHomeRows } from '@/utils/tenders-data'
+import { getServerLocale } from '@/lib/utils'
+import { getTender } from '@/services/tenders/api'
 
 function normalizeTel(phone: string) {
   return phone.replace(/[^\d+]/g, '')
@@ -18,7 +19,12 @@ export default async function TenderDetailPage({
 }) {
   const { slug } = await params
 
-  const tender = tendersHomeRows.find((x) => x.slug === slug)
+  const id = Number(slug)
+  if (!Number.isFinite(id) || id <= 0) notFound()
+
+  const locale = await getServerLocale()
+  const response = await getTender(locale, id)
+  const tender = response?.data
   if (!tender) notFound()
 
   const h = await headers()
@@ -27,13 +33,13 @@ export default async function TenderDetailPage({
   const baseUrl =
     process.env.NEXT_PUBLIC_SITE_URL ??
     (host ? `${forwardedProto ?? 'https'}://${host}` : '')
-  const pageUrl = `${baseUrl}/tenders/${tender.slug}`
+  const pageUrl = `${baseUrl}/tenders/${tender.slug || String(tender.id)}`
 
   const encodedUrl = encodeURIComponent(pageUrl)
-  const encodedText = encodeURIComponent(tender.buyerName)
+  const encodedText = encodeURIComponent(tender.title)
 
   const shareUrls = {
-    whatsapp: `https://wa.me/?text=${encodeURIComponent(`${tender.buyerName} ${pageUrl}`)}`,
+    whatsapp: `https://wa.me/?text=${encodeURIComponent(`${tender.title} ${pageUrl}`)}`,
     telegram: `https://t.me/share/url?url=${encodedUrl}&text=${encodedText}`,
     facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
     x: `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedText}`
@@ -50,32 +56,32 @@ export default async function TenderDetailPage({
               </Link>
               <span className="text-[#6b6e71]">/</span>
               <span className="line-clamp-1 font-medium text-[#32393f]">
-                {tender.subject}
+                {tender.title}
               </span>
             </nav>
 
             <div className="flex flex-col gap-8">
               <h1 className="text-balance text-2xl font-semibold leading-tight text-[#14171a] sm:text-[40px] sm:leading-[56px]">
-                {tender.buyerName}
+                {tender.title}
               </h1>
 
               <div className="flex flex-col gap-3 text-[16px] leading-[26px] sm:text-[18px]">
                 <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-12">
                   <p className="w-full text-[#6b6e71] sm:w-[200px]">Başlama tarixi və saatı</p>
                   <p className="w-full font-medium text-[#14171a] sm:w-[200px]">
-                    {tender.startAt.replace(/\s+/g, ' ').replace('   ', ', ')}
+                    {tender.start_date.replace(/\s+/g, ' ').replace('   ', ', ')}
                   </p>
                 </div>
                 <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-12">
                   <p className="w-full text-[#6b6e71] sm:w-[200px]">Bitmə tarixi və saatı</p>
                   <p className="w-full font-medium text-[#14171a] sm:w-[200px]">
-                    {tender.endAt.replace(/\s+/g, ' ').replace('   ', ', ')}
+                    {tender.end_date.replace(/\s+/g, ' ').replace('   ', ', ')}
                   </p>
                 </div>
                 <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-12">
                   <p className="w-full text-[#6b6e71] sm:w-[200px]">Kateqoriya</p>
                   <p className="w-full font-medium text-[#14171a] sm:w-[200px]">
-                    {tender.category}
+                    {tender.category?.name?.[locale] ?? tender.category?.name?.az ?? '—'}
                   </p>
                 </div>
               </div>
@@ -84,22 +90,20 @@ export default async function TenderDetailPage({
                 <h2 className="text-2xl font-semibold leading-8 text-[#14171a]">
                   Tender haqqında
                 </h2>
-                <div className="flex flex-col gap-4 text-base leading-6 text-[#32393f]">
-                  {tender.about.map((p, idx) => (
-                    <p key={idx}>{p}</p>
-                  ))}
-                </div>
+                <div
+                  className="prose max-w-none text-[#32393f] prose-p:leading-6"
+                  dangerouslySetInnerHTML={{ __html: tender.description }}
+                />
               </div>
 
               <div className="flex flex-col gap-5">
                 <h2 className="text-2xl font-semibold leading-8 text-[#14171a]">
                   Tələb olunan sənədlər
                 </h2>
-                <ul className="list-disc space-y-2 pl-5 text-base leading-6 text-[#32393f]">
-                  {tender.requiredDocuments.map((x) => (
-                    <li key={x}>{x}</li>
-                  ))}
-                </ul>
+                <div
+                  className="prose max-w-none text-[#32393f] prose-p:leading-6"
+                  dangerouslySetInnerHTML={{ __html: tender.required_documents }}
+                />
               </div>
 
               <div className="rounded-xl bg-[#e6eff6] p-6">
@@ -116,7 +120,7 @@ export default async function TenderDetailPage({
                   </div>
 
                   <p className="text-2xl font-semibold leading-8 text-[#14171a]">
-                    İştirak haqqı: {tender.participationFeeAzN} AZN
+                    İştirak haqqı: —
                   </p>
 
                   <div className="h-px w-full bg-[#dadee2]" />
@@ -127,18 +131,18 @@ export default async function TenderDetailPage({
                     </p>
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-12">
                       <a
-                        href={`tel:${normalizeTel(tender.contactPhone)}`}
+                        href={`tel:${normalizeTel(tender.contact_phone)}`}
                         className="inline-flex items-center gap-3 text-sm font-medium leading-5 text-[#14171a] hover:opacity-80"
                       >
                         <Phone className="size-5 text-[#0f477d]" aria-hidden />
-                        {tender.contactPhone}
+                        {tender.contact_phone}
                       </a>
                       <a
-                        href={`mailto:${tender.contactEmail}`}
+                        href={`mailto:${tender.contact_email}`}
                         className="inline-flex items-center gap-3 text-sm font-medium leading-5 text-[#14171a] hover:opacity-80"
                       >
                         <Mail className="size-5 text-[#0f477d]" aria-hidden />
-                        {tender.contactEmail}
+                        {tender.contact_email}
                       </a>
                     </div>
 

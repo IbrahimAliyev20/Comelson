@@ -59,9 +59,9 @@ export default async function MembersHomeSection( { members }: { members: Member
 
           {/* Desktop: keep grid */}
           <div className="hidden md:grid md:grid-cols-3 md:gap-5 xl:grid-cols-5">
-            {list.map((member) => (
+            {list.map((member, idx) => (
               <Link
-                key={member.slug}
+                key={`${member.slug || member.company}-${member.country?.id ?? 'na'}-${idx}`}
                 href={`/${locale}/members/${member.slug}`}
                 className="group flex h-[160px] items-center justify-center overflow-hidden rounded-[10px] border border-[#e8eaed] bg-white p-6 transition-shadow hover:shadow-[0_14px_40px_rgba(15,71,125,0.10)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0f477d]/40 md:h-[180px] lg:h-[160px]"
               >

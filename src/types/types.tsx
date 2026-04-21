@@ -197,6 +197,62 @@ export interface CompanyResponse {
   linkedin: string;
   created_at: string;
   updated_at: string;
+  status: number;
+}
+
+export interface TenderCategoryResponse {
+  id: number
+  name: Record<string, string>
+  created_at: string
+  updated_at: string
+}
+
+export interface TenderResponse {
+  id: number
+  user_id: number
+  title: string
+  slug: string
+  start_date: string
+  end_date: string
+  city?: string
+  company_id?: number
+  description: string
+  required_documents: string
+  contact_name?: string
+  contact_address?: string
+  contact_position: string
+  contact_email: string
+  contact_phone: string
+  contact_instagram: string
+  contact_facebook: string
+  contact_linkedin: string
+  contact_twitter: string
+  category: TenderCategoryResponse
+  notify_by_email: boolean
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+/** POST /tenders — JSON body */
+export interface CreateTenderPayload {
+  title: string
+  category_id: number
+  country_id: number
+  start_date: string
+  end_date: string
+  company_id: number
+  description: string
+  required_documents: string
+  contact_name: string
+  contact_position: string
+  contact_email: string
+  contact_phone: string
+  contact_instagram: string
+  contact_facebook: string
+  contact_linkedin: string
+  contact_twitter: string
+  notify_by_email: boolean
 }
 
 export interface ApiPaginationLinks {
@@ -254,6 +310,8 @@ export interface CompanyCard {
   category: string;
   description: string;
   logo: string;
+  /** API: CompanyResponse.status */
+  status?: number;
   voen?: string;
   country?: string;
   phone?: string;

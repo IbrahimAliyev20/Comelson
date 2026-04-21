@@ -6,7 +6,6 @@ import {
   AlignRight,
   Bold,
   CalendarDays,
-  ChevronDown,
   ChevronLeft,
   Code,
   ImageIcon,
@@ -19,9 +18,24 @@ import {
   Underline,
 } from 'lucide-react'
 import type { ComponentType, ReactNode } from 'react'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
+import PhoneInput from 'react-phone-input-2'
+import 'react-phone-input-2/lib/style.css'
 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { getCompanyCategoriesQuery } from '@/services/company-categories/queries'
+import { getCompaniesQuery } from '@/services/companies/queries'
+import { getCountriesQuery } from '@/services/members/queries'
 import { cn } from '@/lib/utils'
+import type { CompanyCategoryResponse, CompanyResponse, CountryResponse } from '@/types/types'
+import { useQuery } from '@tanstack/react-query'
+import { useLocale } from 'next-intl'
 
 const inputClass =
   'h-12 w-full rounded-lg border border-[#ebeff4] bg-[#f4fafd] px-4 text-sm text-[#1d212a] outline-none placeholder:text-[#889097] focus:border-[#0f477d]/40 focus:ring-4 focus:ring-[#0f477d]/10'
@@ -30,7 +44,8 @@ const labelClass = 'pl-1 text-sm leading-6 text-[#1d212a]'
 
 export type CreateTenderForm = {
   title: string
-  category: string
+  categoryId: string
+  countryId: string
   startAt: string
   endAt: string
   company: string
@@ -39,7 +54,7 @@ export type CreateTenderForm = {
   fullName: string
   position: string
   email: string
-  phonePrefix: string
+  /** `react-phone-input-2` dəyəri (rəqəmlər, ölkə kodu daxil) */
   phone: string
   instagram: string
   facebook: string
@@ -57,30 +72,11 @@ function FieldLabel({ children }: { children: ReactNode }) {
   return <span className={labelClass}>{children}</span>
 }
 
-function NativeSelect({
-  className,
-  children,
-  ...rest
-}: React.ComponentProps<'select'>) {
-  return (
-    <div className="relative w-full">
-      <select
-        className={cn(
-          inputClass,
-          'cursor-pointer appearance-none pr-10 text-[#32393f]',
-          className
-        )}
-        {...rest}
-      >
-        {children}
-      </select>
-      <ChevronDown
-        className="pointer-events-none absolute right-3 top-1/2 size-5 -translate-y-1/2 text-[#1d212a]"
-        aria-hidden
-      />
-    </div>
-  )
-}
+const selectTriggerClass =
+  'h-12 w-full rounded-[8px] border-[#ebeff4] bg-[#f4fafd] px-4 text-sm leading-5 text-[#32393f] focus:border-[#d7e6ef] focus:bg-[#f4fafd] focus:ring-0 focus:ring-offset-0 focus-visible:ring-0'
+
+const selectItemCheckedClass =
+  'data-[state=checked]:bg-[#e6eff6] data-[state=checked]:text-[#0f477d] data-[state=checked]:[&_svg]:!text-[#0f477d]'
 
 function DateInput({
   value,
@@ -93,20 +89,44 @@ function DateInput({
   placeholder: string
   name: string
 }) {
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  const openPicker = () => {
+    const el = inputRef.current
+    if (!el) return
+    if (typeof el.showPicker === 'function') {
+      try {
+        el.showPicker()
+      } catch {
+        el.focus()
+      }
+    } else {
+      el.focus()
+    }
+  }
+
   return (
     <div className="relative w-full">
       <input
+        ref={inputRef}
         name={name}
-        type="text"
+        type="datetime-local"
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        className={cn(inputClass, 'pr-11 text-[#32393f]')}
+        className={cn(
+          inputClass,
+          'pr-11 text-[#32393f] [color-scheme:light] sm:min-w-0'
+        )}
       />
-      <CalendarDays
-        className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-[#1d212a]"
-        aria-hidden
-      />
+      <button
+        type="button"
+        onClick={openPicker}
+        className="absolute right-2 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-md text-[#1d212a] transition-colors hover:bg-[#eaf1fa] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f477d]/40"
+        aria-label="Tarix və saat seçin"
+      >
+        <CalendarDays className="size-4" aria-hidden />
+      </button>
     </div>
   )
 }
@@ -197,9 +217,18 @@ export default function CreateTender({
   onCancel,
   onSubmit,
 }: CreateTenderProps) {
+  const locale = useLocale()
+  const { data: categories = [] } = useQuery(getCompanyCategoriesQuery(locale))
+  const { data: countries = [] } = useQuery(getCountriesQuery(locale))
+  const { data: companiesResponse } = useQuery(
+    getCompaniesQuery({ locale, per_page: 100 })
+  )
+  const companies = (companiesResponse?.data ?? []) as CompanyResponse[]
+
   const [form, setForm] = useState<CreateTenderForm>({
     title: '',
-    category: '',
+    categoryId: '',
+    countryId: '',
     startAt: '',
     endAt: '',
     company: '',
@@ -208,7 +237,6 @@ export default function CreateTender({
     fullName: '',
     position: '',
     email: '',
-    phonePrefix: '+994',
     phone: '',
     instagram: 'https://instagram.com/example',
     facebook: 'https://facebook.com/example',
@@ -276,18 +304,27 @@ export default function CreateTender({
 
             <div className="flex flex-col gap-2">
               <FieldLabel>Kateqoriya</FieldLabel>
-              <NativeSelect
-                name="category"
-                value={form.category}
-                onChange={handleChange('category')}
+              <Select
+                value={form.categoryId}
+                onValueChange={(v) =>
+                  setForm((prev) => ({ ...prev, categoryId: v }))
+                }
               >
-                <option value="" disabled>
-                  Kateqoriyanı seçin
-                </option>
-                <option value="marketing">Marketinq</option>
-                <option value="it">İT</option>
-                <option value="construction">Tikinti</option>
-              </NativeSelect>
+                <SelectTrigger className={selectTriggerClass}>
+                  <SelectValue placeholder="Kateqoriyanı seçin" />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl border-[#ebeff4] bg-white">
+                  {(categories as CompanyCategoryResponse[]).map((c) => (
+                    <SelectItem
+                      key={c.id}
+                      value={String(c.id)}
+                      className={selectItemCheckedClass}
+                    >
+                      {c.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="flex flex-col gap-2">
@@ -296,7 +333,7 @@ export default function CreateTender({
                 name="startAt"
                 value={form.startAt}
                 onChange={handleChange('startAt')}
-                placeholder="mm/dd/yy"
+                placeholder="YYYY-MM-DD --:--"
               />
             </div>
 
@@ -306,24 +343,57 @@ export default function CreateTender({
                 name="endAt"
                 value={form.endAt}
                 onChange={handleChange('endAt')}
-                placeholder="mm/dd/yy"
+                placeholder="YYYY-MM-DD --:--"
               />
             </div>
           </div>
 
           <div className="flex flex-col gap-2">
-            <FieldLabel>Şirkət</FieldLabel>
-            <NativeSelect
-              name="company"
-              value={form.company}
-              onChange={handleChange('company')}
+            <FieldLabel>Ölkə</FieldLabel>
+            <Select
+              value={form.countryId}
+              onValueChange={(v) =>
+                setForm((prev) => ({ ...prev, countryId: v }))
+              }
             >
-              <option value="" disabled>
-                Şirkəti seçin
-              </option>
-              <option value="Comelson MMC">Comelson MMC</option>
-              <option value="Markup Agency">Markup Agency</option>
-            </NativeSelect>
+              <SelectTrigger className={selectTriggerClass}>
+                <SelectValue placeholder="Ölkə seçin" />
+              </SelectTrigger>
+              <SelectContent className="rounded-xl border-[#ebeff4] bg-white">
+                {(countries as CountryResponse[]).map((c) => (
+                  <SelectItem
+                    key={c.id}
+                    value={String(c.id)}
+                    className={selectItemCheckedClass}
+                  >
+                    {c.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <FieldLabel>Şirkət</FieldLabel>
+            <Select
+              value={form.company}
+              onValueChange={(v) => setForm((prev) => ({ ...prev, company: v }))}
+            >
+              <SelectTrigger className={selectTriggerClass}>
+                <SelectValue placeholder="Şirkəti seçin" />
+              </SelectTrigger>
+              <SelectContent className="rounded-xl border-[#ebeff4] bg-white">
+                {companies.map((c) => (
+                  <SelectItem
+                    key={c.id}
+                    value={String(c.id)}
+                    className={selectItemCheckedClass}
+                  >
+                    {c.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <EditorField
@@ -385,26 +455,29 @@ export default function CreateTender({
 
             <div className="flex flex-col gap-2">
               <FieldLabel>Telefon nömrəsi</FieldLabel>
-              <div className="flex gap-2">
-                <NativeSelect
-                  name="phonePrefix"
-                  value={form.phonePrefix}
-                  onChange={handleChange('phonePrefix')}
-                  className="w-[112px] shrink-0 lg:w-[120px]"
-                  aria-label="Ölkə kodu"
-                >
-                  <option value="+994">+994</option>
-                  <option value="+90">+90</option>
-                </NativeSelect>
-                <input
-                  name="phone"
-                  type="tel"
-                  placeholder="Telefon nömrənizi daxil edin"
-                  value={form.phone}
-                  onChange={handleChange('phone')}
-                  className={cn(inputClass, 'min-w-0 flex-1')}
-                />
-              </div>
+              <input type="hidden" name="phone" value={form.phone} />
+              <PhoneInput
+                country="az"
+                value={form.phone}
+                onChange={(value) =>
+                  setForm((prev) => ({ ...prev, phone: value }))
+                }
+                placeholder="Nömrənizi daxil edin"
+                inputStyle={{
+                  width: '100%',
+                  height: '48px',
+                  borderRadius: '12px',
+                  border: '1px solid #d1d5db',
+                  fontSize: '16px',
+                  paddingLeft: '48px',
+                }}
+                buttonStyle={{
+                  border: '1px solid #d1d5db',
+                  borderRadius: '12px 0 0 12px',
+                  backgroundColor: 'transparent',
+                }}
+                containerStyle={{ width: '100%' }}
+              />
             </div>
 
             <label className="flex flex-col gap-2">
