@@ -13,6 +13,19 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL
 const TOKEN_COOKIE_NAME = 'access_token'
 const COUNTRY_ID_COOKIE_NAME = 'country_id'
 const COUNTRY_ID_HEADER = 'X-Country-Id'
+const REFRESH_PATH = '/auth/refresh'
+
+type RetryableAxiosConfig = InternalAxiosRequestConfig & {
+  _retry?: boolean
+  _skipAuthRefresh?: boolean
+}
+
+type RefreshResponse = {
+  message: string
+  token: string
+  token_type: string
+  expires_at?: string
+}
 
 const client: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
@@ -107,6 +120,60 @@ const handleApiError = (error: AxiosError): void => {
   }
 }
 
+let refreshPromise: Promise<string> | null = null
+
+function persistAuthToken(token: string, expiresAt?: string) {
+  if (typeof window === 'undefined') return
+
+  const opts: Cookies.CookieAttributes = { sameSite: 'lax' }
+  if (expiresAt) {
+    const date = new Date(expiresAt)
+    if (!Number.isNaN(date.getTime())) opts.expires = date
+  }
+  Cookies.set(TOKEN_COOKIE_NAME, token, opts)
+}
+
+async function refreshAuthToken(): Promise<string> {
+  const token = await resolveAuthToken()
+  if (!token) throw new Error('No access token to refresh')
+
+  const locale =
+    typeof window !== 'undefined'
+      ? window.location.pathname.split('/')[1] || 'az'
+      : 'az'
+  const acceptLanguage = getAcceptLanguageHeader(locale)
+  const countryId = await resolveCountryId()
+
+  // Use a bare axios call (no interceptors) to avoid recursion.
+  const res = await axios.post<RefreshResponse>(
+    `${API_BASE_URL}${REFRESH_PATH}`,
+    null,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: 'application/json',
+        'Accept-Language': acceptLanguage,
+        ...(countryId ? { [COUNTRY_ID_HEADER]: countryId } : {}),
+      },
+      timeout: 10000,
+    }
+  )
+
+  const next = res.data?.token
+  if (!next) throw new Error('Refresh response missing token')
+  persistAuthToken(next, res.data?.expires_at)
+  return next
+}
+
+async function getRefreshedToken(): Promise<string> {
+  if (!refreshPromise) {
+    refreshPromise = refreshAuthToken().finally(() => {
+      refreshPromise = null
+    })
+  }
+  return await refreshPromise
+}
+
 const setupInterceptors = (): void => {
   client.interceptors.request.use(
     async (config: InternalAxiosRequestConfig) => {
@@ -154,7 +221,34 @@ const setupInterceptors = (): void => {
 
   client.interceptors.response.use(
     (response: AxiosResponse) => response,
-    (error: AxiosError) => {
+    async (error: AxiosError) => {
+      const status = error.response?.status
+      const original = error.config as RetryableAxiosConfig | undefined
+
+      // Client-side only: refresh token once on 401 and retry request.
+      if (
+        typeof window !== 'undefined' &&
+        status === 401 &&
+        original &&
+        !original._retry &&
+        !original._skipAuthRefresh &&
+        !String(original.url ?? '').includes(REFRESH_PATH)
+      ) {
+        try {
+          original._retry = true
+          const nextToken = await getRefreshedToken()
+          original.headers = setRequestHeader(
+            original.headers,
+            'Authorization',
+            `Bearer ${nextToken}`
+          )
+          return await client.request(original)
+        } catch {
+          handleApiError(error)
+          return Promise.reject(error)
+        }
+      }
+
       handleApiError(error)
       return Promise.reject(error)
     }

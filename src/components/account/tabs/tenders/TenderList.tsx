@@ -636,10 +636,10 @@ export default function TenderList() {
     )
   }
 
-  if (view === 'edit' && selectedTender) {
+  if (view === 'edit' && selectedTenderId != null) {
     return (
       <EditTender
-        initialValues={tenderToInitialValues(selectedTender)}
+        tenderId={selectedTenderId}
         onBack={() => {
           setSelectedTenderId(null)
           setView('list')
@@ -651,7 +651,7 @@ export default function TenderList() {
         onSubmit={(form: CreateTenderForm) => {
           updateTender.mutate({
             locale,
-            id: selectedTender.id,
+            id: selectedTenderId,
             body: formToCreatePayload(form),
           })
         }}
@@ -659,11 +659,11 @@ export default function TenderList() {
     )
   }
 
-  if (view === 'detail' && selectedTender) {
+  if (view === 'detail' && selectedTenderId != null) {
     const TenderDetailView = TenderDetail as unknown as ComponentType<TenderDetailProps>
     return (
       <TenderDetailView
-        tender={selectedTender}
+        tenderId={selectedTenderId}
         locale={locale}
         onBack={() => {
           setSelectedTenderId(null)

@@ -1,12 +1,14 @@
 'use client'
 
 import { ChevronLeft } from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
 
 import { cn } from '@/lib/utils'
-import type { TenderResponse } from '@/types/types'
+import { getTenderQuery } from '@/services/tenders/queries'
+import type { ApiResponse, TenderResponse } from '@/types/types'
 
 export type TenderDetailProps = {
-  tender: TenderResponse
+  tenderId: number
   locale: string
   onBack: () => void
 }
@@ -48,7 +50,90 @@ function htmlOrFallback(html?: string | null): string {
   return v
 }
 
-export default function TenderDetail({ tender, locale, onBack }: TenderDetailProps) {
+export default function TenderDetail({ tenderId, locale, onBack }: TenderDetailProps) {
+  const {
+    data: tenderResponse,
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery({
+    ...getTenderQuery({ locale, id: tenderId }),
+    enabled: Number.isFinite(tenderId) && tenderId > 0,
+  })
+
+  if (isLoading) {
+    return (
+      <div className="flex w-full flex-col bg-white pb-12" data-name="tender-detail-loading">
+        <div className="flex shrink-0 items-center gap-3 border-b border-[#eaf1fa] px-8 py-6">
+          <button
+            type="button"
+            onClick={onBack}
+            className="flex size-6 shrink-0 items-center justify-center rounded-md text-[#1d212a] transition-colors hover:bg-[#f4fafd]"
+            aria-label="Geri"
+          >
+            <ChevronLeft className="size-6" aria-hidden />
+          </button>
+          <h2 className="text-2xl font-medium leading-8 text-[#1d212a]">Tender</h2>
+        </div>
+        <div className="px-6 py-10 text-center text-sm text-[#6b6e71] sm:px-12">
+          Yüklənir…
+        </div>
+      </div>
+    )
+  }
+
+  if (isError) {
+    return (
+      <div className="flex w-full flex-col bg-white pb-12" data-name="tender-detail-error">
+        <div className="flex shrink-0 items-center gap-3 border-b border-[#eaf1fa] px-8 py-6">
+          <button
+            type="button"
+            onClick={onBack}
+            className="flex size-6 shrink-0 items-center justify-center rounded-md text-[#1d212a] transition-colors hover:bg-[#f4fafd]"
+            aria-label="Geri"
+          >
+            <ChevronLeft className="size-6" aria-hidden />
+          </button>
+          <h2 className="text-2xl font-medium leading-8 text-[#1d212a]">Tender</h2>
+        </div>
+        <div className="flex flex-col items-center gap-4 px-6 py-10 text-center sm:px-12">
+          <p className="text-sm text-[#6b6e71]">Yükləmə alınmadı</p>
+          <button
+            type="button"
+            onClick={() => void refetch()}
+            className="rounded-2xl bg-[#e6eff6] px-6 py-3 text-sm font-medium text-[#0f477d]"
+          >
+            Yenidən cəhd et
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  const res = tenderResponse as ApiResponse<TenderResponse> | undefined
+  const tender = res?.status ? res.data : undefined
+
+  if (!tender) {
+    return (
+      <div className="flex w-full flex-col bg-white pb-12" data-name="tender-detail-empty">
+        <div className="flex shrink-0 items-center gap-3 border-b border-[#eaf1fa] px-8 py-6">
+          <button
+            type="button"
+            onClick={onBack}
+            className="flex size-6 shrink-0 items-center justify-center rounded-md text-[#1d212a] transition-colors hover:bg-[#f4fafd]"
+            aria-label="Geri"
+          >
+            <ChevronLeft className="size-6" aria-hidden />
+          </button>
+          <h2 className="text-2xl font-medium leading-8 text-[#1d212a]">Tender</h2>
+        </div>
+        <div className="px-6 py-10 text-center text-sm text-[#6b6e71] sm:px-12">
+          Məlumat tapılmadı
+        </div>
+      </div>
+    )
+  }
+
   const category =
     tender.category?.name?.[locale] ?? tender.category?.name?.az ?? '—'
 

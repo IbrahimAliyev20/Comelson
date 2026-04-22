@@ -6,6 +6,7 @@ import {
   AlignRight,
   Bold,
   CalendarDays,
+  ChevronDown,
   ChevronLeft,
   Code,
   ImageIcon,
@@ -22,18 +23,18 @@ import { useEffect, useRef, useState } from 'react'
 import PhoneInput from 'react-phone-input-2'
 import 'react-phone-input-2/lib/style.css'
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { getCompanyCategoriesQuery } from '@/services/company-categories/queries'
 import { getCompaniesQuery } from '@/services/companies/queries'
 import { getCountriesQuery } from '@/services/members/queries'
+import { getTenderQuery } from '@/services/tenders/queries'
 import { cn } from '@/lib/utils'
-import type { CompanyCategoryResponse, CompanyResponse, CountryResponse } from '@/types/types'
+import type {
+  ApiResponse,
+  CompanyCategoryResponse,
+  CompanyResponse,
+  CountryResponse,
+  TenderResponse,
+} from '@/types/types'
 import { useQuery } from '@tanstack/react-query'
 import { useLocale } from 'next-intl'
 
@@ -68,6 +69,7 @@ function mergeForm(partial?: Partial<CreateTenderForm>): CreateTenderForm {
 }
 
 export type EditTenderProps = {
+  tenderId: number
   initialValues?: Partial<CreateTenderForm>
   onBack?: () => void
   onCancel?: () => void
@@ -81,8 +83,30 @@ function FieldLabel({ children }: { children: ReactNode }) {
 const selectTriggerClass =
   'h-12 w-full rounded-[8px] border-[#ebeff4] bg-[#f4fafd] px-4 text-sm leading-5 text-[#32393f] focus:border-[#d7e6ef] focus:bg-[#f4fafd] focus:ring-0 focus:ring-offset-0 focus-visible:ring-0'
 
-const selectItemCheckedClass =
-  'data-[state=checked]:bg-[#e6eff6] data-[state=checked]:text-[#0f477d] data-[state=checked]:[&_svg]:!text-[#0f477d]'
+function NativeSelect({
+  className,
+  children,
+  ...rest
+}: React.ComponentProps<'select'>) {
+  return (
+    <div className="relative w-full">
+      <select
+        className={cn(
+          selectTriggerClass,
+          'cursor-pointer appearance-none pr-10',
+          className
+        )}
+        {...rest}
+      >
+        {children}
+      </select>
+      <ChevronDown
+        className="pointer-events-none absolute right-3 top-1/2 size-5 -translate-y-1/2 text-[#1d212a]"
+        aria-hidden
+      />
+    </div>
+  )
+}
 
 function DateInput({
   value,
@@ -218,7 +242,81 @@ function EditorField({
   )
 }
 
+type TenderDetailLike = TenderResponse & {
+  category_id?: number | string | null
+  country_id?: number | string | null
+  company_id?: number | string | null
+  category?: {
+    id?: number | string | null
+    name?: Record<string, string> | string | null
+  } | null
+  company?: { id?: number | string | null; name?: string | null } | null
+  country?: {
+    id?: number | string | null
+    name?: Record<string, string> | string | null
+  } | null
+}
+
+function getEntityId(
+  ...values: Array<number | string | null | undefined>
+): string {
+  for (const value of values) {
+    if (typeof value === 'number' && Number.isFinite(value) && value > 0) {
+      return String(value)
+    }
+
+    if (typeof value === 'string') {
+      const trimmed = value.trim()
+      if (trimmed) return trimmed
+    }
+  }
+
+  return ''
+}
+
+function apiDateTimeToInputValue(api: string): string {
+  const v = api.trim()
+  if (!v) return ''
+  const m = v.match(/^(\d{4}-\d{2}-\d{2})[\sT](\d{2}:\d{2})/)
+  if (m) return `${m[1]}T${m[2]}`
+  return v.replace(' ', 'T').slice(0, 16)
+}
+
+function getLocalizedName(
+  value: Record<string, string> | string | null | undefined,
+  locale: string,
+  fallback: string
+): string {
+  if (typeof value === 'string') return value
+  if (value && typeof value === 'object') {
+    return value[locale] ?? value.az ?? Object.values(value)[0] ?? fallback
+  }
+  return fallback
+}
+
+function tenderToInitialValues(t: TenderDetailLike): Partial<CreateTenderForm> {
+  return {
+    title: t.title ?? '',
+    categoryId: getEntityId(t.category?.id, t.category_id),
+    countryId: getEntityId(t.country?.id, t.country_id),
+    startAt: apiDateTimeToInputValue(t.start_date ?? ''),
+    endAt: apiDateTimeToInputValue(t.end_date ?? ''),
+    company: getEntityId(t.company?.id, t.company_id),
+    about: t.description ?? '',
+    requiredDocuments: t.required_documents ?? '',
+    fullName: t.contact_name ?? '',
+    position: t.contact_position ?? '',
+    email: t.contact_email ?? '',
+    phone: (t.contact_phone ?? '').replace(/\D/g, ''),
+    instagram: t.contact_instagram ?? '',
+    facebook: t.contact_facebook ?? '',
+    linkedin: t.contact_linkedin ?? '',
+    twitter: t.contact_twitter ?? '',
+  }
+}
+
 export default function EditTender({
+  tenderId,
   initialValues,
   onBack,
   onCancel,
@@ -232,13 +330,33 @@ export default function EditTender({
   )
   const companies = (companiesResponse?.data ?? []) as CompanyResponse[]
 
+  const {
+    data: tenderDetailResponse,
+    isLoading: isLoadingTender,
+    isError: isTenderError,
+    refetch: refetchTender,
+  } = useQuery({
+    ...getTenderQuery({ locale, id: tenderId }),
+    enabled: Number.isFinite(tenderId) && tenderId > 0,
+  })
+
+  const tenderDetail = (() => {
+    const res = tenderDetailResponse as ApiResponse<TenderResponse> | undefined
+    if (!res?.status) return null
+    return res.data as TenderDetailLike
+  })()
+
   const [form, setForm] = useState<CreateTenderForm>(() =>
     mergeForm(initialValues)
   )
 
   useEffect(() => {
+    if (tenderDetail) {
+      setForm(mergeForm(tenderToInitialValues(tenderDetail)))
+      return
+    }
     setForm(mergeForm(initialValues))
-  }, [initialValues])
+  }, [initialValues, tenderDetail])
 
   const handleChange =
     (field: keyof CreateTenderForm) =>
@@ -258,6 +376,59 @@ export default function EditTender({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     onSubmit?.(form)
+  }
+
+  if (isLoadingTender) {
+    return (
+      <div className="flex w-full flex-col bg-white pb-12" data-name="edit-tender-loading">
+        <div className="flex shrink-0 items-center gap-3 border-b border-[#eaf1fa] px-8 py-6">
+          <button
+            type="button"
+            onClick={onBack}
+            className="flex size-6 shrink-0 items-center justify-center rounded-md text-[#1d212a] transition-colors hover:bg-[#f4fafd]"
+            aria-label="Geri"
+          >
+            <ChevronLeft className="size-6" aria-hidden />
+          </button>
+          <h2 className="text-2xl font-medium leading-8 text-[#1d212a]">
+            Tenderi redaktə et
+          </h2>
+        </div>
+        <div className="px-6 py-10 text-center text-sm text-[#6b6e71] sm:px-12">
+          Yüklənir…
+        </div>
+      </div>
+    )
+  }
+
+  if (isTenderError) {
+    return (
+      <div className="flex w-full flex-col bg-white pb-12" data-name="edit-tender-error">
+        <div className="flex shrink-0 items-center gap-3 border-b border-[#eaf1fa] px-8 py-6">
+          <button
+            type="button"
+            onClick={onBack}
+            className="flex size-6 shrink-0 items-center justify-center rounded-md text-[#1d212a] transition-colors hover:bg-[#f4fafd]"
+            aria-label="Geri"
+          >
+            <ChevronLeft className="size-6" aria-hidden />
+          </button>
+          <h2 className="text-2xl font-medium leading-8 text-[#1d212a]">
+            Tenderi redaktə et
+          </h2>
+        </div>
+        <div className="flex flex-col items-center gap-4 px-6 py-10 text-center sm:px-12">
+          <p className="text-sm text-[#6b6e71]">Tender məlumatı yüklənmədi</p>
+          <button
+            type="button"
+            onClick={() => void refetchTender()}
+            className="rounded-2xl bg-[#e6eff6] px-6 py-3 text-sm font-medium text-[#0f477d]"
+          >
+            Yenidən cəhd et
+          </button>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -300,27 +471,34 @@ export default function EditTender({
 
             <div className="flex flex-col gap-2">
               <FieldLabel>Kateqoriya</FieldLabel>
-              <Select
+              <NativeSelect
+                name="categoryId"
                 value={form.categoryId}
-                onValueChange={(v) =>
-                  setForm((prev) => ({ ...prev, categoryId: v }))
+                onChange={(e) =>
+                  setForm((prev) => ({ ...prev, categoryId: e.target.value }))
                 }
               >
-                <SelectTrigger className={selectTriggerClass}>
-                  <SelectValue placeholder="Kateqoriyanı seçin" />
-                </SelectTrigger>
-                <SelectContent className="rounded-xl border-[#ebeff4] bg-white">
+                <option value="" disabled>
+                  Kateqoriyanı seçin
+                </option>
+                  {form.categoryId &&
+                  !(categories as CompanyCategoryResponse[]).some(
+                    (c) => String(c.id) === form.categoryId
+                  ) ? (
+                    <option value={form.categoryId}>
+                      {getLocalizedName(
+                        tenderDetail?.category?.name,
+                        locale,
+                        `#${form.categoryId}`
+                      )}
+                    </option>
+                  ) : null}
                   {(categories as CompanyCategoryResponse[]).map((c) => (
-                    <SelectItem
-                      key={c.id}
-                      value={String(c.id)}
-                      className={selectItemCheckedClass}
-                    >
+                    <option key={c.id} value={String(c.id)}>
                       {c.name}
-                    </SelectItem>
+                    </option>
                   ))}
-                </SelectContent>
-              </Select>
+              </NativeSelect>
             </div>
 
             <div className="flex flex-col gap-2">
@@ -346,50 +524,60 @@ export default function EditTender({
 
           <div className="flex flex-col gap-2">
             <FieldLabel>Ölkə</FieldLabel>
-            <Select
+            <NativeSelect
+              name="countryId"
               value={form.countryId}
-              onValueChange={(v) =>
-                setForm((prev) => ({ ...prev, countryId: v }))
+              onChange={(e) =>
+                setForm((prev) => ({ ...prev, countryId: e.target.value }))
               }
             >
-              <SelectTrigger className={selectTriggerClass}>
-                <SelectValue placeholder="Ölkə seçin" />
-              </SelectTrigger>
-              <SelectContent className="rounded-xl border-[#ebeff4] bg-white">
+              <option value="" disabled>
+                Ölkə seçin
+              </option>
+                {form.countryId &&
+                !(countries as CountryResponse[]).some(
+                  (c) => String(c.id) === form.countryId
+                ) ? (
+                  <option value={form.countryId}>
+                    {getLocalizedName(
+                      tenderDetail?.country?.name,
+                      locale,
+                      `#${form.countryId}`
+                    )}
+                  </option>
+                ) : null}
                 {(countries as CountryResponse[]).map((c) => (
-                  <SelectItem
-                    key={c.id}
-                    value={String(c.id)}
-                    className={selectItemCheckedClass}
-                  >
+                  <option key={c.id} value={String(c.id)}>
                     {c.name}
-                  </SelectItem>
+                  </option>
                 ))}
-              </SelectContent>
-            </Select>
+            </NativeSelect>
           </div>
 
           <div className="flex flex-col gap-2">
             <FieldLabel>Şirkət</FieldLabel>
-            <Select
+            <NativeSelect
+              name="company"
               value={form.company}
-              onValueChange={(v) => setForm((prev) => ({ ...prev, company: v }))}
+              onChange={(e) =>
+                setForm((prev) => ({ ...prev, company: e.target.value }))
+              }
             >
-              <SelectTrigger className={selectTriggerClass}>
-                <SelectValue placeholder="Şirkəti seçin" />
-              </SelectTrigger>
-              <SelectContent className="rounded-xl border-[#ebeff4] bg-white">
+              <option value="" disabled>
+                Şirkəti seçin
+              </option>
+                {form.company &&
+                !companies.some((c) => String(c.id) === form.company) ? (
+                  <option value={form.company}>
+                    {tenderDetail?.company?.name ?? `#${form.company}`}
+                  </option>
+                ) : null}
                 {companies.map((c) => (
-                  <SelectItem
-                    key={c.id}
-                    value={String(c.id)}
-                    className={selectItemCheckedClass}
-                  >
+                  <option key={c.id} value={String(c.id)}>
                     {c.name}
-                  </SelectItem>
+                  </option>
                 ))}
-              </SelectContent>
-            </Select>
+            </NativeSelect>
           </div>
 
           <EditorField

@@ -1,15 +1,18 @@
 import Image from 'next/image'
 import { headers } from 'next/headers'
-import { Info, Mail, Phone } from 'lucide-react'
+import { Info } from 'lucide-react'
 import { notFound } from 'next/navigation'
 
 import Container from '@/components/shared/container'
 import { Link } from '@/i18n/navigation'
 import { getServerLocale } from '@/lib/utils'
-import { getTender } from '@/services/tenders/api'
+import { getPublicTender } from '@/services/tenders/api'
 
-function normalizeTel(phone: string) {
-  return phone.replace(/[^\d+]/g, '')
+function formatDetailDateTime(value: string): string {
+  const m = value.trim().match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}:\d{2})/)
+  if (!m) return value
+  const [, yyyy, mm, dd, hhmm] = m
+  return `${dd}.${mm}.${yyyy}, ${hhmm}`
 }
 
 export default async function TenderDetailPage({
@@ -19,12 +22,9 @@ export default async function TenderDetailPage({
 }) {
   const { slug } = await params
 
-  const id = Number(slug)
-  if (!Number.isFinite(id) || id <= 0) notFound()
-
   const locale = await getServerLocale()
-  const response = await getTender(locale, id)
-  const tender = response?.data
+  const response = await getPublicTender(locale, slug)
+  const tender = response?.data?.tender
   if (!tender) notFound()
 
   const h = await headers()
@@ -35,21 +35,28 @@ export default async function TenderDetailPage({
     (host ? `${forwardedProto ?? 'https'}://${host}` : '')
   const pageUrl = `${baseUrl}/tenders/${tender.slug || String(tender.id)}`
 
-  const encodedUrl = encodeURIComponent(pageUrl)
-  const encodedText = encodeURIComponent(tender.title)
+  const startAt = formatDetailDateTime(tender.start_date)
+  const endAt = formatDetailDateTime(tender.end_date)
+  const category =
+    tender.category?.name?.[locale] ?? tender.category?.name?.az ?? '—'
 
-  const shareUrls = {
-    whatsapp: `https://wa.me/?text=${encodeURIComponent(`${tender.title} ${pageUrl}`)}`,
-    telegram: `https://t.me/share/url?url=${encodedUrl}&text=${encodedText}`,
-    facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
-    x: `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedText}`
-  } as const
+  const contactName = tender.contact_name?.trim() || '—'
+  const contactPosition = tender.contact_position?.trim() || '—'
+  const contactEmail = tender.contact_email?.trim() || '—'
+  const contactPhone = tender.contact_phone?.trim() || '—'
+
+  const instagram = tender.contact_instagram?.trim() || ''
+  const facebook = tender.contact_facebook?.trim() || ''
+  const linkedin = tender.contact_linkedin?.trim() || ''
+
+  // NOTE: Figma shows company, but public tender response currently doesn't include it.
+  const companyName = 'Comelson MMC'
 
   return (
     <section className="bg-[#f8fafc] py-8 md:py-[70px]">
       <Container>
-        <div className="rounded-2xl border border-[#eaf1fa] bg-white p-6 sm:p-10">
-          <div className="mx-auto flex w-full max-w-[1000px] flex-col gap-10 sm:gap-12">
+        <div className="overflow-hidden rounded-2xl border border-[#eaf1fa] bg-white px-6 pb-12 pt-8 sm:px-12">
+          <div className="mx-auto w-full max-w-[1000px]">
             <nav className="flex items-center gap-1 text-xs leading-4">
               <Link href="/tenders" className="text-[#6b6e71] hover:underline">
                 Tender elanları
@@ -60,33 +67,46 @@ export default async function TenderDetailPage({
               </span>
             </nav>
 
-            <div className="flex flex-col gap-8">
-              <h1 className="text-balance text-2xl font-semibold leading-tight text-[#14171a] sm:text-[40px] sm:leading-[56px]">
+            <div className="mt-8 flex flex-col gap-9">
+              <h1 className="text-balance text-3xl font-semibold leading-tight text-[#14171a] sm:text-[40px] sm:leading-[56px]">
                 {tender.title}
               </h1>
 
               <div className="flex flex-col gap-3 text-[16px] leading-[26px] sm:text-[18px]">
-                <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-12">
-                  <p className="w-full text-[#6b6e71] sm:w-[200px]">Başlama tarixi və saatı</p>
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-12">
+                  <p className="w-full text-[#6b6e71] sm:w-[200px]">
+                    Başlama tarixi və saatı
+                  </p>
                   <p className="w-full font-medium text-[#14171a] sm:w-[200px]">
-                    {tender.start_date.replace(/\s+/g, ' ').replace('   ', ', ')}
+                    {startAt}
                   </p>
                 </div>
-                <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-12">
-                  <p className="w-full text-[#6b6e71] sm:w-[200px]">Bitmə tarixi və saatı</p>
+
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-12">
+                  <p className="w-full text-[#6b6e71] sm:w-[200px]">
+                    Bitmə tarixi və saatı
+                  </p>
                   <p className="w-full font-medium text-[#14171a] sm:w-[200px]">
-                    {tender.end_date.replace(/\s+/g, ' ').replace('   ', ', ')}
+                    {endAt}
                   </p>
                 </div>
-                <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-12">
+
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-12">
                   <p className="w-full text-[#6b6e71] sm:w-[200px]">Kateqoriya</p>
                   <p className="w-full font-medium text-[#14171a] sm:w-[200px]">
-                    {tender.category?.name?.[locale] ?? tender.category?.name?.az ?? '—'}
+                    {category}
+                  </p>
+                </div>
+
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-12">
+                  <p className="w-full text-[#6b6e71] sm:w-[200px]">Şirkət</p>
+                  <p className="w-full font-medium text-[#14171a] sm:w-[200px]">
+                    {companyName}
                   </p>
                 </div>
               </div>
 
-              <div className="flex flex-col gap-5">
+              <section className="flex flex-col gap-5">
                 <h2 className="text-2xl font-semibold leading-8 text-[#14171a]">
                   Tender haqqında
                 </h2>
@@ -94,9 +114,9 @@ export default async function TenderDetailPage({
                   className="prose max-w-none text-[#32393f] prose-p:leading-6"
                   dangerouslySetInnerHTML={{ __html: tender.description }}
                 />
-              </div>
+              </section>
 
-              <div className="flex flex-col gap-5">
+              <section className="flex flex-col gap-5">
                 <h2 className="text-2xl font-semibold leading-8 text-[#14171a]">
                   Tələb olunan sənədlər
                 </h2>
@@ -104,94 +124,134 @@ export default async function TenderDetailPage({
                   className="prose max-w-none text-[#32393f] prose-p:leading-6"
                   dangerouslySetInnerHTML={{ __html: tender.required_documents }}
                 />
-              </div>
+              </section>
 
-              <div className="rounded-xl bg-[#e6eff6] p-6">
-                <div className="flex flex-col gap-6">
-                  <div className="flex items-start gap-3">
-                    <span className="inline-flex size-6 items-center justify-center text-[#0f477d]" aria-hidden>
-                      <Info className="size-5" />
-                    </span>
-                    <p className="text-base leading-6 text-[#32393f]">
-                      Təchizatçılar təklifləri təqdim etmək üçün iştirak haqqı ödəməlidirlər. Təchizatçıların sayının
-                      üçdən az olmasına görə satınalmanın baş tutmadığı hallar istisna olmaqla, iştirak haqqı heç bir
-                      halda geri qaytarılmır.
-                    </p>
+              <section className="flex flex-col gap-5">
+                <h2 className="text-2xl font-semibold leading-8 text-[#14171a]">
+                  Əlaqə məlumatları
+                </h2>
+
+                <div className="w-full overflow-hidden rounded-[14px] border border-[#eaf1fa] bg-white">
+                  <div className="hidden w-full items-stretch sm:flex">
+                    <div className="flex w-[204px] items-center justify-center border-r border-[#eaf1fa] px-6 py-5 text-sm leading-5 text-[#1d212a]">
+                      {contactName}
+                    </div>
+                    <div className="flex flex-1 items-center justify-center border-r border-[#eaf1fa] px-6 py-5 text-sm leading-5 text-[#1d212a]">
+                      {contactPosition}
+                    </div>
+                    <div className="flex flex-1 items-center justify-center border-r border-[#eaf1fa] px-6 py-5 text-sm leading-5 text-[#0f477d]">
+                      {contactEmail}
+                    </div>
+                    <div className="flex flex-1 items-center justify-center border-r border-[#eaf1fa] px-6 py-5 text-sm leading-5 text-[#0f477d]">
+                      {contactPhone}
+                    </div>
+                    <div className="flex w-[194px] items-center justify-center gap-3 px-6 py-4">
+                      {instagram ? (
+                        <a
+                          href={instagram}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex size-8 items-center justify-center rounded-[26px] bg-[#e6eff6] p-[6px] hover:opacity-80"
+                          aria-label="Instagram"
+                        >
+                          <Image src="/icons/brand-instagram.svg" alt="" width={20} height={20} />
+                        </a>
+                      ) : null}
+                      {facebook ? (
+                        <a
+                          href={facebook}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex size-8 items-center justify-center rounded-[26px] bg-[#e6eff6] p-[6px] hover:opacity-80"
+                          aria-label="Facebook"
+                        >
+                          <Image src="/icons/brand-facebook.svg" alt="" width={20} height={20} />
+                        </a>
+                      ) : null}
+                      {linkedin ? (
+                        <a
+                          href={linkedin}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex size-8 items-center justify-center rounded-[26px] bg-[#e6eff6] p-[6px] hover:opacity-80"
+                          aria-label="LinkedIn"
+                        >
+                          <Image src="/icons/brand-linkedin.svg" alt="" width={20} height={20} />
+                        </a>
+                      ) : null}
+                    </div>
                   </div>
 
-                  <p className="text-2xl font-semibold leading-8 text-[#14171a]">
-                    İştirak haqqı: —
-                  </p>
-
-                  <div className="h-px w-full bg-[#dadee2]" />
-
-                  <div className="flex flex-col gap-5">
-                    <p className="text-xl font-medium leading-7 text-[#14171a]">
-                      Əlaqə vasitələri
-                    </p>
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-12">
-                      <a
-                        href={`tel:${normalizeTel(tender.contact_phone)}`}
-                        className="inline-flex items-center gap-3 text-sm font-medium leading-5 text-[#14171a] hover:opacity-80"
-                      >
-                        <Phone className="size-5 text-[#0f477d]" aria-hidden />
-                        {tender.contact_phone}
-                      </a>
-                      <a
-                        href={`mailto:${tender.contact_email}`}
-                        className="inline-flex items-center gap-3 text-sm font-medium leading-5 text-[#14171a] hover:opacity-80"
-                      >
-                        <Mail className="size-5 text-[#0f477d]" aria-hidden />
-                        {tender.contact_email}
-                      </a>
+                  <div className="grid grid-cols-1 sm:hidden">
+                    <div className="flex items-center justify-center border-b border-[#eaf1fa] px-6 py-4 text-sm leading-5 text-[#1d212a]">
+                      {contactName}
                     </div>
-
-                    <div className="flex flex-wrap items-center gap-3">
-                      <span className="inline-flex items-center gap-2 rounded-lg border border-[#dadee2] bg-white px-2.5 py-2 text-sm leading-5 text-[#1d212a]">
-                        <span className="text-sm leading-5">Paylaş:</span>
-                        <div className="flex items-center gap-1.5">
-                          <a
-                            className="hover:opacity-70"
-                            href={shareUrls.whatsapp}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label="WhatsApp"
-                          >
-                            <Image src="/icons/brand-whatsapp.svg" alt="WhatsApp" width={16} height={16} />
-                          </a>
-                          <a
-                            className="hover:opacity-70"
-                            href={shareUrls.telegram}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label="Telegram"
-                          >
-                            <Image src="/icons/brand-telegram.svg" alt="Telegram" width={16} height={16} />
-                          </a>
-                          <a
-                            className="hover:opacity-70"
-                            href={shareUrls.facebook}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label="Facebook"
-                          >
-                            <Image src="/icons/brand-facebook.svg" alt="Facebook" width={16} height={16} />
-                          </a>
-                          <a
-                            className="hover:opacity-70"
-                            href={shareUrls.x}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label="X"
-                          >
-                            <Image src="/icons/brand-x.svg" alt="X" width={16} height={16} />
-                          </a>
-                        </div>
-                      </span>
+                    <div className="flex items-center justify-center border-b border-[#eaf1fa] px-6 py-4 text-sm leading-5 text-[#1d212a]">
+                      {contactPosition}
+                    </div>
+                    <div className="flex items-center justify-center border-b border-[#eaf1fa] px-6 py-4 text-sm leading-5 text-[#0f477d]">
+                      {contactEmail}
+                    </div>
+                    <div className="flex items-center justify-center border-b border-[#eaf1fa] px-6 py-4 text-sm leading-5 text-[#0f477d]">
+                      {contactPhone}
+                    </div>
+                    <div className="flex items-center justify-center gap-3 px-6 py-4">
+                      {instagram ? (
+                        <a
+                          href={instagram}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex size-8 items-center justify-center rounded-[26px] bg-[#e6eff6] p-[6px] hover:opacity-80"
+                          aria-label="Instagram"
+                        >
+                          <Image src="/icons/brand-instagram.svg" alt="" width={20} height={20} />
+                        </a>
+                      ) : null}
+                      {facebook ? (
+                        <a
+                          href={facebook}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex size-8 items-center justify-center rounded-[26px] bg-[#e6eff6] p-[6px] hover:opacity-80"
+                          aria-label="Facebook"
+                        >
+                          <Image src="/icons/brand-facebook.svg" alt="" width={20} height={20} />
+                        </a>
+                      ) : null}
+                      {linkedin ? (
+                        <a
+                          href={linkedin}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex size-8 items-center justify-center rounded-[26px] bg-[#e6eff6] p-[6px] hover:opacity-80"
+                          aria-label="LinkedIn"
+                        >
+                          <Image src="/icons/brand-linkedin.svg" alt="" width={20} height={20} />
+                        </a>
+                      ) : null}
                     </div>
                   </div>
                 </div>
+              </section>
+
+              <div className="rounded-[12px] bg-[#e6eff6] p-6">
+                <div className="flex gap-3">
+                  <span
+                    className="mt-0.5 inline-flex size-5 items-center justify-center rounded-full bg-[#0f477d] text-xs font-semibold text-white"
+                    aria-hidden
+                  >
+                    i
+                  </span>
+                  <p className="text-base leading-6 text-[#32393f]">
+                    Təchizatçılar təklifləri təqdim etmək üçün iştirak haqqı
+                    ödəməlidirlər. Təchizatçıların sayının üçdən az olmasına görə
+                    satınalmanın baş tutmadığı hallar istisna olmaqla, iştirak
+                    haqqı heç bir halda geri qaytarılmır.
+                  </p>
+                </div>
               </div>
+
+              <p className="sr-only">{pageUrl}</p>
             </div>
           </div>
         </div>

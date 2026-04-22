@@ -207,6 +207,39 @@ export interface TenderCategoryResponse {
   updated_at: string
 }
 
+export type LocalizedName = Record<string, string>
+
+export interface TenderCompanyResponse {
+  id: number
+  user_id: number
+  category_id: number
+  name: string
+  voen: string
+  country_id: number
+  description: string
+  logo: string
+  phone: string
+  email: string
+  address: string
+  status: number
+  website: string
+  instagram: string
+  facebook: string
+  linkedin: string
+  created_at: string
+  updated_at: string
+  deleted_at: string | null
+}
+
+export interface TenderCountryResponse {
+  id: number
+  name: LocalizedName
+  flag: string
+  lang_code: string
+  created_at: string
+  updated_at: string
+}
+
 export interface TenderResponse {
   id: number
   user_id: number
@@ -228,10 +261,48 @@ export interface TenderResponse {
   contact_linkedin: string
   contact_twitter: string
   category: TenderCategoryResponse
+  company?: TenderCompanyResponse
+  country?: TenderCountryResponse
   notify_by_email: boolean
   is_active: boolean
   created_at: string
   updated_at: string
+}
+
+/**
+ * Public `all-tenders` endpoint response item.
+ * Differences from `TenderResponse`:
+ * - `user_id` can be null
+ * - `category` can be null
+ * - some contact fields can be null
+ */
+export interface PublicTenderResponse {
+  id: number
+  user_id: number | null
+  title: string
+  slug: string
+  start_date: string
+  end_date: string
+  description: string
+  required_documents: string
+  contact_name: string | null
+  contact_position: string | null
+  contact_email: string | null
+  contact_phone: string | null
+  contact_instagram: string | null
+  contact_facebook: string | null
+  contact_linkedin: string | null
+  contact_twitter: string | null
+  category: TenderCategoryResponse | null
+  notify_by_email: boolean
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface PublicTenderDetailData {
+  tender: PublicTenderResponse
+  other_tenders: PublicTenderResponse[]
 }
 
 /** POST /tenders — JSON body */
