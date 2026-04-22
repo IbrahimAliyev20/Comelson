@@ -79,6 +79,11 @@ function normalizePhone(raw: string): string {
   return t.startsWith('+') ? t : `+${t}`
 }
 
+function phoneHasEnoughDigits(value: string): boolean {
+  const digits = value.replace(/\D/g, '')
+  return digits.length >= 10
+}
+
 /** Figma 459:6806 — Şirkət əlavə et */
 export type CreateCampainProps = {
   onBack: () => void
@@ -167,19 +172,36 @@ export default function CreateCampain({
       (form.elements.namedItem('linkedin') as HTMLInputElement)?.value ?? ''
     ).trim()
 
+    if (!logoFile) {
+      toast.error('Logo yükləyin')
+      return
+    }
     if (!categoryId || !countryId) {
       toast.error('Kateqoriya və ölkə seçin')
       return
     }
-    if (!name || !voen || !email) {
-      toast.error('Məcburi sahələri doldurun')
+    if (!name || !voen) {
+      toast.error('Şirkətin adı və VÖEN məcburidir')
+      return
+    }
+    if (!about.trim()) {
+      toast.error('Şirkət haqqında məlumat daxil edin')
+      return
+    }
+    if (!phoneHasEnoughDigits(phone)) {
+      toast.error('Telefon nömrəsini daxil edin')
+      return
+    }
+    if (!email) {
+      toast.error('Email ünvanını daxil edin')
+      return
+    }
+    if (!address) {
+      toast.error('Ünvanı daxil edin')
       return
     }
 
-    const description =
-      about.trim().length > 0
-        ? `<p>${escapeHtmlPlain(about)}</p>`
-        : '<p></p>'
+    const description = `<p>${escapeHtmlPlain(about.trim())}</p>`
 
     createMutation.mutate({
       locale,
@@ -207,7 +229,7 @@ export default function CreateCampain({
         <button
           type="button"
           onClick={onBack}
-          className="flex size-6 shrink-0 items-center justify-center rounded-md text-[#1d212a] transition-colors hover:bg-[#f4fafd]"
+          className="flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-md text-[#1d212a] transition-colors hover:bg-[#f4fafd]"
           aria-label="Geri"
         >
           <ChevronLeft className="size-6" aria-hidden />
@@ -218,6 +240,7 @@ export default function CreateCampain({
       </div>
 
       <form
+        noValidate
         onSubmit={handleSubmit}
         className="flex flex-col gap-12 px-6 sm:px-12"
       >
@@ -231,6 +254,7 @@ export default function CreateCampain({
                 type="file"
                 accept="image/jpeg,image/png,image/jpg"
                 className="sr-only"
+                aria-required="true"
                 onChange={(ev) => {
                   const f = ev.target.files?.[0]
                   setLogoFile(f ?? null)
@@ -250,7 +274,10 @@ export default function CreateCampain({
             </label>
             <div className="flex min-w-0 flex-col gap-2.5">
               <p className="text-sm font-medium leading-5 text-[#14171a]">
-                Şirkətinizin rəsmi logosunu əlavə edin
+                Şirkətinizin rəsmi logosunu əlavə edin{' '}
+                <span className="text-[#ff3b30]" aria-hidden>
+                  *
+                </span>
               </p>
               <p className="text-xs leading-4 text-[#6b6e71]">
                 JPG, JPEG və ya PNG formatı • Maksimum 5 MB
@@ -260,32 +287,50 @@ export default function CreateCampain({
 
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-x-8">
             <label className="flex flex-col gap-2">
-              <FieldLabel>Şirkətin adı</FieldLabel>
+              <FieldLabel>
+                Şirkətin adı{' '}
+                <span className="text-[#ff3b30]" aria-hidden>
+                  *
+                </span>
+              </FieldLabel>
               <input
                 name="companyName"
                 type="text"
                 placeholder="Şirkət adını daxil edin"
                 autoComplete="organization"
+                aria-required="true"
                 className={inputClass}
               />
             </label>
             <label className="flex flex-col gap-2">
-              <FieldLabel>Şirkətin VÖEN-i</FieldLabel>
+              <FieldLabel>
+                Şirkətin VÖEN-i{' '}
+                <span className="text-[#ff3b30]" aria-hidden>
+                  *
+                </span>
+              </FieldLabel>
               <input
                 name="voen"
                 type="text"
                 inputMode="numeric"
                 placeholder="Şirkətin VÖEN-ni daxil edin"
+                aria-required="true"
                 className={inputClass}
               />
             </label>
             <div className="flex flex-col gap-2">
-              <FieldLabel>Kateqoriya</FieldLabel>
+              <FieldLabel>
+                Kateqoriya{' '}
+                <span className="text-[#ff3b30]" aria-hidden>
+                  *
+                </span>
+              </FieldLabel>
               <NativeSelect
                 name="category"
                 value={categoryId}
                 onChange={(e) => setCategoryId(e.target.value)}
                 required
+                aria-required="true"
                 disabled={categoriesLoading}
               >
                 <option value="" disabled>
@@ -299,12 +344,18 @@ export default function CreateCampain({
               </NativeSelect>
             </div>
             <div className="flex flex-col gap-2">
-              <FieldLabel>Ölkə</FieldLabel>
+              <FieldLabel>
+                Ölkə{' '}
+                <span className="text-[#ff3b30]" aria-hidden>
+                  *
+                </span>
+              </FieldLabel>
               <NativeSelect
                 name="country"
                 value={countryId}
                 onChange={(e) => setCountryId(e.target.value)}
                 required
+                aria-required="true"
                 disabled={countriesLoading}
               >
                 <option value="" disabled>
@@ -321,7 +372,10 @@ export default function CreateCampain({
 
           <div className="flex flex-col gap-2">
             <span className={cn(labelClass, 'text-[#32393f]')}>
-              Şirkət haqqında
+              Şirkət haqqında{' '}
+              <span className="text-[#ff3b30]" aria-hidden>
+                *
+              </span>
             </span>
             <div className="overflow-hidden rounded-xl border border-[#b5b8bb] bg-[#f4fafd]">
               <div
@@ -356,6 +410,7 @@ export default function CreateCampain({
                 onChange={(e) => setAbout(e.target.value)}
                 placeholder="Şirkət haqqında məlumat daxil edin"
                 rows={6}
+                aria-required="true"
                 className="min-h-[140px] w-full resize-y border-0 bg-transparent px-4 py-4 text-sm leading-5 text-[#1d212a] outline-none placeholder:text-[#889097]"
               />
             </div>
@@ -369,46 +424,69 @@ export default function CreateCampain({
           </h3>
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-x-8">
             <div className="flex flex-col gap-2">
-              <FieldLabel>Telefon nömrəsi</FieldLabel>
+              <FieldLabel>
+                Telefon nömrəsi{' '}
+                <span className="text-[#ff3b30]" aria-hidden>
+                  *
+                </span>
+              </FieldLabel>
               <input type="hidden" name="phone" value={phone} />
               <PhoneInput
                 country="az"
                 value={phone}
                 onChange={(value) => setPhone(value)}
                 placeholder="Nömrənizi daxil edin"
+                inputProps={{
+                  required: false,
+                  'aria-required': true,
+                }}
                 inputStyle={{
                   width: '100%',
                   height: '48px',
-                  borderRadius: '12px',
-                  border: '1px solid #d1d5db',
+                  borderRadius: '0 12px 12px 0',
+                  border: '1px solid #ebeff4',
+                  borderLeft: 'none',
+                  backgroundColor: '#f4fafd',
                   fontSize: '16px',
                   paddingLeft: '48px',
                 }}
                 buttonStyle={{
-                  border: '1px solid #d1d5db',
+                  border: '1px solid #ebeff4',
                   borderRadius: '12px 0 0 12px',
-                  backgroundColor: 'transparent',
+                  backgroundColor: '#f4fafd',
                 }}
                 containerStyle={{ width: '100%' }}
               />
             </div>
             <label className="flex flex-col gap-2">
-              <FieldLabel>Email</FieldLabel>
+              <FieldLabel>
+                Email{' '}
+                <span className="text-[#ff3b30]" aria-hidden>
+                  *
+                </span>
+              </FieldLabel>
               <input
                 name="email"
                 type="email"
                 autoComplete="email"
                 placeholder="Email adresini daxil edin"
+                aria-required="true"
                 className={inputClass}
               />
             </label>
           </div>
           <label className="flex flex-col gap-2">
-            <FieldLabel>Ünvan</FieldLabel>
+            <FieldLabel>
+              Ünvan{' '}
+              <span className="text-[#ff3b30]" aria-hidden>
+                *
+              </span>
+            </FieldLabel>
             <input
               name="address"
               type="text"
               placeholder="Şirkətin ünvanını daxil edin"
+              aria-required="true"
               className={inputClass}
             />
           </label>
@@ -463,14 +541,14 @@ export default function CreateCampain({
           <button
             type="button"
             onClick={handleCancel}
-            className="inline-flex h-12 flex-1 items-center justify-center rounded-2xl bg-[#e6eff6] px-6 text-base font-medium leading-6 text-[#0f477d] transition-colors hover:bg-[#d7e6f2] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f477d]"
+            className="inline-flex h-12 flex-1 cursor-pointer items-center justify-center rounded-2xl bg-[#e6eff6] px-6 text-base font-medium leading-6 text-[#0f477d] transition-colors hover:bg-[#d7e6f2] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f477d]"
           >
             Ləğv et
           </button>
           <button
             type="submit"
             disabled={createMutation.isPending}
-            className="inline-flex h-12 flex-1 items-center justify-center rounded-2xl bg-[#0f477d] px-6 text-base font-medium leading-6 text-white transition-colors hover:bg-[#0c3a66] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:opacity-60"
+            className="inline-flex h-12 flex-1 cursor-pointer items-center justify-center rounded-2xl bg-[#0f477d] px-6 text-base font-medium leading-6 text-white transition-colors hover:bg-[#0c3a66] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:opacity-60"
           >
             {createMutation.isPending ? 'Göndərilir…' : 'Əlavə et'}
           </button>
@@ -491,7 +569,7 @@ function ToolbarIconButton({
     <button
       type="button"
       title={label}
-      className="rounded-md p-1.5 text-[#1d212a] transition-colors hover:bg-[#eaf1fa]"
+      className="cursor-pointer rounded-md p-1.5 text-[#1d212a] transition-colors hover:bg-[#eaf1fa]"
     >
       <Icon className="size-6" aria-hidden />
     </button>

@@ -142,7 +142,10 @@ export default function AccountPage() {
                 <button
                   type="button"
                   onClick={() => setActiveTab('account')}
-                  className={cn(navRowShell(activeTab === 'account'), 'text-left')}
+                  className={cn(
+                    navRowShell(activeTab === 'account'),
+                    'cursor-pointer text-left'
+                  )}
                 >
                   <span className="flex min-w-0 flex-1 items-center gap-3.5">
                     <CircleUser
@@ -165,7 +168,10 @@ export default function AccountPage() {
                 <button
                   type="button"
                   onClick={() => setActiveTab('security')}
-                  className={cn(navRowShell(activeTab === 'security'), 'text-left')}
+                  className={cn(
+                    navRowShell(activeTab === 'security'),
+                    'cursor-pointer text-left'
+                  )}
                 >
                   <span className="flex min-w-0 flex-1 items-center gap-3.5">
                     <Shield
@@ -188,7 +194,10 @@ export default function AccountPage() {
                 <button
                   type="button"
                   onClick={() => setActiveTab('companies')}
-                  className={cn(navRowShell(activeTab === 'companies'), 'text-left')}
+                  className={cn(
+                    navRowShell(activeTab === 'companies'),
+                    'cursor-pointer text-left'
+                  )}
                 >
                   <span className="flex min-w-0 flex-1 items-center gap-3.5">
                     <CompaniesNavIcon
@@ -210,7 +219,10 @@ export default function AccountPage() {
                 <button
                   type="button"
                   onClick={() => setActiveTab('tenders')}
-                  className={cn(navRowShell(activeTab === 'tenders'), 'text-left')}
+                  className={cn(
+                    navRowShell(activeTab === 'tenders'),
+                    'cursor-pointer text-left'
+                  )}
                 >
                   <span className="flex min-w-0 flex-1 items-center gap-3.5">
                     <FileText
@@ -236,7 +248,7 @@ export default function AccountPage() {
               <button
                 type="button"
                 onClick={() => setLogoutOpen(true)}
-                className={cn(navRowShell(false), 'text-left')}
+                className={cn(navRowShell(false), 'cursor-pointer text-left')}
               >
                 <span className="flex min-w-0 flex-1 items-center gap-3.5">
                   <LogOut className="size-7 shrink-0 text-[#6b6e71]" aria-hidden />
@@ -280,7 +292,7 @@ export default function AccountPage() {
           <button
             type="button"
             aria-label="Bağla"
-            className="absolute inset-0 bg-black/40"
+            className="absolute inset-0 cursor-pointer bg-black/40"
             onClick={() => setLogoutOpen(false)}
           />
           <div
@@ -295,7 +307,7 @@ export default function AccountPage() {
               <button
                 type="button"
                 onClick={() => setLogoutOpen(false)}
-                className="rounded-xl border border-[#ebf0f7] bg-white px-4 py-2.5 text-sm font-medium text-[#565355] transition-colors hover:bg-[#f4f7fb]"
+                className="cursor-pointer rounded-xl border border-[#ebf0f7] bg-white px-4 py-2.5 text-sm font-medium text-[#565355] transition-colors hover:bg-[#f4f7fb]"
               >
                 Ləğv et
               </button>
@@ -315,7 +327,7 @@ export default function AccountPage() {
                     router.push('/login')
                   }
                 }}
-                className="rounded-xl bg-red-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-red-700 disabled:opacity-60"
+                className="cursor-pointer rounded-xl bg-red-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-red-700 disabled:opacity-60"
               >
                 {logoutPending ? 'Çıxılır…' : 'Hesabdan çıx'}
               </button>

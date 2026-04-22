@@ -200,7 +200,11 @@ export default function MembersSection({
               ))}
             </div>
 
-            {canLoadMore ? (
+            {filtered.length === 0 ? (
+              <div className="w-full rounded-xl border border-[#eaf1fa] bg-white px-6 py-10 text-center text-sm text-[#64717c]">
+                Hazırda üzv yoxdur
+              </div>
+            ) : canLoadMore ? (
               <button
                 type="button"
                 onClick={() => setVisible((v) => v + 9)}

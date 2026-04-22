@@ -5,16 +5,90 @@ import { notFound } from 'next/navigation'
 import Container from '@/components/shared/container'
 import { Link } from '@/i18n/navigation'
 import { getServerQueryClient } from '@/providers/server'
-import { getEventQuery, getEventsQuery } from '@/services/events/queries'
+import { getEventQuery } from '@/services/events/queries'
 
-function stripHtml(value: string) {
+function stripHtml(value?: string | null) {
+  if (!value) return ''
   return value.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
 }
 
+function parseApiDate(value: string): Date | null {
+  // API returns either ISO-ish or `DD-MM-YYYY`
+  const raw = value.trim()
+  const m = raw.match(/^(\d{2})-(\d{2})-(\d{4})$/)
+  if (m) {
+    const [, dd, mm, yyyy] = m
+    const d = new Date(Number(yyyy), Number(mm) - 1, Number(dd))
+    return Number.isNaN(d.getTime()) ? null : d
+  }
+  const d = new Date(raw)
+  return Number.isNaN(d.getTime()) ? null : d
+}
+
 function formatDate(value: string, locale: string) {
-  const d = new Date(value)
-  if (Number.isNaN(d.getTime())) return value
-  return new Intl.DateTimeFormat(locale, { day: '2-digit', month: '2-digit', year: 'numeric' }).format(d)
+  const d = parseApiDate(value)
+  if (!d) return value
+  return new Intl.DateTimeFormat(locale, {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  }).format(d)
+}
+
+type EventLike = {
+  name: string
+  slug: string
+  image: string
+  created_at: string
+  description?: string | null
+  category?: { id: number } | null
+  join_link?: string | null
+}
+
+function asObject(value: unknown): Record<string, unknown> | null {
+  return value && typeof value === 'object' ? (value as Record<string, unknown>) : null
+}
+
+function parseEventLike(value: unknown): EventLike | null {
+  const obj = asObject(value)
+  if (!obj) return null
+  const name = obj.name
+  const slug = obj.slug
+  const image = obj.image
+  const created_at = obj.created_at
+  if (
+    typeof name !== 'string' ||
+    typeof slug !== 'string' ||
+    typeof image !== 'string' ||
+    typeof created_at !== 'string'
+  ) {
+    return null
+  }
+
+  const description = typeof obj.description === 'string' ? obj.description : null
+  const join_link = typeof obj.join_link === 'string' ? obj.join_link : null
+  const categoryObj = asObject(obj.category)
+  const categoryId = categoryObj?.id
+  const category =
+    typeof categoryId === 'number' ? ({ id: categoryId } as const) : null
+
+  return { name, slug, image, created_at, description, join_link, category }
+}
+
+function parseEventDetailPayload(value: unknown): { event: EventLike; otherEvents: EventLike[] } | null {
+  const base = asObject(value)
+  if (!base) return null
+
+  const payload = asObject(base.data) ?? base
+  const event = parseEventLike(payload.event ?? payload)
+  if (!event) return null
+
+  const otherRaw = payload.other_events
+  const otherEvents = Array.isArray(otherRaw)
+    ? otherRaw.map(parseEventLike).filter((x): x is EventLike => x != null)
+    : []
+
+  return { event, otherEvents }
 }
 
 export default async function EventDetailPage({
@@ -25,26 +99,20 @@ export default async function EventDetailPage({
   const { locale, slug } = await params
   const queryClient = getServerQueryClient()
 
-  let event = null
+  let event: EventLike | null = null
+  let otherEvents: EventLike[] = []
   try {
     const singleResponse = await queryClient.fetchQuery(getEventQuery(locale, slug))
-    event = singleResponse?.data ?? singleResponse ?? null
+    const parsed = parseEventDetailPayload(singleResponse)
+    event = parsed?.event ?? null
+    otherEvents = parsed?.otherEvents ?? []
   } catch {
     event = null
   }
 
   if (!event) notFound()
 
-  const relatedCategoryId = event.category?.id ?? null
-  let picked: typeof event[] = []
-  if (relatedCategoryId !== null) {
-    try {
-      const relatedResponse = await queryClient.fetchQuery(getEventsQuery(locale, relatedCategoryId))
-      picked = (relatedResponse?.data ?? []).filter((item) => item.slug !== slug).slice(0, 2)
-    } catch {
-      picked = []
-    }
-  }
+  const picked = otherEvents.filter((item) => item.slug !== slug).slice(0, 2)
 
   const h = await headers()
   const forwardedProto = h.get('x-forwarded-proto')
@@ -143,7 +211,7 @@ export default async function EventDetailPage({
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   {picked.map((item) => (
                     <Link
-                      key={item.slug}
+                      key={`${item.slug}-${item.created_at}`}
                       href={`/events/${item.slug}`}
                       className="group flex flex-col gap-4 rounded-2xl border border-[#eaf1fa] bg-[#fafdff] px-2 pb-5 pt-2"
                     >

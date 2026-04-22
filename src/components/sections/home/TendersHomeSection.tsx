@@ -3,10 +3,27 @@ import { getTranslations } from 'next-intl/server'
 import Image from 'next/image'
 
 import Container from '@/components/shared/container'
+import { TenderSharePopover } from '@/components/tenders/TenderSharePopover'
 import { Link } from '@/i18n/navigation'
-import { tendersHomeRows } from '@/utils/tenders-data'
+import type { PublicTenderResponse } from '@/types/types'
 
-export default async function TendersHomeSection() {
+type TendersHomeSectionProps = {
+  locale: string
+  tenders: PublicTenderResponse[]
+}
+
+function formatApiDateTime(value: string): string {
+  const match = value.trim().match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}:\d{2})/)
+  if (!match) return value
+
+  const [, year, month, day, hourMinute] = match
+  return `${day}.${month}.${year}   ${hourMinute}`
+}
+
+export default async function TendersHomeSection({
+  locale,
+  tenders,
+}: TendersHomeSectionProps) {
   const t = await getTranslations('home')
 
   return (
@@ -20,7 +37,7 @@ export default async function TendersHomeSection() {
             </h2>
 
             <Link
-              href="/tender"
+              href="/tenders"
               className="hidden h-11 w-full shrink-0 items-center justify-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-medium leading-5 text-[#0f477d] transition-opacity hover:opacity-80 min-[400px]:h-12 min-[400px]:w-auto min-[400px]:gap-3 min-[400px]:px-6 min-[400px]:py-3 min-[400px]:text-base min-[400px]:leading-6 lg:inline-flex"
             >
               {t('tenders.cta')}
@@ -28,62 +45,88 @@ export default async function TendersHomeSection() {
             </Link>
           </div>
 
-          <div className="overflow-hidden rounded-[8px] border border-[#f2f9ff] bg-white px-4 py-6 md:px-6 md:py-8">
+          <div className="overflow-hidden rounded-lg border border-[#f2f9ff] bg-white px-6 py-8">
             <div className="w-full overflow-x-auto">
-              <table className="min-w-[980px] w-full border-separate border-spacing-0">
+              <table className="min-w-[1100px] w-full border-separate border-spacing-0">
                 <thead>
-                  <tr className="border-b border-[#f2f9ff]">
-                    <th className="px-4 py-4 text-left text-sm font-medium leading-5 text-[#64717c]">
-                      {t('tenders.columns.no')}
+                  <tr className="border-b border-[#eaf1fa]">
+                    <th className="w-16 px-6 py-4 text-left text-sm font-medium leading-5 text-[#64717c]">
+                      №
                     </th>
-                    <th className="px-4 py-4 text-left text-sm font-medium leading-5 text-[#64717c]">
-                      {t('tenders.columns.buyer')}
+                    <th className="min-w-[236px] px-6 py-4 text-left text-sm font-medium leading-5 text-[#64717c]">
+                      Tender başlığı
                     </th>
-                    <th className="px-4 py-4 text-left text-sm font-medium leading-5 text-[#64717c]">
-                      {t('tenders.columns.subject')}
+                    <th className="min-w-[212px] px-6 py-4 text-left text-sm font-medium leading-5 text-[#64717c]">
+                      Şirkət
                     </th>
-                    <th className="px-4 py-4 text-left text-sm font-medium leading-5 text-[#64717c]">
-                      {t('tenders.columns.start')}
+                    <th className="min-w-[208px] px-6 py-4 text-left text-sm font-medium leading-5 text-[#64717c]">
+                      Tenderin kateqoriyası
                     </th>
-                    <th className="px-4 py-4 text-left text-sm font-medium leading-5 text-[#64717c]">
-                      {t('tenders.columns.end')}
+                    <th className="min-w-[178px] px-6 py-4 text-left text-sm font-medium leading-5 text-[#64717c]">
+                      Başlama tarixi
                     </th>
-                    <th className="px-4 py-4" />
-                    <th className="px-4 py-4" />
+                    <th className="min-w-[178px] px-6 py-4 text-left text-sm font-medium leading-5 text-[#64717c]">
+                      Bitmə tarixi
+                    </th>
+                    <th className="min-w-[120px] px-6 py-4" />
+                    <th className="px-6 py-4" />
                   </tr>
                 </thead>
                 <tbody>
-                  {tendersHomeRows.map((row) => (
-                    <tr key={row.id} className="border-t border-[#eaf1fa]">
-                      <td className="px-4 py-5 align-middle text-sm leading-5 text-[#1d212a]">
-                        {row.id}
+                  {tenders.map((row, index) => (
+                    <tr key={row.id}>
+                      <td className="h-[82px] border-b border-[#eaf1fa] px-6 align-middle text-center text-sm font-normal leading-5 text-[#1d212a]">
+                        {index + 1}
                       </td>
-                      <td className="px-4 py-5 align-middle text-sm leading-5 text-[#1d212a]">
-                        <p className="max-w-[18rem]">{row.buyerName}</p>
+                      <td className="h-[82px] border-b border-[#eaf1fa] px-6 align-middle text-sm font-normal leading-5 text-[#1d212a]">
+                        <p className="max-w-[18rem]">{row.title}</p>
                       </td>
-                      <td className="px-4 py-5 align-middle text-sm leading-5 text-[#1d212a]">
-                        <p className="max-w-[22rem]">{row.subject}</p>
+                      <td className="h-[82px] border-b border-[#eaf1fa] px-6 align-middle">
+                        <div className="flex items-center justify-center gap-3">
+                          <span className="relative inline-flex size-10 shrink-0 overflow-hidden rounded-full border border-[rgba(69,136,183,0.12)] bg-white">
+                            <Image
+                              src="/images/Logo.svg"
+                              alt=""
+                              width={40}
+                              height={40}
+                              className="object-cover"
+                              aria-hidden
+                            />
+                          </span>
+                          <span className="text-sm font-medium leading-5 text-[#1d212a]">
+                            Comelson MMC
+                          </span>
+                        </div>
                       </td>
-                      <td className="px-4 py-5 align-middle whitespace-pre text-sm leading-5 text-[#1d212a]">
-                        {row.startAt}
+                      <td className="h-[82px] border-b border-[#eaf1fa] px-6 align-middle text-sm font-normal leading-5 text-[#1d212a]">
+                        <p className="max-w-[18rem]">
+                          {row.category?.name?.[locale] ??
+                            row.category?.name?.az ??
+                            Object.values(row.category?.name ?? {})[0] ??
+                            '—'}
+                        </p>
                       </td>
-                      <td className="px-4 py-5 align-middle whitespace-pre text-sm leading-5 text-[#1d212a]">
-                        {row.endAt}
+                      <td className="h-[82px] border-b border-[#eaf1fa] px-6 align-middle whitespace-pre text-sm font-normal leading-5 text-[#1d212a]">
+                        {formatApiDateTime(row.start_date)}
                       </td>
-                      <td className="px-4 py-5 align-middle">
+                      <td className="h-[82px] border-b border-[#eaf1fa] px-6 align-middle whitespace-pre text-sm font-normal leading-5 text-[#1d212a]">
+                        {formatApiDateTime(row.end_date)}
+                      </td>
+                      <td className="h-[82px] border-b border-[#eaf1fa] px-6 align-middle">
                         <Link
                           href={`/tenders/${row.slug}`}
-                          className="inline-flex items-center gap-2 text-sm leading-5 text-[#0f477d] transition-opacity hover:opacity-80"
+                          className="inline-flex items-center gap-2 text-sm font-normal leading-5 text-[#0f477d] transition-opacity hover:opacity-80"
                         >
-                          {t('tenders.rowCta')}
-                          <ChevronRight className="size-5" aria-hidden />
+                          Ətraflı
+                          <ChevronRight className="size-6 shrink-0" aria-hidden />
                         </Link>
                       </td>
-                      <td className="px-4 py-5 align-middle">
-                        <div className="flex items-center justify-center">
-                          <span className="inline-flex size-9 items-center justify-center rounded-full bg-[#e6eff6] text-[#0f477d]">
-                            <Image src="/icons/share.svg" alt="tenders-icon" width={20} height={20} />
-                          </span>
+                      <td className="h-[82px] border-b border-[#eaf1fa] px-6 align-middle">
+                        <div className="flex items-center justify-center gap-3">
+                          <TenderSharePopover
+                            slug={row.slug}
+                            tenderTitle={row.title}
+                          />
                         </div>
                       </td>
                     </tr>
@@ -91,6 +134,12 @@ export default async function TendersHomeSection() {
                 </tbody>
               </table>
             </div>
+
+            {!tenders.length ? (
+              <div className="border-t border-[#f2f9ff] px-4 py-6 text-center text-sm text-[#64717c]">
+                Tender tapılmadı
+              </div>
+            ) : null}
 
             <div className="border-t border-[#f2f9ff] bg-white px-4 py-3 text-xs text-[#64717c] sm:hidden">
               <span className="inline-flex items-center gap-2">
@@ -102,7 +151,7 @@ export default async function TendersHomeSection() {
 
           <div className="flex justify-center lg:hidden">
             <Link
-              href="/tender"
+              href="/tenders"
               className="inline-flex h-11 w-full shrink-0 items-center justify-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-medium leading-5 text-[#0f477d] transition-opacity hover:opacity-80 min-[400px]:h-12 min-[400px]:w-auto min-[400px]:gap-3 min-[400px]:px-6 min-[400px]:py-3 min-[400px]:text-base min-[400px]:leading-6"
             >
               {t('tenders.cta')}

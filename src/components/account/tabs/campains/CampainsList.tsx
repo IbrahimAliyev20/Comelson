@@ -1,11 +1,12 @@
 'use client'
-import { CheckCircle2, ChevronRight, Clock4, MoreVertical, PencilIcon, Trash2, XCircle } from 'lucide-react'
+import { CheckCircle2, ChevronRight, Clock4, MoreVertical, PencilIcon, Plus, Trash2, XCircle } from 'lucide-react'
 import { useLocale } from 'next-intl'
 import type { ReactNode } from 'react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { DeleteConfirmDialog } from '@/components/ui/delete-confirm-dialog'
 import { cn } from '@/lib/utils'
 import { companyResponseToCard } from '@/services/companies/company-card-map'
 import { deleteCompanyMutation } from '@/services/companies/mutations'
@@ -100,11 +101,13 @@ export function AddCompanyButton({
       type="button"
       onClick={onClick}
       className={cn(
-        'inline-flex h-12 shrink-0 items-center justify-center gap-4 rounded-2xl bg-[#e6eff6] px-6 py-3 text-base font-medium leading-6 text-[#0f477d] transition-colors hover:bg-[#d7e6f2] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f477d]',
+        'inline-flex h-12 shrink-0 cursor-pointer items-center justify-center gap-4 rounded-2xl bg-[#e6eff6] px-6 py-3 text-base font-medium leading-6 text-[#0f477d] transition-colors hover:bg-[#d7e6f2] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f477d]',
         className
       )}
     >
-      {children ?? 'Şirkət əlavə et'}
+            <Plus className="size-6 shrink-0" aria-hidden />
+
+      {children ?? ' Şirkət əlavə et'}
     </button>
   )
 }
@@ -164,7 +167,7 @@ function CompanyCardItem({
           aria-haspopup="menu"
           aria-expanded={menuOpen}
           onClick={() => setMenuOpen((v) => !v)}
-          className="inline-flex size-10 items-center justify-center rounded-lg bg-[#eaf1fa] text-[#6b6e71] transition-colors hover:bg-[#dfe9f7]"
+          className="inline-flex size-10 cursor-pointer items-center justify-center rounded-lg bg-[#eaf1fa] text-[#6b6e71] transition-colors hover:bg-[#dfe9f7]"
         >
           <MoreVertical className="size-5" aria-hidden />
         </button>
@@ -252,7 +255,7 @@ function CompanyCardItem({
         <button
           type="button"
           onClick={() => onOpen(company)}
-          className="group inline-flex h-12 items-center justify-center gap-3 rounded-2xl px-2 text-base font-medium leading-6 text-[#0f477d] transition-opacity hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f477d]"
+          className="group cursor-pointer inline-flex h-12 items-center justify-center gap-3 rounded-2xl px-2 text-base font-medium leading-6 text-[#0f477d] transition-opacity hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f477d]"
         >
           Ətraflı bax
           <ChevronRight className="size-5 transition-transform group-hover:translate-x-0.5" aria-hidden />
@@ -314,6 +317,7 @@ export default function CampainsList({
   const [selectedCompany, setSelectedCompany] = useState<CompanyCard | null>(
     null
   )
+  const [deleteTarget, setDeleteTarget] = useState<CompanyCard | null>(null)
 
   useEffect(() => {
     if (selectedCompany) return
@@ -329,6 +333,7 @@ export default function CampainsList({
       }
       toast.success('Şirkət silindi')
       void queryClient.invalidateQueries({ queryKey: ['companies'] })
+      setDeleteTarget(null)
     },
     onError: () => {
       toast.error('Şirkət silinmədi')
@@ -365,7 +370,13 @@ export default function CampainsList({
   }
 
   if (view === 'detail' && selectedCompany) {
-    return <CampainsDetail company={selectedCompany} onBack={() => onViewChange('list')} />
+    return (
+      <CampainsDetail
+        company={selectedCompany}
+        onBack={() => onViewChange('list')}
+        onEdit={() => onViewChange('edit')}
+      />
+    )
   }
 
   if (isLoading) {
@@ -392,6 +403,7 @@ export default function CampainsList({
   }
 
   return (
+    <>
     <div className="flex flex-col gap-6 px-6 pt-8 sm:px-12">
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#eaf1fa] pb-6">
         <h2 className="text-2xl font-medium leading-8 text-[#1d212a]">
@@ -417,18 +429,29 @@ export default function CampainsList({
                 setSelectedCompany(item)
                 onViewChange('edit')
               }}
-              onDelete={(item) => {
-                const ok = window.confirm('Şirkəti silmək istəyirsiniz?')
-                if (!ok) return
-                const id = Number(item.id)
-                if (Number.isNaN(id)) return
-                deleteMutation.mutate({ locale, id })
-                setSelectedCompany((prev) => (prev?.id === item.id ? null : prev))
-              }}
+              onDelete={(item) => setDeleteTarget(item)}
             />
           ))}
         </div>
       )}
     </div>
+    <DeleteConfirmDialog
+      open={deleteTarget !== null}
+      onOpenChange={(next) => {
+        if (!next) setDeleteTarget(null)
+      }}
+      title="Şirkəti silmək istədiyinizə əminsiniz?"
+      confirmPending={deleteMutation.isPending}
+      onConfirm={() => {
+        if (!deleteTarget) return
+        const id = Number(deleteTarget.id)
+        if (Number.isNaN(id)) return
+        setSelectedCompany((prev) =>
+          prev?.id === deleteTarget.id ? null : prev
+        )
+        deleteMutation.mutate({ locale, id })
+      }}
+    />
+    </>
   )
 }

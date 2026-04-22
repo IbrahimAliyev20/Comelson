@@ -95,7 +95,7 @@ export default function Security({ userEmail }: SecurityProps) {
               type="button"
               aria-label={showCurrent ? 'Şifrəni gizlət' : 'Şifrəni göstər'}
               onClick={() => setShowCurrent((v) => !v)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6b6e71] transition-opacity hover:opacity-80"
+              className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-[#6b6e71] transition-opacity hover:opacity-80"
             >
               {showCurrent ? (
                 <EyeOff className="h-5 w-5" aria-hidden />
@@ -125,7 +125,7 @@ export default function Security({ userEmail }: SecurityProps) {
               type="button"
               aria-label={showNew ? 'Şifrəni gizlət' : 'Şifrəni göstər'}
               onClick={() => setShowNew((v) => !v)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6b6e71] transition-opacity hover:opacity-80"
+              className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-[#6b6e71] transition-opacity hover:opacity-80"
             >
               {showNew ? (
                 <EyeOff className="h-5 w-5" aria-hidden />
@@ -157,7 +157,7 @@ export default function Security({ userEmail }: SecurityProps) {
               type="button"
               aria-label={showConfirm ? 'Şifrəni gizlət' : 'Şifrəni göstər'}
               onClick={() => setShowConfirm((v) => !v)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6b6e71] transition-opacity hover:opacity-80"
+              className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-[#6b6e71] transition-opacity hover:opacity-80"
             >
               {showConfirm ? (
                 <EyeOff className="h-5 w-5" aria-hidden />
@@ -175,7 +175,7 @@ export default function Security({ userEmail }: SecurityProps) {
           disabled={!canSubmit || isPending}
           aria-disabled={!canSubmit || isPending}
           className={cn(
-            'inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-[#0f477d] px-6 text-base font-medium leading-6 text-white transition-opacity hover:opacity-95 disabled:opacity-50',
+            'inline-flex h-12 cursor-pointer items-center justify-center gap-2 rounded-2xl bg-[#0f477d] px-6 text-base font-medium leading-6 text-white transition-opacity hover:opacity-95 disabled:opacity-50',
             isPending && 'cursor-wait'
           )}
         >

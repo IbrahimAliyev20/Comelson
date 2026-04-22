@@ -48,7 +48,7 @@ function useAccountTabActive() {
 }
 
 const itemBase =
-  'flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-normal leading-5 transition-colors'
+  'group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-normal leading-5 transition-colors'
 const itemInactive = 'text-[#14171a] hover:bg-[#e6eff6]'
 const itemActive = 'bg-[#e6eff6] font-medium text-[#0f477d]'
 
@@ -142,12 +142,12 @@ export function UserMenuPanel({
         >
           <CircleUser
             className={cn(
-              'size-5 shrink-0',
+              'size-5 shrink-0 transition-colors',
               tabActive.account
                 ? 'text-[#0f477d]'
                 : lightOnDark
                   ? 'text-white/80'
-                  : 'text-[#6b6e71]'
+                  : 'text-[#6b6e71] group-hover:text-[#0f477d]'
             )}
             aria-hidden
           />
@@ -167,12 +167,12 @@ export function UserMenuPanel({
         >
           <Building2
             className={cn(
-              'size-5 shrink-0',
+              'size-5 shrink-0 transition-colors',
               tabActive.companies
                 ? 'text-[#0f477d]'
                 : lightOnDark
                   ? 'text-white/80'
-                  : 'text-[#6b6e71]'
+                  : 'text-[#6b6e71] group-hover:text-[#0f477d]'
             )}
             aria-hidden
           />
@@ -192,12 +192,12 @@ export function UserMenuPanel({
         >
           <FileText
             className={cn(
-              'size-5 shrink-0',
+              'size-5 shrink-0 transition-colors',
               tabActive.tenders
                 ? 'text-[#0f477d]'
                 : lightOnDark
                   ? 'text-white/80'
-                  : 'text-[#6b6e71]'
+                  : 'text-[#6b6e71] group-hover:text-[#0f477d]'
             )}
             aria-hidden
           />
@@ -223,8 +223,8 @@ export function UserMenuPanel({
         >
           <LogOut
             className={cn(
-              'size-5 shrink-0',
-              lightOnDark ? 'text-white/70' : 'text-[#6b6e71]'
+              'size-5 shrink-0 transition-colors',
+              lightOnDark ? 'text-white/70' : 'text-[#6b6e71] group-hover:text-[#0f477d]'
             )}
             aria-hidden
           />

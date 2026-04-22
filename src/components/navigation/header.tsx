@@ -227,7 +227,7 @@ export function Header() {
         <Container>
           <div
             className={cn(
-              'flex items-center justify-between py-5 md:py-6'
+              'flex items-center justify-between py-4 md:py-5'
             )}
           >
             <div className="flex min-w-0 items-center gap-6 md:gap-8 lg:gap-[90px]">

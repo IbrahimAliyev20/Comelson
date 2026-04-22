@@ -152,7 +152,7 @@ function DateInput({
       <button
         type="button"
         onClick={openPicker}
-        className="absolute right-2 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-md text-[#1d212a] transition-colors hover:bg-[#eaf1fa] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f477d]/40"
+        className="absolute right-2 top-1/2 flex size-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-md text-[#1d212a] transition-colors hover:bg-[#eaf1fa] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f477d]/40"
         aria-label="Tarix və saat seçin"
       >
         <CalendarDays className="size-4" aria-hidden />
@@ -172,7 +172,7 @@ function ToolbarIconButton({
     <button
       type="button"
       title={label}
-      className="rounded-md p-1.5 text-[#1d212a] transition-colors hover:bg-[#eaf1fa]"
+      className="cursor-pointer rounded-md p-1.5 text-[#1d212a] transition-colors hover:bg-[#eaf1fa]"
     >
       <Icon className="size-5" aria-hidden />
     </button>
@@ -216,13 +216,13 @@ function EditorField({
           <div className="mx-1 hidden h-6 w-px bg-[#aeaeb2]/40 sm:block" />
           <button
             type="button"
-            className="rounded-md px-1.5 py-1 text-sm font-medium text-[#1d212a] transition-colors hover:bg-[#eaf1fa]"
+            className="cursor-pointer rounded-md px-1.5 py-1 text-sm font-medium text-[#1d212a] transition-colors hover:bg-[#eaf1fa]"
           >
             x2
           </button>
           <button
             type="button"
-            className="rounded-md px-1.5 py-1 text-sm font-medium text-[#1d212a] transition-colors hover:bg-[#eaf1fa]"
+            className="cursor-pointer rounded-md px-1.5 py-1 text-sm font-medium text-[#1d212a] transition-colors hover:bg-[#eaf1fa]"
           >
             x2
           </button>
@@ -385,7 +385,7 @@ export default function EditTender({
           <button
             type="button"
             onClick={onBack}
-            className="flex size-6 shrink-0 items-center justify-center rounded-md text-[#1d212a] transition-colors hover:bg-[#f4fafd]"
+            className="flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-md text-[#1d212a] transition-colors hover:bg-[#f4fafd]"
             aria-label="Geri"
           >
             <ChevronLeft className="size-6" aria-hidden />
@@ -408,7 +408,7 @@ export default function EditTender({
           <button
             type="button"
             onClick={onBack}
-            className="flex size-6 shrink-0 items-center justify-center rounded-md text-[#1d212a] transition-colors hover:bg-[#f4fafd]"
+            className="flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-md text-[#1d212a] transition-colors hover:bg-[#f4fafd]"
             aria-label="Geri"
           >
             <ChevronLeft className="size-6" aria-hidden />
@@ -422,7 +422,7 @@ export default function EditTender({
           <button
             type="button"
             onClick={() => void refetchTender()}
-            className="rounded-2xl bg-[#e6eff6] px-6 py-3 text-sm font-medium text-[#0f477d]"
+            className="cursor-pointer rounded-2xl bg-[#e6eff6] px-6 py-3 text-sm font-medium text-[#0f477d]"
           >
             Yenidən cəhd et
           </button>
@@ -437,7 +437,7 @@ export default function EditTender({
         <button
           type="button"
           onClick={onBack}
-          className="flex size-6 shrink-0 items-center justify-center rounded-md text-[#1d212a] transition-colors hover:bg-[#f4fafd]"
+          className="flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-md text-[#1d212a] transition-colors hover:bg-[#f4fafd]"
           aria-label="Geri"
         >
           <ChevronLeft className="size-6" aria-hidden />
@@ -650,15 +650,17 @@ export default function EditTender({
                 inputStyle={{
                   width: '100%',
                   height: '48px',
-                  borderRadius: '12px',
-                  border: '1px solid #d1d5db',
+                  borderRadius: '0 12px 12px 0',
+                  border: '1px solid #ebeff4',
+                  borderLeft: 'none',
+                  backgroundColor: '#f4fafd',
                   fontSize: '16px',
                   paddingLeft: '48px',
                 }}
                 buttonStyle={{
-                  border: '1px solid #d1d5db',
+                  border: '1px solid #ebeff4',
                   borderRadius: '12px 0 0 12px',
-                  backgroundColor: 'transparent',
+                  backgroundColor: '#f4fafd',
                 }}
                 containerStyle={{ width: '100%' }}
               />
@@ -727,13 +729,13 @@ export default function EditTender({
           <button
             type="button"
             onClick={handleCancel}
-            className="inline-flex h-12 flex-1 items-center justify-center rounded-2xl bg-[#e6eff6] px-6 text-base font-medium leading-6 text-[#0f477d] transition-colors hover:bg-[#d7e6f2] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f477d]"
+            className="inline-flex h-12 flex-1 cursor-pointer items-center justify-center rounded-2xl bg-[#e6eff6] px-6 text-base font-medium leading-6 text-[#0f477d] transition-colors hover:bg-[#d7e6f2] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f477d]"
           >
             Ləğv et
           </button>
           <button
             type="submit"
-            className="inline-flex h-12 flex-1 items-center justify-center rounded-2xl bg-[#0f477d] px-6 text-base font-medium leading-6 text-white transition-colors hover:bg-[#0c3a66] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+            className="inline-flex h-12 flex-1 cursor-pointer items-center justify-center rounded-2xl bg-[#0f477d] px-6 text-base font-medium leading-6 text-white transition-colors hover:bg-[#0c3a66] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
           >
             Dəyişiklikləri yadda saxla
           </button>

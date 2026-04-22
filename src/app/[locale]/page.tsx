@@ -15,6 +15,7 @@ import { getMembersQuery } from "@/services/members/queries";
 import { getSlidersQuery } from "@/services/sliders/queries";
 import { getStatisticsQuery } from "@/services/statistics/queries";
 import { getSuccessStoriesQuery } from "@/services/success-stories/queries";
+import { getAllTendersQuery } from "@/services/tenders/queries";
 
 export default async function Home() {
   const locale = await getServerLocale();
@@ -30,6 +31,14 @@ export default async function Home() {
      queryClient.prefetchQuery(getSuccessStoriesQuery(locale)),
      queryClient.prefetchQuery(getMembersQuery(locale)),
      queryClient.prefetchQuery(getBlogsQuery(locale, null, '')),
+     queryClient.prefetchQuery(
+       getAllTendersQuery({
+         locale,
+         page: 1,
+         per_page: 5,
+         is_active: 1,
+       })
+     ),
     
     ]);
     
@@ -40,13 +49,21 @@ export default async function Home() {
   const sliders = queryClient.getQueryData(getSlidersQuery(locale).queryKey)?.data;
   const about = queryClient.getQueryData(getAboutQuery(locale).queryKey)?.data;
   const successStories = queryClient.getQueryData(getSuccessStoriesQuery(locale).queryKey)?.data;
+  const tenders = queryClient.getQueryData(
+    getAllTendersQuery({
+      locale,
+      page: 1,
+      per_page: 5,
+      is_active: 1,
+    }).queryKey
+  )?.data;
   return (
     <div className="flex flex-col ">
       <HeroHomeSection sliders={sliders} formLogo={formLogo} />
       <AboutHomeSection about={about} />
       <MembersHomeSection members={members} />
       <StatisticsSection statistics={statistics} />
-      <TendersHomeSection />
+      <TendersHomeSection locale={locale} tenders={tenders ?? []} />
       <NewsHomeSection blogs={blogs} />
       <SuccessHomeStories successStories={successStories} />
       <CtaBanner />

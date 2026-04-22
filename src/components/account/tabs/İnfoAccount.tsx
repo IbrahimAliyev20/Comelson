@@ -100,7 +100,7 @@ export default function InfoAccount({
           <button
             type="button"
             onClick={onRetry}
-            className="self-start rounded-lg border border-current px-3 py-1.5 text-sm font-medium hover:opacity-90"
+            className="cursor-pointer self-start rounded-lg border border-current px-3 py-1.5 text-sm font-medium hover:opacity-90"
           >
             Yenidən yüklə
           </button>
@@ -174,7 +174,7 @@ export default function InfoAccount({
           type="button"
           aria-label="Profil şəklini dəyişdirin"
           onClick={() => fileInputRef.current?.click()}
-          className="absolute -right-0.5 -top-1 flex size-8 items-center justify-center rounded-full border border-[#e6eff6] bg-white p-1.5 text-[#6b6e71] shadow-sm transition-opacity hover:opacity-90"
+          className="absolute -right-0.5 -top-1 flex size-8 cursor-pointer items-center justify-center rounded-full border border-[#e6eff6] bg-white p-1.5 text-[#6b6e71] shadow-sm transition-opacity hover:opacity-90"
         >
           <Pencil className="size-5" aria-hidden />
         </button>
@@ -217,7 +217,7 @@ export default function InfoAccount({
           type="button"
           disabled={!canSave}
           onClick={handleSave}
-          className="inline-flex h-12 min-w-[200px] items-center justify-center gap-2 rounded-2xl bg-[#0f477d] px-6 text-base font-medium leading-6 text-white transition-opacity hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex h-12 min-w-[200px] cursor-pointer items-center justify-center gap-2 rounded-2xl bg-[#0f477d] px-6 text-base font-medium leading-6 text-white transition-opacity hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isPending ? (
             <Loader2 className="size-5 animate-spin" aria-hidden />

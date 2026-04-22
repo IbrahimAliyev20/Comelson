@@ -1,4 +1,6 @@
-import { ChevronLeft } from 'lucide-react'
+'use client'
+
+import { ChevronLeft, PencilIcon } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
 
@@ -46,9 +48,11 @@ function initialsFromName(name: string): string {
 export default function CampainsDetail({
   company,
   onBack,
+  onEdit,
 }: {
   company: CompanyCard
   onBack: () => void
+  onEdit?: () => void
 }) {
   return (
     <div className="flex w-full flex-col bg-white pb-12" data-name="company-detail">
@@ -56,14 +60,24 @@ export default function CampainsDetail({
         <button
           type="button"
           onClick={onBack}
-          className="flex size-6 shrink-0 items-center justify-center rounded-md text-[#1d212a] transition-colors hover:bg-[#f4fafd]"
+          className="flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-md text-[#1d212a] transition-colors hover:bg-[#f4fafd]"
           aria-label="Geri"
         >
           <ChevronLeft className="size-6" aria-hidden />
         </button>
-        <h2 className="text-2xl font-medium leading-8 text-[#1d212a]">
+        <h2 className="min-w-0 flex-1 truncate text-2xl font-medium leading-8 text-[#1d212a]">
           {company.name}
         </h2>
+        {onEdit ? (
+          <button
+            type="button"
+            onClick={onEdit}
+            className="inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-2xl bg-[#e6eff6] px-4 py-2.5 text-sm font-medium leading-5 text-[#0f477d] transition-colors hover:bg-[#d7e6f2] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f477d] min-[400px]:px-6 min-[400px]:py-3 min-[400px]:text-base min-[400px]:leading-6"
+          >
+            <PencilIcon className="size-4 shrink-0 min-[400px]:size-5" aria-hidden />
+            Redaktə et
+          </button>
+        ) : null}
       </div>
 
       <div className="flex flex-col gap-6 px-6 pt-8 sm:px-12">

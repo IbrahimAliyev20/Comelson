@@ -52,7 +52,7 @@ export default function EventsSection({
             ) : (
               shown.map((item) => (
                 <Link
-                  key={item.slug}
+                  key={`${item.slug}-${item.created_at}`}
                   href={`/${locale}/events/${item.slug}`}
                   className="flex w-full flex-col gap-4 rounded-2xl border border-[#eaf1fa] bg-white px-2 pb-5 pt-2"
                 >

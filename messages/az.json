@@ -24,7 +24,7 @@
     "pricePackages": {
       "titleLine1": "Planı Kəşf Edin",
       "titleLine2": "Sizin üçün Ən Uyğun ",
-      "headerCta": "Tərəfdaşlarımız",
+      "headerCta": "Üzvlərimiz",
       "badge": "Ən çox seçilən",
       "button": "Üzv ol"
     },
@@ -104,6 +104,10 @@
     }
   },
   "common": {
-    "loading": "Yüklənir..."
+    "loading": "Yüklənir...",
+    "pagination": {
+      "previous": "Əvvəlki",
+      "next": "Sonrakı"
+    }
   }
 }

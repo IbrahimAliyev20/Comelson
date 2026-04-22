@@ -1,6 +1,6 @@
 'use client'
 
-import { ChevronLeft } from 'lucide-react'
+import { ChevronLeft, PencilIcon } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 
 import { cn } from '@/lib/utils'
@@ -11,6 +11,43 @@ export type TenderDetailProps = {
   tenderId: number
   locale: string
   onBack: () => void
+  onEdit?: () => void
+}
+
+function DetailHeader({
+  title,
+  onBack,
+  onEdit,
+}: {
+  title: string
+  onBack: () => void
+  onEdit?: () => void
+}) {
+  return (
+    <div className="flex shrink-0 items-center gap-3 border-b border-[#eaf1fa] px-8 py-6">
+      <button
+        type="button"
+        onClick={onBack}
+        className="flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-md text-[#1d212a] transition-colors hover:bg-[#f4fafd]"
+        aria-label="Geri"
+      >
+        <ChevronLeft className="size-6" aria-hidden />
+      </button>
+      <h2 className="min-w-0 flex-1 truncate text-2xl font-medium leading-8 text-[#1d212a]">
+        {title}
+      </h2>
+      {onEdit ? (
+        <button
+          type="button"
+          onClick={onEdit}
+          className="inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-2xl bg-[#e6eff6] px-4 py-2.5 text-sm font-medium leading-5 text-[#0f477d] transition-colors hover:bg-[#d7e6f2] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f477d] min-[400px]:px-6 min-[400px]:py-3 min-[400px]:text-base min-[400px]:leading-6"
+        >
+          <PencilIcon className="size-4 shrink-0 min-[400px]:size-5" aria-hidden />
+          Redaktə et
+        </button>
+      ) : null}
+    </div>
+  )
 }
 
 function FieldRow({
@@ -50,7 +87,12 @@ function htmlOrFallback(html?: string | null): string {
   return v
 }
 
-export default function TenderDetail({ tenderId, locale, onBack }: TenderDetailProps) {
+export default function TenderDetail({
+  tenderId,
+  locale,
+  onBack,
+  onEdit,
+}: TenderDetailProps) {
   const {
     data: tenderResponse,
     isLoading,
@@ -64,17 +106,7 @@ export default function TenderDetail({ tenderId, locale, onBack }: TenderDetailP
   if (isLoading) {
     return (
       <div className="flex w-full flex-col bg-white pb-12" data-name="tender-detail-loading">
-        <div className="flex shrink-0 items-center gap-3 border-b border-[#eaf1fa] px-8 py-6">
-          <button
-            type="button"
-            onClick={onBack}
-            className="flex size-6 shrink-0 items-center justify-center rounded-md text-[#1d212a] transition-colors hover:bg-[#f4fafd]"
-            aria-label="Geri"
-          >
-            <ChevronLeft className="size-6" aria-hidden />
-          </button>
-          <h2 className="text-2xl font-medium leading-8 text-[#1d212a]">Tender</h2>
-        </div>
+        <DetailHeader title="Tender" onBack={onBack} onEdit={onEdit} />
         <div className="px-6 py-10 text-center text-sm text-[#6b6e71] sm:px-12">
           Yüklənir…
         </div>
@@ -85,23 +117,13 @@ export default function TenderDetail({ tenderId, locale, onBack }: TenderDetailP
   if (isError) {
     return (
       <div className="flex w-full flex-col bg-white pb-12" data-name="tender-detail-error">
-        <div className="flex shrink-0 items-center gap-3 border-b border-[#eaf1fa] px-8 py-6">
-          <button
-            type="button"
-            onClick={onBack}
-            className="flex size-6 shrink-0 items-center justify-center rounded-md text-[#1d212a] transition-colors hover:bg-[#f4fafd]"
-            aria-label="Geri"
-          >
-            <ChevronLeft className="size-6" aria-hidden />
-          </button>
-          <h2 className="text-2xl font-medium leading-8 text-[#1d212a]">Tender</h2>
-        </div>
+        <DetailHeader title="Tender" onBack={onBack} onEdit={onEdit} />
         <div className="flex flex-col items-center gap-4 px-6 py-10 text-center sm:px-12">
           <p className="text-sm text-[#6b6e71]">Yükləmə alınmadı</p>
           <button
             type="button"
             onClick={() => void refetch()}
-            className="rounded-2xl bg-[#e6eff6] px-6 py-3 text-sm font-medium text-[#0f477d]"
+            className="cursor-pointer rounded-2xl bg-[#e6eff6] px-6 py-3 text-sm font-medium text-[#0f477d]"
           >
             Yenidən cəhd et
           </button>
@@ -116,17 +138,7 @@ export default function TenderDetail({ tenderId, locale, onBack }: TenderDetailP
   if (!tender) {
     return (
       <div className="flex w-full flex-col bg-white pb-12" data-name="tender-detail-empty">
-        <div className="flex shrink-0 items-center gap-3 border-b border-[#eaf1fa] px-8 py-6">
-          <button
-            type="button"
-            onClick={onBack}
-            className="flex size-6 shrink-0 items-center justify-center rounded-md text-[#1d212a] transition-colors hover:bg-[#f4fafd]"
-            aria-label="Geri"
-          >
-            <ChevronLeft className="size-6" aria-hidden />
-          </button>
-          <h2 className="text-2xl font-medium leading-8 text-[#1d212a]">Tender</h2>
-        </div>
+        <DetailHeader title="Tender" onBack={onBack} onEdit={onEdit} />
         <div className="px-6 py-10 text-center text-sm text-[#6b6e71] sm:px-12">
           Məlumat tapılmadı
         </div>
@@ -139,19 +151,7 @@ export default function TenderDetail({ tenderId, locale, onBack }: TenderDetailP
 
   return (
     <div className="flex w-full flex-col bg-white pb-12" data-name="tender-detail">
-      <div className="flex shrink-0 items-center gap-3 border-b border-[#eaf1fa] px-8 py-6">
-        <button
-          type="button"
-          onClick={onBack}
-          className="flex size-6 shrink-0 items-center justify-center rounded-md text-[#1d212a] transition-colors hover:bg-[#f4fafd]"
-          aria-label="Geri"
-        >
-          <ChevronLeft className="size-6" aria-hidden />
-        </button>
-        <h2 className="text-2xl font-medium leading-8 text-[#1d212a]">
-          {tender.title}
-        </h2>
-      </div>
+      <DetailHeader title={tender.title} onBack={onBack} onEdit={onEdit} />
 
       <div className="flex flex-col gap-6 px-6 pt-8 sm:px-12">
         <div className="rounded-xl border border-[#eaf1fa] bg-white p-5">

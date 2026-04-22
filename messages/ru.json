@@ -104,6 +104,10 @@
     }
   },
   "common": {
-    "loading": "Загрузка..."
+    "loading": "Загрузка...",
+    "pagination": {
+      "previous": "Назад",
+      "next": "Вперёд"
+    }
   }
 }

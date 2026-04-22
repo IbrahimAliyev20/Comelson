@@ -5,12 +5,12 @@ import {
   AlignLeft,
   AlignRight,
   Bold,
-  Camera,
   ChevronDown,
   ChevronLeft,
   Code,
   ImageIcon,
   Italic,
+  ImagePlus,
   Link2,
   List,
   ListOrdered,
@@ -243,7 +243,7 @@ export default function EditCampain({
         <button
           type="button"
           onClick={onCancel}
-          className="flex size-6 shrink-0 items-center justify-center rounded-md text-[#1d212a] transition-colors hover:bg-[#f4fafd]"
+          className="flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-md text-[#1d212a] transition-colors hover:bg-[#f4fafd]"
           aria-label="Geri"
         >
           <ChevronLeft className="size-6" aria-hidden />
@@ -277,8 +277,11 @@ export default function EditCampain({
                 alt={form.name}
                 className="size-full rounded-full object-cover"
               />
-              <span className="absolute right-0 top-0 flex size-8 items-center justify-center rounded-full border border-[#e6eff6] bg-white text-[#6b6e71] shadow-sm">
-                <Camera className="size-4" aria-hidden />
+              <span
+                className="pointer-events-none absolute right-0 top-0 z-10 flex size-9 items-center justify-center rounded-full border-2 border-white bg-[#e6eff6] text-[#0f477d] shadow-[0_2px_8px_rgba(15,71,125,0.25)] ring-1 ring-[#0f477d]/15"
+                aria-hidden
+              >
+                <ImagePlus className="size-5 shrink-0 stroke-[2.25]" />
               </span>
               <span className="sr-only">Logo yüklə</span>
             </label>
@@ -433,15 +436,17 @@ export default function EditCampain({
                 inputStyle={{
                   width: '100%',
                   height: '48px',
-                  borderRadius: '12px',
-                  border: '1px solid #d1d5db',
+                  borderRadius: '0 12px 12px 0',
+                  border: '1px solid #ebeff4',
+                  borderLeft: 'none',
+                  backgroundColor: '#f4fafd',
                   fontSize: '16px',
                   paddingLeft: '48px',
                 }}
                 buttonStyle={{
-                  border: '1px solid #d1d5db',
+                  border: '1px solid #ebeff4',
                   borderRadius: '12px 0 0 12px',
-                  backgroundColor: 'transparent',
+                  backgroundColor: '#f4fafd',
                 }}
                 containerStyle={{ width: '100%' }}
               />
@@ -524,14 +529,14 @@ export default function EditCampain({
           <button
             type="button"
             onClick={onCancel}
-            className="inline-flex h-12 flex-1 items-center justify-center rounded-2xl bg-[#e6eff6] px-6 text-base font-medium leading-6 text-[#0f477d] transition-colors hover:bg-[#d7e6f2] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f477d]"
+            className="inline-flex h-12 flex-1 cursor-pointer items-center justify-center rounded-2xl bg-[#e6eff6] px-6 text-base font-medium leading-6 text-[#0f477d] transition-colors hover:bg-[#d7e6f2] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f477d]"
           >
             Ləğv et
           </button>
           <button
             type="submit"
             disabled={updateMutation.isPending}
-            className="inline-flex h-12 flex-1 items-center justify-center rounded-2xl bg-[#0f477d] px-6 text-base font-medium leading-6 text-white transition-colors hover:bg-[#0c3a66] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:opacity-60"
+            className="inline-flex h-12 flex-1 cursor-pointer items-center justify-center rounded-2xl bg-[#0f477d] px-6 text-base font-medium leading-6 text-white transition-colors hover:bg-[#0c3a66] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:opacity-60"
           >
             {updateMutation.isPending ? 'Saxlanılır…' : 'Yadda saxla'}
           </button>
@@ -552,7 +557,7 @@ function ToolbarIconButton({
     <button
       type="button"
       title={label}
-      className="rounded-md p-1.5 text-[#1d212a] transition-colors hover:bg-[#eaf1fa]"
+      className="cursor-pointer rounded-md p-1.5 text-[#1d212a] transition-colors hover:bg-[#eaf1fa]"
     >
       <Icon className="size-5" aria-hidden />
     </button>

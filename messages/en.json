@@ -104,6 +104,10 @@
     }
   },
   "common": {
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next"
+    }
   }
 }

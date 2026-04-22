@@ -2,8 +2,10 @@
 
 import {
   CalendarDays,
+  CheckCircle2,
   ChevronDown,
   ChevronRight,
+  Clock4,
   FileText,
   MoreVertical,
   PencilIcon,
@@ -18,6 +20,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import Cookies from 'js-cookie'
 import { toast } from 'sonner'
 
+import { TenderSharePopover } from '@/components/tenders/TenderSharePopover'
+import { DeleteConfirmDialog } from '@/components/ui/delete-confirm-dialog'
 import { cn } from '@/lib/utils'
 import { deleteTenderMutation, postTenderMutation, updateTenderMutation } from '@/services/tenders/mutations'
 import { getTendersQuery } from '@/services/tenders/queries'
@@ -32,12 +36,13 @@ type TenderStatusFilter = 'all' | 'active'
 
 type TenderListItem = {
   id: number
+  slug: string
   title: string
   company: string
   companyLogo: string
   category: string
-  startDate: string
-  endDate: string
+  /** API `is_active` */
+  isActive: boolean
   status: 'active' | 'closed'
 }
 
@@ -69,14 +74,6 @@ function toPositiveNumber(value: string): number | null {
 function inputValueToApiDateTime(value: string): string {
   if (!value.trim()) return ''
   return value.replace('T', ' ').slice(0, 16)
-}
-
-/** API: `YYYY-MM-DD HH:mm` → Form: `YYYY-MM-DDTHH:mm` */
-function apiDateTimeToInputValue(api: string): string {
-  if (!api.trim()) return ''
-  const m = api.match(/^(\d{4}-\d{2}-\d{2})[\sT](\d{2}:\d{2})/)
-  if (m) return `${m[1]}T${m[2]}`
-  return api.replace(' ', 'T').slice(0, 16)
 }
 
 function normalizePhone(raw: string): string {
@@ -112,28 +109,6 @@ function formToCreatePayload(form: CreateTenderForm): CreateTenderPayload {
   }
 }
 
-function tenderToInitialValues(t: TenderResponse): Partial<CreateTenderForm> {
-  return {
-    title: t.title ?? '',
-    categoryId: String(t.category?.id ?? ''),
-    countryId: '',
-    startAt: apiDateTimeToInputValue(t.start_date ?? ''),
-    endAt: apiDateTimeToInputValue(t.end_date ?? ''),
-    company: String(t.company_id ?? ''),
-    about: t.description ?? '',
-    requiredDocuments: t.required_documents ?? '',
-    fullName: t.contact_name ?? '',
-    position: t.contact_position ?? '',
-    email: t.contact_email ?? '',
-    /** `react-phone-input-2` üçün yalnız rəqəmlər */
-    phone: (t.contact_phone ?? '').replace(/\D/g, ''),
-    instagram: t.contact_instagram ?? '',
-    facebook: t.contact_facebook ?? '',
-    linkedin: t.contact_linkedin ?? '',
-    twitter: t.contact_twitter ?? '',
-  }
-}
-
 function getLocalizedLabel(value: Record<string, string> | undefined, locale: string): string {
   if (!value) return '—'
   return value[locale] ?? value.az ?? Object.values(value)[0] ?? '—'
@@ -142,14 +117,31 @@ function getLocalizedLabel(value: Record<string, string> | undefined, locale: st
 function tenderResponseToListItem(t: TenderResponse, locale: string): TenderListItem {
   return {
     id: t.id,
+    slug: t.slug,
     title: t.title,
     company: '—',
     companyLogo: COMPANY_LOGO,
     category: getLocalizedLabel(t.category?.name, locale),
-    startDate: t.start_date.split(/\s+/)[0] ?? t.start_date,
-    endDate: t.end_date.split(/\s+/)[0] ?? t.end_date,
+    isActive: Boolean(t.is_active),
     status: t.is_active ? 'active' : 'closed',
   }
+}
+
+function TenderStatusBadge({ isActive }: { isActive: boolean }) {
+  if (isActive) {
+    return (
+      <span className="inline-flex h-9 w-full max-w-[152px] items-center justify-center gap-2 rounded-2xl bg-[#eaf8ef] px-3 text-xs font-medium leading-5 text-[#34c759] sm:text-sm sm:leading-5">
+        <CheckCircle2 className="size-4 shrink-0" aria-hidden />
+        Aktiv
+      </span>
+    )
+  }
+  return (
+    <span className="inline-flex h-9 w-full max-w-[152px] items-center justify-center gap-2 rounded-2xl bg-[#fffae5] px-3 text-xs font-medium leading-5 text-[#ff9500] sm:text-sm sm:leading-5">
+      <Clock4 className="size-4 shrink-0" aria-hidden />
+      Deaktiv
+    </span>
+  )
 }
 
 function AddTenderButton({
@@ -164,7 +156,7 @@ function AddTenderButton({
       type="button"
       onClick={onClick}
       className={cn(
-        'inline-flex h-12 items-center justify-center gap-4 rounded-2xl bg-[#0f477d] px-6 text-base font-medium leading-6 text-white transition-colors hover:bg-[#0c3a66] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f477d]',
+        'inline-flex h-12 cursor-pointer items-center justify-center gap-4 rounded-2xl bg-[#e6eff6] px-8 text-base font-medium leading-6 text-[#0f477d] transition-colors hover:bg-[#d7e6f2] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f477d]',
         className
       )}
     >
@@ -210,7 +202,7 @@ function FilterButton({
   return (
     <button
       type="button"
-      className="inline-flex h-12 items-center justify-between rounded-xl border border-[#dadee2] bg-white px-3.5 text-base leading-6 text-[#32393f]"
+      className="inline-flex h-12 cursor-pointer items-center justify-between rounded-xl border border-[#dadee2] bg-white px-3.5 text-base leading-6 text-[#32393f]"
     >
       <span>{label}</span>
       {icon === 'calendar' ? (
@@ -264,7 +256,7 @@ function RowActionMenu({
         aria-haspopup="menu"
         aria-expanded={menuOpen}
         onClick={() => setMenuOpen((v) => !v)}
-        className="inline-flex size-10 items-center justify-center rounded-full bg-[#e6eff6] text-[#0f477d] transition-colors hover:bg-[#d7e6f2]"
+        className="inline-flex size-10 cursor-pointer items-center justify-center rounded-full bg-[#e6eff6] text-[#0f477d] transition-colors hover:bg-[#d7e6f2]"
       >
         <MoreVertical className="size-5" aria-hidden />
       </button>
@@ -281,7 +273,7 @@ function RowActionMenu({
               setMenuOpen(false)
               onEdit(tender)
             }}
-            className="flex w-full items-center gap-2 rounded-lg px-4 py-3 text-left text-sm text-[#14171a] transition-colors hover:bg-[#f4fafd]"
+            className="flex w-full cursor-pointer items-center gap-2 rounded-lg px-4 py-3 text-left text-sm text-[#14171a] transition-colors hover:bg-[#f4fafd]"
           >
             <PencilIcon className="size-4" aria-hidden />
             Redaktə et
@@ -293,7 +285,7 @@ function RowActionMenu({
               setMenuOpen(false)
               onDelete(tender)
             }}
-            className="flex w-full items-center gap-2 rounded-lg px-4 py-3 text-left text-sm text-red-600 transition-colors hover:bg-red-50"
+            className="flex w-full cursor-pointer items-center gap-2 rounded-lg px-4 py-3 text-left text-sm text-red-600 transition-colors hover:bg-red-50"
           >
             <Trash2 className="size-4" aria-hidden />
             Sil
@@ -301,34 +293,6 @@ function RowActionMenu({
         </div>
       ) : null}
     </div>
-  )
-}
-
-function ShareButton() {
-  return (
-    <button
-      type="button"
-      className="inline-flex size-10 items-center justify-center rounded-full bg-[#e6eff6] text-[#0f477d] transition-colors hover:bg-[#d7e6f2]"
-      aria-label="Tenderi paylaş"
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="20"
-        height="20"
-        viewBox="0 0 20 20"
-        fill="none"
-        className="size-5"
-        aria-hidden
-      >
-        <path
-          d="M10.8335 3.33301V6.66634C5.35432 7.52301 3.31682 12.323 2.50016 16.6663C2.46932 16.838 6.98682 11.698 10.8335 11.6663V14.9997L17.5002 9.16634L10.8335 3.33301Z"
-          stroke="#0F477D"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    </button>
   )
 }
 
@@ -372,7 +336,7 @@ function TenderTable({
   }, [categoryFilter, query, statusFilter, tenders])
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-4 xl:flex-row xl:items-center">
         <div className="relative min-w-0 flex-1">
           <Search
@@ -431,12 +395,19 @@ function TenderTable({
 
       {/* NOTE: keep overflow visible so row menus can pop out */}
       <div className="rounded-lg border border-[#f2f9ff] bg-white">
-        <div className="hidden grid-cols-[56px_minmax(220px,1.7fr)_minmax(180px,1.1fr)_128px_128px_48px_116px] items-center gap-3 border-b border-[#eaf1fa] px-6 pb-7 text-sm font-medium leading-5 text-[#64717c] lg:grid">
-          <span className="text-center">№</span>
-          <span className="text-left">Tender başlığı</span>
-          <span className="text-center">Şirkət</span>
-          <span className="text-center">Başlama tarixi</span>
-          <span className="text-center">Bitmə tarixi</span>
+        <div className="hidden grid-cols-[56px_minmax(200px,1.6fr)_minmax(160px,1.1fr)_minmax(120px,0.85fr)_44px_108px] items-center gap-2 border-b border-[#eaf1fa] px-4 py-4 text-sm font-medium leading-5 text-[#64717c] lg:grid xl:grid-cols-[56px_minmax(220px,1.8fr)_minmax(180px,1.2fr)_minmax(132px,0.95fr)_48px_116px] xl:gap-3 xl:px-6">
+          <span className="flex items-center justify-center self-center text-center">
+            №
+          </span>
+          <span className="flex items-center self-center text-left">
+            Tender başlığı
+          </span>
+          <span className="flex items-center justify-center self-center text-center">
+            Şirkət
+          </span>
+          <span className="flex items-center justify-center self-center text-center">
+            Status
+          </span>
           <span className="sr-only">Ətraflı</span>
           <span className="sr-only">Əməliyyatlar</span>
         </div>
@@ -447,16 +418,16 @@ function TenderTable({
               key={tender.id}
               className="border-b border-[#eaf1fa] px-0 py-4 last:border-b-0 lg:px-6"
             >
-              <div className="hidden grid-cols-[56px_minmax(220px,1.7fr)_minmax(180px,1.1fr)_128px_128px_48px_116px] items-center gap-3 lg:grid">
-                <span className="text-center text-sm leading-5 text-[#1d212a]">
+              <div className="hidden grid-cols-[56px_minmax(200px,1.6fr)_minmax(160px,1.1fr)_minmax(120px,0.85fr)_44px_108px] items-center gap-2 lg:grid xl:grid-cols-[56px_minmax(220px,1.8fr)_minmax(180px,1.2fr)_minmax(132px,0.95fr)_48px_116px] xl:gap-3">
+                <span className="flex items-center justify-center self-center text-center text-sm leading-5 text-[#1d212a]">
                   {index + 1}
                 </span>
 
-                <p className="max-w-[252px] text-left text-sm leading-7 text-[#1d212a]">
+                <p className="flex max-w-[252px] items-center self-center text-left text-sm leading-6 text-[#1d212a]">
                   {tender.title}
                 </p>
 
-                <div className="flex items-center justify-center gap-3">
+                <div className="flex items-center justify-center gap-3 self-center">
                   <div className="relative size-10 shrink-0 overflow-hidden rounded-full border border-[rgba(69,136,183,0.12)] bg-white">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
@@ -470,14 +441,11 @@ function TenderTable({
                   </span>
                 </div>
 
-                <span className="text-center text-sm leading-5 text-[#1d212a]">
-                  {tender.startDate}
-                </span>
-                <span className="text-center text-sm leading-5 text-[#1d212a]">
-                  {tender.endDate}
-                </span>
+                <div className="flex justify-center self-center px-0.5">
+                  <TenderStatusBadge isActive={tender.isActive} />
+                </div>
 
-                <div className="flex justify-center">
+                <div className="flex justify-center self-center">
                   <button
                     type="button"
                     onClick={() => onOpen(tender)}
@@ -488,8 +456,11 @@ function TenderTable({
                   </button>
                 </div>
 
-                <div className="flex items-center justify-center gap-3">
-                  <ShareButton />
+                <div className="flex items-center justify-center gap-3 self-center">
+                  <TenderSharePopover
+                    slug={tender.slug}
+                    tenderTitle={tender.title}
+                  />
                   <RowActionMenu
                     tender={tender}
                     onEdit={onEdit}
@@ -532,19 +503,15 @@ function TenderTable({
                   </span>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3 text-sm leading-5 text-[#1d212a]">
-                  <div>
-                    <p className="text-xs text-[#64717c]">Başlama tarixi</p>
-                    <p className="mt-1">{tender.startDate}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-[#64717c]">Bitmə tarixi</p>
-                    <p className="mt-1">{tender.endDate}</p>
-                  </div>
+                <div className="flex justify-start">
+                  <TenderStatusBadge isActive={tender.isActive} />
                 </div>
 
                 <div className="flex items-center justify-end gap-3">
-                  <ShareButton />
+                  <TenderSharePopover
+                    slug={tender.slug}
+                    tenderTitle={tender.title}
+                  />
                   <RowActionMenu
                     tender={tender}
                     onEdit={onEdit}
@@ -566,6 +533,7 @@ export default function TenderList() {
 
   const [view, setView] = useState<TenderListView>('list')
   const [selectedTenderId, setSelectedTenderId] = useState<number | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<TenderListItem | null>(null)
 
   const { data, isLoading, isError, refetch } = useQuery(
     getTendersQuery({ locale })
@@ -576,11 +544,6 @@ export default function TenderList() {
   const items = useMemo(() => {
     return tenders.map((t) => tenderResponseToListItem(t, locale))
   }, [locale, tenders])
-
-  const selectedTender = useMemo(() => {
-    if (selectedTenderId == null) return null
-    return tenders.find((t) => t.id === selectedTenderId) ?? null
-  }, [selectedTenderId, tenders])
 
   const createTender = useMutation({
     ...postTenderMutation(),
@@ -620,6 +583,7 @@ export default function TenderList() {
       }
       toast.success('Tender silindi')
       void queryClient.invalidateQueries({ queryKey: ['tenders'] })
+      setDeleteTarget(null)
     },
     onError: () => toast.error('Tender silinmədi'),
   })
@@ -669,11 +633,13 @@ export default function TenderList() {
           setSelectedTenderId(null)
           setView('list')
         }}
+        onEdit={() => setView('edit')}
       />
     )
   }
 
   return (
+    <>
     <div className="flex h-full min-h-0 w-full flex-col rounded-xl border border-[#eaf1fa] bg-white">
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#eaf1fa] px-8 py-6">
         <h2 className="text-2xl font-medium leading-8 text-[#1d212a]">
@@ -716,14 +682,23 @@ export default function TenderList() {
               setSelectedTenderId(tender.id)
               setView('edit')
             }}
-            onDelete={(tender) => {
-              const ok = window.confirm('Tenderi silmək istəyirsiniz?')
-              if (!ok) return
-              deleteTender.mutate({ locale, id: tender.id })
-            }}
+            onDelete={(tender) => setDeleteTarget(tender)}
           />
         )}
       </div>
     </div>
+    <DeleteConfirmDialog
+      open={deleteTarget !== null}
+      onOpenChange={(next) => {
+        if (!next) setDeleteTarget(null)
+      }}
+      title="Tenderi silmək istədiyinizə əminsiniz?"
+      confirmPending={deleteTender.isPending}
+      onConfirm={() => {
+        if (!deleteTarget) return
+        deleteTender.mutate({ locale, id: deleteTarget.id })
+      }}
+    />
+    </>
   )
 }

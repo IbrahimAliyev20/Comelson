@@ -1,12 +1,13 @@
- 'use client'
+'use client'
 
 import Image from 'next/image'
 import { ChevronRight, Search } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 import Container from '@/components/shared/container'
+import { TenderSharePopover } from '@/components/tenders/TenderSharePopover'
 import { Input } from '@/components/ui/input'
 import {
   Pagination,
@@ -73,6 +74,7 @@ function getPaginationWindow(
 
 export default function TendersSection() {
   const locale = useLocale()
+  const t = useTranslations('common')
   const [query, setQuery] = useState('')
   const [status, setStatus] = useState<StatusFilter>('active')
   const [categoryId, setCategoryId] = useState<number | null>(null)
@@ -121,6 +123,8 @@ export default function TendersSection() {
   const paginationItems = useMemo(() => {
     return getPaginationWindow(currentPage, lastPage, 1)
   }, [currentPage, lastPage])
+
+  const rowNumberOffset = (currentPage - 1) * perPage
 
   return (
     <section className="bg-[#f8fafc] py-8 md:py-[70px]">
@@ -227,88 +231,94 @@ export default function TendersSection() {
             </div>
           </div>
 
-          <div className="overflow-hidden rounded-2xl border border-[#eaf1fa] bg-white">
+          <div className="overflow-hidden rounded-lg border border-[#f2f9ff] bg-white px-6 py-8">
             {isLoading ? (
-              <div className="px-6 py-10 text-center text-sm text-[#6b6e71]">
+              <div className="py-10 text-center text-sm text-[#6b6e71]">
                 Yüklənir…
               </div>
             ) : isError ? (
-              <div className="px-6 py-10 text-center text-sm text-[#6b6e71]">
+              <div className="py-10 text-center text-sm text-[#6b6e71]">
                 Yükləmə alınmadı
               </div>
             ) : null}
             <div className="w-full overflow-x-auto">
-              <table className="min-w-[980px] w-full border-separate border-spacing-0">
+              <table className="min-w-[1100px] w-full border-separate border-spacing-0">
                 <thead>
-                  <tr className="border-b border-[#f2f9ff]">
-                    <th className="px-6 py-5 text-left text-sm font-medium leading-5 text-[#64717c]">
+                  <tr className="border-b border-[#eaf1fa]">
+                    <th className="w-16 px-6 py-4 text-left text-sm font-medium leading-5 text-[#64717c]">
                       №
                     </th>
-                    <th className="px-6 py-5 text-left text-sm font-medium leading-5 text-[#64717c]">
+                    <th className="min-w-[236px] px-6 py-4 text-left text-sm font-medium leading-5 text-[#64717c]">
                       Tender başlığı
                     </th>
-                    <th className="px-6 py-5 text-left text-sm font-medium leading-5 text-[#64717c]">
+                    <th className="min-w-[212px] px-6 py-4 text-left text-sm font-medium leading-5 text-[#64717c]">
                       Şirkət
                     </th>
-                    <th className="px-6 py-5 text-left text-sm font-medium leading-5 text-[#64717c]">
+                    <th className="min-w-[208px] px-6 py-4 text-left text-sm font-medium leading-5 text-[#64717c]">
                       Tenderin kateqoriyası
                     </th>
-                    <th className="px-6 py-5 text-left text-sm font-medium leading-5 text-[#64717c]">
+                    <th className="min-w-[178px] px-6 py-4 text-left text-sm font-medium leading-5 text-[#64717c]">
                       Başlama tarixi
                     </th>
-                    <th className="px-6 py-5 text-left text-sm font-medium leading-5 text-[#64717c]">
+                    <th className="min-w-[178px] px-6 py-4 text-left text-sm font-medium leading-5 text-[#64717c]">
                       Bitmə tarixi
                     </th>
-                    <th className="px-6 py-5" />
-                    <th className="px-6 py-5" />
+                    <th className="min-w-[120px] px-6 py-4" />
+                    <th className="px-6 py-4" />
                   </tr>
                 </thead>
                 <tbody>
                   {rows.map((row, index) => (
-                    <tr key={row.id} className="border-t border-[#eaf1fa]">
-                      <td className="px-6 py-6 align-middle text-sm leading-5 text-[#1d212a]">
-                        {index + 1}
+                    <tr key={row.id}>
+                      <td className="h-[82px] border-b border-[#eaf1fa] px-6 align-middle text-center text-sm font-normal leading-5 text-[#1d212a]">
+                        {rowNumberOffset + index + 1}
                       </td>
-                      <td className="px-6 py-6 align-middle text-sm leading-5 text-[#1d212a]">
+                      <td className="h-[82px] border-b border-[#eaf1fa] px-6 align-middle text-sm font-normal leading-5 text-[#1d212a]">
                         <p className="max-w-[18rem]">{row.title}</p>
                       </td>
-                      <td className="px-6 py-6 align-middle">
-                        <div className="flex items-center gap-3">
-                          <span className="inline-flex size-10 items-center justify-center rounded-full border border-[rgba(69,136,183,0.12)] bg-white text-[#0f477d]">
-                            <span className="text-sm font-semibold leading-none">
-                              C
-                            </span>
+                      <td className="h-[82px] border-b border-[#eaf1fa] px-6 align-middle">
+                        <div className="flex items-center justify-center gap-3">
+                          <span className="relative inline-flex size-10 shrink-0 overflow-hidden rounded-full border border-[rgba(69,136,183,0.12)] bg-white">
+                            <Image
+                              src="/images/Logo.svg"
+                              alt=""
+                              width={40}
+                              height={40}
+                              className="object-cover"
+                              aria-hidden
+                            />
                           </span>
                           <span className="text-sm font-medium leading-5 text-[#1d212a]">
                             Comelson MMC
                           </span>
                         </div>
                       </td>
-                      <td className="px-6 py-6 align-middle text-sm leading-5 text-[#1d212a]">
+                      <td className="h-[82px] border-b border-[#eaf1fa] px-6 align-middle text-sm font-normal leading-5 text-[#1d212a]">
                         <p className="max-w-[18rem]">
                           {getLocalizedLabel(row.category?.name, locale)}
                         </p>
                       </td>
-                      <td className="px-6 py-6 align-middle text-sm leading-5 text-[#1d212a] whitespace-pre">
+                      <td className="h-[82px] border-b border-[#eaf1fa] px-6 align-middle text-sm font-normal leading-5 whitespace-pre text-[#1d212a]">
                         {formatApiDateTime(row.start_date)}
                       </td>
-                      <td className="px-6 py-6 align-middle text-sm leading-5 text-[#1d212a] whitespace-pre">
+                      <td className="h-[82px] border-b border-[#eaf1fa] px-6 align-middle text-sm font-normal leading-5 whitespace-pre text-[#1d212a]">
                         {formatApiDateTime(row.end_date)}
                       </td>
-                      <td className="px-6 py-6 align-middle">
+                      <td className="h-[82px] border-b border-[#eaf1fa] px-6 align-middle">
                         <Link
                           href={`/tenders/${row.slug}`}
-                          className="inline-flex items-center gap-2 text-sm leading-5 text-[#0f477d] transition-opacity hover:opacity-80"
+                          className="inline-flex items-center gap-2 text-sm font-normal leading-5 text-[#0f477d] transition-opacity hover:opacity-80"
                         >
                           Ətraflı
-                          <ChevronRight className="size-5" aria-hidden />
+                          <ChevronRight className="size-6 shrink-0" aria-hidden />
                         </Link>
                       </td>
-                      <td className="px-6 py-6 align-middle">
-                        <div className="flex items-center justify-center">
-                          <span className="inline-flex size-9 items-center justify-center rounded-full bg-[#e6eff6] text-[#0f477d]">
-                            <Image src="/icons/share.svg" alt="" width={20} height={20} aria-hidden />
-                          </span>
+                      <td className="h-[82px] border-b border-[#eaf1fa] px-6 align-middle">
+                        <div className="flex items-center justify-center gap-3">
+                          <TenderSharePopover
+                            slug={row.slug}
+                            tenderTitle={row.title}
+                          />
                         </div>
                       </td>
                     </tr>
@@ -316,11 +326,17 @@ export default function TendersSection() {
                 </tbody>
               </table>
             </div>
+
+            {!isLoading && !isError && rows.length === 0 ? (
+              <div className="border-t border-[#f2f9ff] px-4 py-6 text-center text-sm text-[#64717c]">
+                Axtarışınıza uyğun nəticə tapılmadı
+              </div>
+            ) : null}
           </div>
 
           {lastPage > 1 ? (
-            <Pagination className="pt-6">
-              <PaginationContent>
+            <Pagination className="pt-4">
+              <PaginationContent className="gap-0.5">
                 <PaginationItem>
                   <PaginationPrevious
                     href="#"
@@ -330,8 +346,13 @@ export default function TendersSection() {
                       setPage((p) => Math.max(1, p - 1))
                     }}
                     aria-disabled={!canPrev}
-                    className={cn(!canPrev && 'pointer-events-none opacity-50')}
-                  />
+                    className={cn(
+                      'px-2 text-sm',
+                      !canPrev && 'pointer-events-none opacity-50'
+                    )}
+                  >
+                    {t('pagination.previous')}
+                  </PaginationPrevious>
                 </PaginationItem>
 
                 {paginationItems.map((item, idx) => {
@@ -348,6 +369,7 @@ export default function TendersSection() {
                       <PaginationLink
                         href="#"
                         isActive={item === currentPage}
+                        className="h-9 w-9 text-sm"
                         onClick={(e) => {
                           e.preventDefault()
                           setPage(item)
@@ -368,8 +390,13 @@ export default function TendersSection() {
                       setPage((p) => Math.min(lastPage, p + 1))
                     }}
                     aria-disabled={!canNext}
-                    className={cn(!canNext && 'pointer-events-none opacity-50')}
-                  />
+                    className={cn(
+                      'px-2 text-sm',
+                      !canNext && 'pointer-events-none opacity-50'
+                    )}
+                  >
+                    {t('pagination.next')}
+                  </PaginationNext>
                 </PaginationItem>
               </PaginationContent>
             </Pagination>

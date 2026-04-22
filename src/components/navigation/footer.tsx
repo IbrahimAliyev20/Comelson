@@ -231,6 +231,14 @@ export function Footer() {
   const contact = contactResponse?.data
   const { data: countries = [] } = useQuery(getCountriesQuery(locale))
 
+  const footerNavSplitIndex = Math.ceil(FOOTER_NAV_ITEMS.length / 2)
+  const footerNavColumns = useMemo(() => {
+    return {
+      left: FOOTER_NAV_ITEMS.slice(0, footerNavSplitIndex),
+      right: FOOTER_NAV_ITEMS.slice(footerNavSplitIndex),
+    }
+  }, [footerNavSplitIndex])
+
   useEffect(() => {
     if (selectedCountryId !== null) return
     const raw = Cookies.get(COUNTRY_ID_COOKIE)
@@ -327,7 +335,7 @@ export function Footer() {
                         alt=""
                         width={24}
                         height={24}
-                        className="transition-transform duration-200 group-hover:scale-110 group-active:scale-95"
+                        className="transition-[filter,transform] duration-200 group-hover:scale-110 group-active:scale-95 group-hover:[filter:brightness(0)_saturate(100%)_invert(19%)_sepia(78%)_saturate(1738%)_hue-rotate(182deg)_brightness(93%)_contrast(93%)]"
                       />
                     </Link>
                   ))}
@@ -367,18 +375,32 @@ export function Footer() {
             <div className="flex flex-col gap-10 md:flex-row md:gap-28">
               <div className="flex flex-col gap-6">
                 <h3 className="px-2 text-[16px] font-medium leading-6 text-black">Keçidlər</h3>
-                <ul className="flex flex-col gap-2">
-                  {FOOTER_NAV_ITEMS.map(({ href, labelKey }) => (
-                    <li key={`${href}-${labelKey}`} className="px-2">
-                      <Link
-                        href={href}
-                        className="text-[14px] font-medium leading-5 text-[#8E8E93] transition-colors hover:text-[#0f477d]"
-                      >
-                        {t(labelKey)}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
+                <div className="grid grid-cols-2 gap-x-8">
+                  <ul className="flex flex-col gap-2">
+                    {footerNavColumns.left.map(({ href, labelKey }) => (
+                      <li key={`${href}-${labelKey}`} className="px-2">
+                        <Link
+                          href={href}
+                          className="text-[14px] font-medium leading-5 text-[#8E8E93] transition-colors hover:text-[#0f477d]"
+                        >
+                          {t(labelKey)}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                  <ul className="flex flex-col gap-2">
+                    {footerNavColumns.right.map(({ href, labelKey }) => (
+                      <li key={`${href}-${labelKey}`} className="px-2">
+                        <Link
+                          href={href}
+                          className="text-[14px] font-medium leading-5 text-[#8E8E93] transition-colors hover:text-[#0f477d]"
+                        >
+                          {t(labelKey)}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
 
               <div className="flex flex-col gap-6">
