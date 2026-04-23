@@ -1,7 +1,8 @@
 'use client'
 
 import { Eye, EyeOff, Loader2 } from 'lucide-react'
-import { type FormEvent, useState, useTransition } from 'react'
+import { useState, useTransition } from 'react'
+import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
 import {
@@ -17,29 +18,42 @@ import { OTP_FLOW_REGISTER, buildOtpSearchParams } from '@/lib/auth/otp-flow'
 import { cn } from '@/lib/utils'
 import { registerAction } from '@/services/auth/serveractions'
 
+type RegisterFormValues = {
+  fullName: string
+  email: string
+  password: string
+}
+
 export default function RegisterPage() {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
-  const [fullName, setFullName] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
   const [formError, setFormError] = useState<string | null>(null)
+  const { register, watch, handleSubmit } = useForm<RegisterFormValues>({
+    defaultValues: {
+      fullName: '',
+      email: '',
+      password: '',
+    },
+  })
+
+  const fullName = watch('fullName')
+  const email = watch('email')
+  const password = watch('password')
   const canSubmit =
     fullName.trim().length > 0 &&
     email.trim().length > 0 &&
     password.trim().length >= 8
 
-  function handleSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault()
+  function submit(values: RegisterFormValues) {
     if (!canSubmit || isPending) return
 
     setFormError(null)
     startTransition(async () => {
       const result = await registerAction({
-        name: fullName.trim(),
-        email: email.trim(),
-        password,
+        name: values.fullName.trim(),
+        email: values.email.trim(),
+        password: values.password,
       })
 
       if (result.ok) {
@@ -78,7 +92,7 @@ export default function RegisterPage() {
 
           <form
             className={cn(authFormFlexGrow, 'gap-8 sm:gap-10 md:gap-12')}
-            onSubmit={handleSubmit}
+            onSubmit={handleSubmit(submit)}
             noValidate
           >
             <div className={cn(authUpperBlockGrow, 'gap-4')}>
@@ -92,67 +106,61 @@ export default function RegisterPage() {
               ) : null}
 
               <div className="flex flex-col gap-4">
-                  <label className="flex flex-col gap-2">
-                    <span className="px-1 text-sm leading-6 text-[#1d212a]">
-                      Ad,soyad
-                    </span>
-                    <input
-                      type="text"
-                      name="fullName"
-                      autoComplete="name"
-                      placeholder="Ad və soyadınızı daxil edin"
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      className="h-12 w-full rounded-lg border border-[#ebeff4] bg-[#f4fafd] px-4 text-sm text-[#1d212a] outline-none placeholder:text-[#6b7277] focus:border-[#0f477d]/40 focus:ring-4 focus:ring-[#0f477d]/10"
-                    />
-                  </label>
+                <label className="flex flex-col gap-2">
+                  <span className="px-1 text-sm leading-6 text-[#1d212a]">
+                    Ad, soyad
+                  </span>
+                  <input
+                    type="text"
+                    autoComplete="name"
+                    placeholder="Ad və soyadınızı daxil edin"
+                    {...register('fullName')}
+                    className="h-12 w-full rounded-lg border border-[#ebeff4] bg-[#f4fafd] px-4 text-sm text-[#1d212a] outline-none placeholder:text-[#6b7277] focus:border-[#0f477d]/40 focus:ring-4 focus:ring-[#0f477d]/10"
+                  />
+                </label>
 
-                  <label className="flex flex-col gap-2">
-                    <span className="px-1 text-sm leading-6 text-[#1d212a]">
-                      Email
-                    </span>
-                    <input
-                      type="email"
-                      name="email"
-                      autoComplete="email"
-                      placeholder="Email adresinizi daxil edin"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="h-12 w-full rounded-lg border border-[#ebeff4] bg-[#f4fafd] px-4 text-sm text-[#1d212a] outline-none placeholder:text-[#6b7277] focus:border-[#0f477d]/40 focus:ring-4 focus:ring-[#0f477d]/10"
-                    />
-                  </label>
+                <label className="flex flex-col gap-2">
+                  <span className="px-1 text-sm leading-6 text-[#1d212a]">
+                    Email
+                  </span>
+                  <input
+                    type="email"
+                    autoComplete="email"
+                    placeholder="Email adresinizi daxil edin"
+                    {...register('email')}
+                    className="h-12 w-full rounded-lg border border-[#ebeff4] bg-[#f4fafd] px-4 text-sm text-[#1d212a] outline-none placeholder:text-[#6b7277] focus:border-[#0f477d]/40 focus:ring-4 focus:ring-[#0f477d]/10"
+                  />
+                </label>
 
-                  <label className="flex flex-col gap-2">
-                    <span className="px-1 text-sm leading-6 text-[#1d212a]">
-                      Şifrə
-                    </span>
-                    <div className="relative">
-                      <input
-                        type={isPasswordVisible ? 'text' : 'password'}
-                        name="password"
-                        autoComplete="new-password"
-                        placeholder="Şifrənizi daxil edin"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="h-12 w-full rounded-lg border border-[#ebeff4] bg-[#f4fafd] px-4 pr-11 text-sm text-[#1d212a] outline-none placeholder:text-[#6b6e71] focus:border-[#0f477d]/40 focus:ring-4 focus:ring-[#0f477d]/10"
-                      />
-                      <button
-                        type="button"
-                        aria-label={
-                          isPasswordVisible ? 'Hide password' : 'Show password'
-                        }
-                        onClick={() => setIsPasswordVisible((v) => !v)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6b6e71] transition-opacity hover:opacity-80"
-                      >
-                        {isPasswordVisible ? (
-                          <EyeOff className="h-5 w-5" aria-hidden />
-                        ) : (
-                          <Eye className="h-5 w-5" aria-hidden />
-                        )}
-                      </button>
-                    </div>
-                  </label>
-                </div>
+                <label className="flex flex-col gap-2">
+                  <span className="px-1 text-sm leading-6 text-[#1d212a]">
+                    Şifrə
+                  </span>
+                  <div className="relative">
+                    <input
+                      type={isPasswordVisible ? 'text' : 'password'}
+                      autoComplete="new-password"
+                      placeholder="Şifrənizi daxil edin"
+                      {...register('password')}
+                      className="h-12 w-full rounded-lg border border-[#ebeff4] bg-[#f4fafd] px-4 pr-11 text-sm text-[#1d212a] outline-none placeholder:text-[#6b6e71] focus:border-[#0f477d]/40 focus:ring-4 focus:ring-[#0f477d]/10"
+                    />
+                    <button
+                      type="button"
+                      aria-label={
+                        isPasswordVisible ? 'Hide password' : 'Show password'
+                      }
+                      onClick={() => setIsPasswordVisible((v) => !v)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6b6e71] transition-opacity hover:opacity-80"
+                    >
+                      {isPasswordVisible ? (
+                        <EyeOff className="h-5 w-5" aria-hidden />
+                      ) : (
+                        <Eye className="h-5 w-5" aria-hidden />
+                      )}
+                    </button>
+                  </div>
+                </label>
+              </div>
             </div>
 
             <div className={authMobileCtaCluster}>
@@ -174,7 +182,7 @@ export default function RegisterPage() {
                       className="size-5 shrink-0 animate-spin"
                       aria-hidden
                     />
-                    <span>Gözləyin…</span>
+                    <span>Gözləyin...</span>
                   </>
                 ) : (
                   <span className="min-w-0 text-center">

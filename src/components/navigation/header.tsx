@@ -23,13 +23,17 @@ export function Header() {
   const isHero = pathname === '/'
   const headerRef = useRef<HTMLElement | null>(null)
   const aboutDropdownRef = useRef<HTMLDivElement | null>(null)
+  const mediaDropdownRef = useRef<HTMLDivElement | null>(null)
   const [heroScrolled, setHeroScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isAboutDropdownOpen, setIsAboutDropdownOpen] = useState(false)
+  const [isMediaDropdownOpen, setIsMediaDropdownOpen] = useState(false)
   const [isMobileAboutOpen, setIsMobileAboutOpen] = useState(false)
+  const [isMobileMediaOpen, setIsMobileMediaOpen] = useState(false)
   const [hasTopHero, setHasTopHero] = useState(false)
   const [headerHeight, setHeaderHeight] = useState(0)
   const aboutCloseTimeoutRef = useRef<number | null>(null)
+  const mediaCloseTimeoutRef = useRef<number | null>(null)
 
   const isGlassMode = hasTopHero || isHero
   const showHeroGlass = isGlassMode && !heroScrolled
@@ -112,6 +116,8 @@ export function Header() {
     setIsMobileMenuOpen(false)
     setIsMobileAboutOpen(false)
     setIsAboutDropdownOpen(false)
+    setIsMobileMediaOpen(false)
+    setIsMediaDropdownOpen(false)
   }, [pathname, locale])
 
   useEffect(() => {
@@ -144,9 +150,41 @@ export function Header() {
   }, [isAboutDropdownOpen])
 
   useEffect(() => {
+    if (!isMediaDropdownOpen) return
+
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') setIsMediaDropdownOpen(false)
+    }
+
+    function handlePointerDown(e: PointerEvent) {
+      const el = mediaDropdownRef.current
+      if (!el) return
+      if (e.target instanceof Node && el.contains(e.target)) return
+      setIsMediaDropdownOpen(false)
+    }
+
+    function handleScroll() {
+      setIsMediaDropdownOpen(false)
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    document.addEventListener('pointerdown', handlePointerDown)
+    window.addEventListener('scroll', handleScroll, { passive: true })
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+      document.removeEventListener('pointerdown', handlePointerDown)
+      window.removeEventListener('scroll', handleScroll)
+    }
+  }, [isMediaDropdownOpen])
+
+  useEffect(() => {
     return () => {
       if (aboutCloseTimeoutRef.current) {
         window.clearTimeout(aboutCloseTimeoutRef.current)
+      }
+      if (mediaCloseTimeoutRef.current) {
+        window.clearTimeout(mediaCloseTimeoutRef.current)
       }
     }
   }, [])
@@ -159,6 +197,13 @@ export function Header() {
     ] as const
   }, [])
 
+  const mediaDropdownItems = useMemo(() => {
+    return [
+      { key: 'events', href: '/events' },
+      { key: 'news', href: '/news' },
+    ] as const
+  }, [])
+
   /** Figma 90:2830 — Secondary (#e6eff6) + Primary (#0f477d) */
   const secondaryCtaClass =
     'inline-flex h-11 items-center justify-center gap-4 rounded-2xl bg-[#e6eff6] px-6 text-base font-medium leading-6 text-[#0f477d] transition-opacity hover:opacity-90'
@@ -168,6 +213,15 @@ export function Header() {
   function isDesktopNavActive(href: string) {
     if (href === '/') return pathname === '/'
     return pathname === href || pathname.startsWith(`${href}/`)
+  }
+
+  function isMediaActive() {
+    return (
+      pathname === '/events' ||
+      pathname.startsWith('/events/') ||
+      pathname === '/news' ||
+      pathname.startsWith('/news/')
+    )
   }
 
   function openAboutDropdown() {
@@ -186,6 +240,25 @@ export function Header() {
     aboutCloseTimeoutRef.current = window.setTimeout(() => {
       setIsAboutDropdownOpen(false)
       aboutCloseTimeoutRef.current = null
+    }, 120)
+  }
+
+  function openMediaDropdown() {
+    if (mediaCloseTimeoutRef.current) {
+      window.clearTimeout(mediaCloseTimeoutRef.current)
+      mediaCloseTimeoutRef.current = null
+    }
+    setIsMediaDropdownOpen(true)
+  }
+
+  function closeMediaDropdownSoon() {
+    if (mediaCloseTimeoutRef.current) {
+      window.clearTimeout(mediaCloseTimeoutRef.current)
+    }
+
+    mediaCloseTimeoutRef.current = window.setTimeout(() => {
+      setIsMediaDropdownOpen(false)
+      mediaCloseTimeoutRef.current = null
     }, 120)
   }
 
@@ -246,6 +319,88 @@ export function Header() {
 
               <nav className="hidden lg:flex items-center gap-5" aria-label="Primary">
                 {heroNavigationItems.map((item) => {
+                  if (item.key === 'media' && item.hasDropdown) {
+                    const active = isMediaActive()
+                    return (
+                      <div
+                        key={item.key}
+                        ref={mediaDropdownRef}
+                        className="relative"
+                        onMouseEnter={openMediaDropdown}
+                        onMouseLeave={closeMediaDropdownSoon}
+                      >
+                        <button
+                          type="button"
+                          aria-haspopup="menu"
+                          aria-expanded={isMediaDropdownOpen}
+                          onClick={() => setIsMediaDropdownOpen((v) => !v)}
+                          className={cn(
+                            'relative inline-flex items-center gap-1 px-2 py-1 text-sm font-normal leading-5 transition-colors hover:opacity-80',
+                            showHeroGlass
+                              ? 'text-white'
+                              : 'text-[#14171A] hover:text-[#14171A]',
+                            active &&
+                              (showHeroGlass
+                                ? 'after:absolute after:left-2 after:right-2 after:-bottom-1 after:h-[2px] after:rounded-full after:bg-white'
+                                : 'after:absolute after:left-2 after:right-2 after:-bottom-1 after:h-[2px] after:rounded-full after:bg-[#0f477d]')
+                          )}
+                        >
+                          {t('heroNav.media')}
+                          <ChevronDown
+                            className={cn(
+                              'size-4 transition-transform',
+                              isMediaDropdownOpen ? 'rotate-180' : 'rotate-0',
+                              showHeroGlass ? 'opacity-90' : 'opacity-80'
+                            )}
+                            aria-hidden
+                          />
+                        </button>
+
+                        {isMediaDropdownOpen ? (
+                          <>
+                            <div
+                              aria-hidden
+                              className="absolute left-0 top-full z-40 h-4 min-w-[280px]"
+                            />
+                            <div
+                              role="menu"
+                              className={cn(
+                                'absolute left-0 top-full z-50 w-56 pt-3',
+                                'animate-in fade-in-0 slide-in-from-top-2 duration-200'
+                              )}
+                            >
+                              <div
+                                className={cn(
+                                  'rounded-2xl border p-3 shadow-xl',
+                                  showHeroGlass
+                                    ? 'border-white/10 bg-[#0D2C4A]/95 backdrop-blur-xl'
+                                    : 'border-[#EAF1FA] bg-white'
+                                )}
+                              >
+                                {mediaDropdownItems.map((dd) => (
+                                  <Link
+                                    key={dd.key}
+                                    href={dd.href}
+                                    role="menuitem"
+                                    className={cn(
+                                      'flex w-full cursor-pointer items-center rounded-xl px-4 py-3 text-sm transition-colors',
+                                      showHeroGlass
+                                        ? 'text-white/90 hover:bg-white/10'
+                                        : 'text-[#14171A]/80 hover:bg-black/5 hover:text-[#14171A]'
+                                    )}
+                                    onClick={() => setIsMediaDropdownOpen(false)}
+                                  >
+                                    {t(`mediaDropdown.${dd.key}`)}
+                                  </Link>
+                                ))}
+                              </div>
+                            </div>
+                          </>
+                        ) : null}
+                      </div>
+                    )
+                  }
+
                   if (item.key !== 'about' || !item.hasDropdown) {
                     const isActive = isDesktopNavActive(item.href)
                     return (
@@ -304,12 +459,12 @@ export function Header() {
                         <>
                           <div
                             aria-hidden
-                            className="absolute left-0 top-full z-40 h-4 w-[320px]"
+                            className="absolute left-0 top-full z-40 h-4 w-56"
                           />
                           <div
                             role="menu"
                             className={cn(
-                              'absolute left-0 top-full z-50 w-[320px] pt-3',
+                              'absolute left-0 top-full z-50 w-56 pt-3',
                               'animate-in fade-in-0 slide-in-from-top-2 duration-200',
                             )}
                           >
@@ -477,6 +632,56 @@ export function Header() {
                                   )}
                                 >
                                   {t(`aboutDropdown.${dd.key}`)}
+                                </Link>
+                              ))}
+                            </div>
+                          ) : null}
+                        </div>
+                      )
+                    }
+
+                    if (item.key === 'media' && item.hasDropdown) {
+                      const active = isMediaActive()
+                      return (
+                        <div key={item.key} className="flex flex-col">
+                          <button
+                            type="button"
+                            onClick={() => setIsMobileMediaOpen((v) => !v)}
+                            className={cn(
+                              'flex items-center justify-between rounded-2xl px-3 py-3 text-sm leading-5 transition-colors',
+                              showHeroGlass
+                                ? active
+                                  ? 'bg-white/12 font-medium text-white'
+                                  : 'text-white/90 hover:bg-white/8'
+                                : active
+                                  ? 'bg-black/5 font-medium text-[#14171A]'
+                                  : 'text-[#14171A]/80 hover:bg-black/5 hover:text-[#14171A]'
+                            )}
+                          >
+                            <span>{label}</span>
+                            <ChevronDown
+                              className={cn(
+                                'h-4 w-4 transition-transform',
+                                isMobileMediaOpen ? 'rotate-180' : 'rotate-0',
+                                showHeroGlass ? 'opacity-80' : 'opacity-70'
+                              )}
+                            />
+                          </button>
+
+                          {isMobileMediaOpen ? (
+                            <div className="mt-2 flex flex-col gap-1 rounded-2xl p-2">
+                              {mediaDropdownItems.map((dd) => (
+                                <Link
+                                  key={dd.key}
+                                  href={dd.href}
+                                  className={cn(
+                                    'rounded-xl px-3 py-2 text-sm transition-colors',
+                                    showHeroGlass
+                                      ? 'text-white/90 hover:bg-white/10'
+                                      : 'text-[#14171A]/80 hover:bg-black/5 hover:text-[#14171A]'
+                                  )}
+                                >
+                                  {t(`mediaDropdown.${dd.key}`)}
                                 </Link>
                               ))}
                             </div>

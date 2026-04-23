@@ -85,6 +85,7 @@ export function UserMenuPanel({
   }
 
   const borderSection = lightOnDark ? 'border-white/10' : 'border-[#eaf1fa]'
+  const dividerBg = lightOnDark ? 'bg-white/50' : 'bg-[#F2F9FF]'
   const textMuted = lightOnDark ? 'text-white/70' : 'text-[#6b6e71]'
   const textName = lightOnDark ? 'text-white' : 'text-[#14171a]'
   const cardBg = lightOnDark ? 'border-white/10 bg-white/5' : 'border-[#eaf1fa] bg-white'
@@ -205,7 +206,7 @@ export function UserMenuPanel({
         </Link>
       </div>
 
-      <div className={cn('mx-2 my-2 h-px', borderSection)} />
+      <div className={cn('mx-2 my-2 h-px', dividerBg)} />
 
       <div className="px-2 pb-1">
         <button

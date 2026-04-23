@@ -6,7 +6,6 @@ import {
   AlignRight,
   Bold,
   Camera,
-  ChevronDown,
   ChevronLeft,
   Code,
   ImageIcon,
@@ -20,12 +19,20 @@ import {
 } from 'lucide-react'
 import { useLocale } from 'next-intl'
 import type { ComponentType, ReactNode } from 'react'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import PhoneInput from 'react-phone-input-2'
 import 'react-phone-input-2/lib/style.css'
+import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { cn } from '@/lib/utils'
 import { postCompanyMutation } from '@/services/companies/mutations'
 import { getCompanyCategoriesQuery } from '@/services/company-categories/queries'
@@ -36,33 +43,24 @@ const inputClass =
 
 const labelClass = 'pl-1 text-sm leading-6 text-[#1d212a]'
 
-function FieldLabel({ children }: { children: ReactNode }) {
-  return <span className={labelClass}>{children}</span>
+type CreateCampainFormValues = {
+  companyName: string
+  voen: string
+  categoryId: string
+  countryId: string
+  about: string
+  phone: string
+  email: string
+  address: string
+  website: string
+  instagram: string
+  facebook: string
+  linkedin: string
+  logo: File | null
 }
 
-function NativeSelect({
-  className,
-  children,
-  ...rest
-}: React.ComponentProps<'select'>) {
-  return (
-    <div className="relative w-full">
-      <select
-        className={cn(
-          inputClass,
-          'cursor-pointer appearance-none pr-10',
-          className
-        )}
-        {...rest}
-      >
-        {children}
-      </select>
-      <ChevronDown
-        className="pointer-events-none absolute right-3 top-1/2 size-5 -translate-y-1/2 text-[#6b6e71]"
-        aria-hidden
-      />
-    </div>
-  )
+function FieldLabel({ children }: { children: ReactNode }) {
+  return <span className={labelClass}>{children}</span>
 }
 
 function escapeHtmlPlain(text: string): string {
@@ -84,11 +82,9 @@ function phoneHasEnoughDigits(value: string): boolean {
   return digits.length >= 10
 }
 
-/** Figma 459:6806 — Şirkət əlavə et */
 export type CreateCampainProps = {
   onBack: () => void
   onCancel?: () => void
-  /** API uğuru — siyahını yeniləmək üçün */
   onSuccess?: () => void
 }
 
@@ -104,25 +100,33 @@ export default function CreateCampain({
   const { data: categories = [], isLoading: categoriesLoading } = useQuery(
     getCompanyCategoriesQuery(locale)
   )
-  const [about, setAbout] = useState('')
-  const [phone, setPhone] = useState<string>('')
-  const [categoryId, setCategoryId] = useState('')
-  const [countryId, setCountryId] = useState('')
-  const [logoFile, setLogoFile] = useState<File | null>(null)
-  const [logoPreviewUrl, setLogoPreviewUrl] = useState<string>('')
+  const { register, control, setValue, watch, handleSubmit } =
+    useForm<CreateCampainFormValues>({
+      defaultValues: {
+        companyName: '',
+        voen: '',
+        categoryId: '',
+        countryId: '',
+        about: '',
+        phone: '',
+        email: '',
+        address: '',
+        website: '',
+        instagram: '',
+        facebook: '',
+        linkedin: '',
+        logo: null,
+      },
+    })
+
+  const logoFile = watch('logo')
+  const logoPreviewUrl = logoFile ? URL.createObjectURL(logoFile) : ''
 
   useEffect(() => {
-    if (!logoFile) {
-      setLogoPreviewUrl('')
-      return
-    }
-
-    const url = URL.createObjectURL(logoFile)
-    setLogoPreviewUrl(url)
     return () => {
-      URL.revokeObjectURL(url)
+      if (logoPreviewUrl) URL.revokeObjectURL(logoPreviewUrl)
     }
-  }, [logoFile])
+  }, [logoPreviewUrl])
 
   const createMutation = useMutation({
     ...postCompanyMutation(),
@@ -144,81 +148,41 @@ export default function CreateCampain({
     onBack()
   }
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    const form = e.currentTarget
-    const name = String(
-      (form.elements.namedItem('companyName') as HTMLInputElement)?.value ?? ''
-    ).trim()
-    const voen = String(
-      (form.elements.namedItem('voen') as HTMLInputElement)?.value ?? ''
-    ).trim()
-    const email = String(
-      (form.elements.namedItem('email') as HTMLInputElement)?.value ?? ''
-    ).trim()
-    const address = String(
-      (form.elements.namedItem('address') as HTMLInputElement)?.value ?? ''
-    ).trim()
-    const website = String(
-      (form.elements.namedItem('website') as HTMLInputElement)?.value ?? ''
-    ).trim()
-    const instagram = String(
-      (form.elements.namedItem('instagram') as HTMLInputElement)?.value ?? ''
-    ).trim()
-    const facebook = String(
-      (form.elements.namedItem('facebook') as HTMLInputElement)?.value ?? ''
-    ).trim()
-    const linkedin = String(
-      (form.elements.namedItem('linkedin') as HTMLInputElement)?.value ?? ''
-    ).trim()
+  const submit = (data: CreateCampainFormValues) => {
+    if (!data.logo) return void toast.error('Logo yükləyin')
+    if (!data.categoryId || !data.countryId) {
+      return void toast.error('Kateqoriya və ölkə seçin')
+    }
+    if (!data.companyName.trim() || !data.voen.trim()) {
+      return void toast.error('Şirkətin adı və VÖEN məcburidir')
+    }
+    if (!data.about.trim()) {
+      return void toast.error('Şirkət haqqında məlumat daxil edin')
+    }
+    if (!phoneHasEnoughDigits(data.phone)) {
+      return void toast.error('Telefon nömrəsini daxil edin')
+    }
+    if (!data.email.trim()) return void toast.error('Email ünvanını daxil edin')
+    if (!data.address.trim()) return void toast.error('Ünvanı daxil edin')
 
-    if (!logoFile) {
-      toast.error('Logo yükləyin')
-      return
-    }
-    if (!categoryId || !countryId) {
-      toast.error('Kateqoriya və ölkə seçin')
-      return
-    }
-    if (!name || !voen) {
-      toast.error('Şirkətin adı və VÖEN məcburidir')
-      return
-    }
-    if (!about.trim()) {
-      toast.error('Şirkət haqqında məlumat daxil edin')
-      return
-    }
-    if (!phoneHasEnoughDigits(phone)) {
-      toast.error('Telefon nömrəsini daxil edin')
-      return
-    }
-    if (!email) {
-      toast.error('Email ünvanını daxil edin')
-      return
-    }
-    if (!address) {
-      toast.error('Ünvanı daxil edin')
-      return
-    }
-
-    const description = `<p>${escapeHtmlPlain(about.trim())}</p>`
+    const description = `<p>${escapeHtmlPlain(data.about.trim())}</p>`
 
     createMutation.mutate({
       locale,
       body: {
-        name,
-        voen,
-        category_id: Number(categoryId),
-        country_id: Number(countryId),
+        name: data.companyName.trim(),
+        voen: data.voen.trim(),
+        category_id: Number(data.categoryId),
+        country_id: Number(data.countryId),
         description,
-        phone: normalizePhone(phone),
-        email,
-        address,
-        website,
-        instagram,
-        facebook,
-        linkedin,
-        logo: logoFile ?? undefined,
+        phone: normalizePhone(data.phone),
+        email: data.email.trim(),
+        address: data.address.trim(),
+        website: data.website.trim(),
+        instagram: data.instagram.trim(),
+        facebook: data.facebook.trim(),
+        linkedin: data.linkedin.trim(),
+        logo: data.logo,
       },
     })
   }
@@ -241,13 +205,10 @@ export default function CreateCampain({
 
       <form
         noValidate
-        onSubmit={handleSubmit}
+        onSubmit={handleSubmit(submit)}
         className="flex flex-col gap-12 px-6 sm:px-12"
       >
-        {/* Şirkət detalları */}
         <section className="flex flex-col gap-8 py-5">
-      
-
           <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:gap-5">
             <label className="relative flex size-[120px] shrink-0 cursor-pointer flex-col items-center justify-center overflow-hidden rounded-full border border-[#eaf1fa] bg-[#e6eff6] p-2.5">
               <input
@@ -256,17 +217,12 @@ export default function CreateCampain({
                 className="sr-only"
                 aria-required="true"
                 onChange={(ev) => {
-                  const f = ev.target.files?.[0]
-                  setLogoFile(f ?? null)
+                  const file = ev.target.files?.[0] ?? null
+                  setValue('logo', file)
                 }}
               />
               {logoPreviewUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={logoPreviewUrl}
-                  alt=""
-                  className="size-full object-cover"
-                />
+                <img src={logoPreviewUrl} alt="" className="size-full object-cover" />
               ) : (
                 <Camera className="size-9 text-[#6b6e71]" aria-hidden />
               )}
@@ -294,7 +250,7 @@ export default function CreateCampain({
                 </span>
               </FieldLabel>
               <input
-                name="companyName"
+                {...register('companyName')}
                 type="text"
                 placeholder="Şirkət adını daxil edin"
                 autoComplete="organization"
@@ -310,7 +266,7 @@ export default function CreateCampain({
                 </span>
               </FieldLabel>
               <input
-                name="voen"
+                {...register('voen')}
                 type="text"
                 inputMode="numeric"
                 placeholder="Şirkətin VÖEN-ni daxil edin"
@@ -325,23 +281,32 @@ export default function CreateCampain({
                   *
                 </span>
               </FieldLabel>
-              <NativeSelect
-                name="category"
-                value={categoryId}
-                onChange={(e) => setCategoryId(e.target.value)}
-                required
-                aria-required="true"
-                disabled={categoriesLoading}
-              >
-                <option value="" disabled>
-                  {categoriesLoading ? 'Yüklənir…' : 'Kateqoriyanı seçin'}
-                </option>
-                {categories.map((c) => (
-                  <option key={c.id} value={String(c.id)}>
-                    {c.name}
-                  </option>
-                ))}
-              </NativeSelect>
+              <Controller
+                name="categoryId"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    disabled={categoriesLoading}
+                    onValueChange={field.onChange}
+                    value={field.value || undefined}
+                  >
+                    <SelectTrigger className={cn(inputClass, 'justify-between')}>
+                      <SelectValue
+                        placeholder={
+                          categoriesLoading ? 'Yüklənir...' : 'Kateqoriyanı seçin'
+                        }
+                      />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-xl border-[#ebeff4] bg-white">
+                      {categories.map((c) => (
+                        <SelectItem key={String(c.id)} value={String(c.id)}>
+                          {c.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
             </div>
             <div className="flex flex-col gap-2">
               <FieldLabel>
@@ -350,23 +315,30 @@ export default function CreateCampain({
                   *
                 </span>
               </FieldLabel>
-              <NativeSelect
-                name="country"
-                value={countryId}
-                onChange={(e) => setCountryId(e.target.value)}
-                required
-                aria-required="true"
-                disabled={countriesLoading}
-              >
-                <option value="" disabled>
-                  {countriesLoading ? 'Yüklənir…' : 'Ölkəni seçin'}
-                </option>
-                {countries.map((c) => (
-                  <option key={c.id} value={String(c.id)}>
-                    {c.name}
-                  </option>
-                ))}
-              </NativeSelect>
+              <Controller
+                name="countryId"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    disabled={countriesLoading}
+                    onValueChange={field.onChange}
+                    value={field.value || undefined}
+                  >
+                    <SelectTrigger className={cn(inputClass, 'justify-between')}>
+                      <SelectValue
+                        placeholder={countriesLoading ? 'Yüklənir...' : 'Ölkəni seçin'}
+                      />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-xl border-[#ebeff4] bg-white">
+                      {countries.map((c) => (
+                        <SelectItem key={String(c.id)} value={String(c.id)}>
+                          {c.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
             </div>
           </div>
 
@@ -389,10 +361,7 @@ export default function CreateCampain({
                 <ToolbarIconButton label="Keçid" icon={Link2} />
                 <ToolbarIconButton label="Kod" icon={Code} />
                 <ToolbarIconButton label="Sitat" icon={Quote} />
-                <span
-                  className="size-6 shrink-0 rounded-full bg-[#1d212a]"
-                  aria-hidden
-                />
+                <span className="size-6 shrink-0 rounded-full bg-[#1d212a]" aria-hidden />
                 <div className="mx-1 hidden h-6 w-px bg-[#aeaeb2]/40 sm:block" />
                 <ToolbarIconButton label="Sola" icon={AlignLeft} />
                 <ToolbarIconButton label="Mərkəz" icon={AlignCenter} />
@@ -405,9 +374,7 @@ export default function CreateCampain({
                 <ToolbarIconButton label="Cədvəl" icon={Table2} />
               </div>
               <textarea
-                name="about"
-                value={about}
-                onChange={(e) => setAbout(e.target.value)}
+                {...register('about')}
                 placeholder="Şirkət haqqında məlumat daxil edin"
                 rows={6}
                 aria-required="true"
@@ -417,7 +384,6 @@ export default function CreateCampain({
           </div>
         </section>
 
-        {/* Əlaqə vasitələri */}
         <section className="flex flex-col gap-5">
           <h3 className="text-2xl font-medium leading-8 text-[#14171a]">
             Əlaqə vasitələri
@@ -430,32 +396,34 @@ export default function CreateCampain({
                   *
                 </span>
               </FieldLabel>
-              <input type="hidden" name="phone" value={phone} />
-              <PhoneInput
-                country="az"
-                value={phone}
-                onChange={(value) => setPhone(value)}
-                placeholder="Nömrənizi daxil edin"
-                inputProps={{
-                  required: false,
-                  'aria-required': true,
-                }}
-                inputStyle={{
-                  width: '100%',
-                  height: '48px',
-                  borderRadius: '0 12px 12px 0',
-                  border: '1px solid #ebeff4',
-                  borderLeft: 'none',
-                  backgroundColor: '#f4fafd',
-                  fontSize: '16px',
-                  paddingLeft: '48px',
-                }}
-                buttonStyle={{
-                  border: '1px solid #ebeff4',
-                  borderRadius: '12px 0 0 12px',
-                  backgroundColor: '#f4fafd',
-                }}
-                containerStyle={{ width: '100%' }}
+              <Controller
+                name="phone"
+                control={control}
+                render={({ field }) => (
+                  <PhoneInput
+                    country="az"
+                    value={field.value}
+                    onChange={(value) => field.onChange(value)}
+                    placeholder="Nömrənizi daxil edin"
+                    inputProps={{ required: false, 'aria-required': true }}
+                    inputStyle={{
+                      width: '100%',
+                      height: '48px',
+                      borderRadius: '0 12px 12px 0',
+                      border: '1px solid #ebeff4',
+                      borderLeft: 'none',
+                      backgroundColor: '#f4fafd',
+                      fontSize: '16px',
+                      paddingLeft: '48px',
+                    }}
+                    buttonStyle={{
+                      border: '1px solid #ebeff4',
+                      borderRadius: '12px 0 0 12px',
+                      backgroundColor: '#f4fafd',
+                    }}
+                    containerStyle={{ width: '100%' }}
+                  />
+                )}
               />
             </div>
             <label className="flex flex-col gap-2">
@@ -466,7 +434,7 @@ export default function CreateCampain({
                 </span>
               </FieldLabel>
               <input
-                name="email"
+                {...register('email')}
                 type="email"
                 autoComplete="email"
                 placeholder="Email adresini daxil edin"
@@ -483,7 +451,7 @@ export default function CreateCampain({
               </span>
             </FieldLabel>
             <input
-              name="address"
+              {...register('address')}
               type="text"
               placeholder="Şirkətin ünvanını daxil edin"
               aria-required="true"
@@ -492,7 +460,6 @@ export default function CreateCampain({
           </label>
         </section>
 
-        {/* Sosial media */}
         <section className="flex flex-col gap-5">
           <h3 className="text-2xl font-medium leading-8 text-[#14171a]">
             Sosial media vasitələri
@@ -501,7 +468,7 @@ export default function CreateCampain({
             <label className="flex flex-col gap-2">
               <FieldLabel>Website</FieldLabel>
               <input
-                name="website"
+                {...register('website')}
                 type="url"
                 placeholder="https://example.com"
                 className={inputClass}
@@ -510,7 +477,7 @@ export default function CreateCampain({
             <label className="flex flex-col gap-2">
               <FieldLabel>Instagram</FieldLabel>
               <input
-                name="instagram"
+                {...register('instagram')}
                 type="url"
                 placeholder="https://instagram.com/example"
                 className={inputClass}
@@ -519,7 +486,7 @@ export default function CreateCampain({
             <label className="flex flex-col gap-2">
               <FieldLabel>Facebook</FieldLabel>
               <input
-                name="facebook"
+                {...register('facebook')}
                 type="url"
                 placeholder="https://facebook.com/example"
                 className={inputClass}
@@ -528,7 +495,7 @@ export default function CreateCampain({
             <label className="flex flex-col gap-2">
               <FieldLabel>LinkedIn</FieldLabel>
               <input
-                name="linkedin"
+                {...register('linkedin')}
                 type="url"
                 placeholder="https://linkedin.com/example"
                 className={inputClass}
@@ -550,7 +517,7 @@ export default function CreateCampain({
             disabled={createMutation.isPending}
             className="inline-flex h-12 flex-1 cursor-pointer items-center justify-center rounded-2xl bg-[#0f477d] px-6 text-base font-medium leading-6 text-white transition-colors hover:bg-[#0c3a66] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:opacity-60"
           >
-            {createMutation.isPending ? 'Göndərilir…' : 'Əlavə et'}
+            {createMutation.isPending ? 'Göndərilir...' : 'Əlavə et'}
           </button>
         </div>
       </form>

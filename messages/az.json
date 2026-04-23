@@ -84,16 +84,21 @@
       "about": "Haqqımızda",
       "tenders": "Tenderlər",
       "members": "Üzvlər",
-      "news": "Xəbərlər",
+      "media": "Media",
       "contact": "Əlaqə",
-      "events": "Tədbirlər"
+      "events": "Tədbirlər",
+      "news": "Xəbərlər"
+    },
+    "mediaDropdown": {
+      "events": "Tədbirlər",
+      "news": "Xəbərlər"
     },
     "aboutDropdown": {
       "about": "Haqqımızda",
       "successStories": "Uğur hekayələri",
       "partnership": "Tərəfdaşlıq"
     },
-    "headerCta": "Qeydiyyatdan keç",
+    "headerCta": "Qeydiyyat",
     "loginCta": "Giriş et",
     "accountNav": "Hesabım",
     "userMenu": {

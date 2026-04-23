@@ -84,9 +84,14 @@
       "about": "О нас",
       "tenders": "Тендеры",
       "members": "Участники",
-      "news": "Новости",
+      "media": "Медиа",
       "contact": "Контакты",
-      "events": "События"
+      "events": "События",
+      "news": "Новости"
+    },
+    "mediaDropdown": {
+      "events": "События",
+      "news": "Новости"
     },
     "aboutDropdown": {
       "about": "О нас",

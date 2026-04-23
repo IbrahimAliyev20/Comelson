@@ -265,32 +265,33 @@ export default function OtpPage() {
             </div>
           </div>
 
-          <button
-            type="button"
-            disabled={!canSubmit || isPending}
-            aria-disabled={!canSubmit || isPending}
-            onClick={handleOtpConfirm}
-            className={cn(
-              'inline-flex h-12 w-full min-w-0 items-center justify-center gap-2 rounded-2xl px-4 text-base font-medium leading-6 transition-colors sm:gap-4 sm:px-6',
-              authMobileStickySubmit,
-              canSubmit && !isPending
-                ? 'bg-[#0f477d] text-white hover:bg-[#0c3a66]'
-                : 'bg-[#889097] text-[#dadee2]',
-              isPending && 'cursor-wait'
-            )}
-          >
-            {isPending ? (
-              <>
-                <Loader2
-                  className="size-5 shrink-0 animate-spin"
-                  aria-hidden
-                />
-                <span>Gözləyin…</span>
-              </>
-            ) : (
-              <span className="min-w-0 text-center">Təsdiq et</span>
-            )}
-          </button>
+          <div className={authMobileStickySubmit}>
+            <button
+              type="button"
+              disabled={!canSubmit || isPending}
+              aria-disabled={!canSubmit || isPending}
+              onClick={handleOtpConfirm}
+              className={cn(
+                'inline-flex h-12 w-full min-w-0 items-center justify-center gap-2 rounded-2xl px-4 text-base font-medium leading-6 transition-colors sm:gap-4 sm:px-6',
+                canSubmit && !isPending
+                  ? 'bg-[#0f477d] text-white hover:bg-[#0c3a66]'
+                  : 'bg-[#889097] text-[#dadee2]',
+                isPending && 'cursor-wait'
+              )}
+            >
+              {isPending ? (
+                <>
+                  <Loader2
+                    className="size-5 shrink-0 animate-spin"
+                    aria-hidden
+                  />
+                  <span>Gözləyin…</span>
+                </>
+              ) : (
+                <span className="min-w-0 text-center">Təsdiq et</span>
+              )}
+            </button>
+          </div>
         </div>
       </div>
     </AuthSplitLayout>

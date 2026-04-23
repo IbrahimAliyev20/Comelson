@@ -1,6 +1,7 @@
 'use client'
 
 import { ChevronLeft, PencilIcon } from 'lucide-react'
+import { useState } from 'react'
 
 import { cn } from '@/lib/utils'
 
@@ -54,6 +55,8 @@ export default function CampainsDetail({
   onBack: () => void
   onEdit?: () => void
 }) {
+  const [logoOk, setLogoOk] = useState(true)
+
   return (
     <div className="flex w-full flex-col bg-white pb-12" data-name="company-detail">
       <div className="flex shrink-0 items-center gap-3 border-b border-[#eaf1fa] px-8 py-6">
@@ -84,12 +87,13 @@ export default function CampainsDetail({
         <div className="rounded-xl border border-[#eaf1fa] bg-[#fafdff] p-5">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-5">
             <div className="relative size-[84px] shrink-0 overflow-hidden rounded-full border border-[#f1f2f6] bg-white">
-              {company.logo?.trim() ? (
+              {company.logo?.trim() && logoOk ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={company.logo}
                   alt={company.name}
                   className="size-full object-cover"
+                  onError={() => setLogoOk(false)}
                 />
               ) : (
                 <div

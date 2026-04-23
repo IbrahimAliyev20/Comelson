@@ -4,6 +4,8 @@ import { Mail, MapPin, Phone } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
 import { useMemo, useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Controller, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { toast } from 'sonner'
 
@@ -20,28 +22,55 @@ import { ContactResponse } from '@/types/types'
 
 type TopicKey = 'membership' | 'tender' | 'partnership' | 'support'
 
+type ContactFormValues = {
+  name: string
+  email: string
+  type: TopicKey | ''
+  message: string
+  locale?: string
+}
+
 export default function ContactSection({ contact }: { contact: ContactResponse | undefined }) {
   const t = useTranslations('home')
   const locale = useLocale()
-
-  const [topic, setTopic] = useState<TopicKey | ''>('')
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
-  const [message, setMessage] = useState('')
   const [formError, setFormError] = useState<string | null>(null)
   const [formSuccess, setFormSuccess] = useState<string | null>(null)
+
+  const topicKeys = useMemo(
+    () => ['membership', 'tender', 'partnership', 'support'] as const,
+    []
+  )
 
   const schema = useMemo(
     () =>
       z.object({
         name: z.string().trim().min(2),
         email: z.string().trim().email(),
-        type: z.string().trim().min(1),
+        type: z
+          .union([z.literal(''), z.enum(topicKeys)])
+          .refine((v) => v !== '', { message: 'Topic is required' }),
         message: z.string().trim().min(3),
-        locale: z.string().trim().min(2).optional()
+        locale: z.string().trim().min(2).optional(),
       }),
-    []
+    [topicKeys]
   )
+
+  const { control, register, watch, reset, handleSubmit } =
+    useForm<ContactFormValues>({
+      resolver: zodResolver(schema),
+      defaultValues: {
+        name: '',
+        email: '',
+        type: '',
+        message: '',
+        locale,
+      },
+    })
+
+  const name = watch('name')
+  const email = watch('email')
+  const topic = watch('type')
+  const message = watch('message')
 
   const mutation = useMutation({
     ...postContactFormMutation(),
@@ -56,21 +85,28 @@ export default function ContactSection({ contact }: { contact: ContactResponse |
         return
       }
 
-      setName('')
-      setEmail('')
-      setTopic('')
-      setMessage('')
+      reset({
+        name: '',
+        email: '',
+        type: '',
+        message: '',
+        locale,
+      })
       setFormSuccess(res?.message || 'Submitted')
       toast.success(res?.message || 'Submitted')
     },
     onError: () => {
       setFormError('Request failed')
       toast.error('Request failed')
-    }
+    },
   })
 
   const isSubmitting = mutation.isPending
-  const canSubmit = name.trim().length > 0 && email.trim().length > 0 && topic !== '' && message.trim().length > 0
+  const canSubmit =
+    name.trim().length > 0 &&
+    email.trim().length > 0 &&
+    topic !== '' &&
+    message.trim().length > 0
   const selectItemCheckedClass =
     'data-[state=checked]:bg-[#e6eff6] data-[state=checked]:text-[#0f477d] data-[state=checked]:[&_svg]:!text-[#0f477d]'
   const fieldLabelClass = 'px-1 text-sm leading-6 text-[#1d212a]'
@@ -79,25 +115,15 @@ export default function ContactSection({ contact }: { contact: ContactResponse |
   const fieldTextareaClass =
     'h-[80px] w-full resize-none rounded-[8px] border border-[#ebeff4] bg-[#f4fafd] px-4 py-[14px] text-sm leading-5 text-[#32393f] outline-none placeholder:text-[#6b7277] focus:border-[#d7e6ef] focus:bg-[#f4fafd]'
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
+  const submit = (values: ContactFormValues) => {
     setFormError(null)
     setFormSuccess(null)
+    mutation.mutate({ ...values, locale })
+  }
 
-    const parsed = schema.safeParse({
-      name,
-      email,
-      type: topic,
-      message,
-      locale
-    })
-
-    if (!parsed.success) {
-      setFormError(parsed.error.issues[0]?.message ?? 'Invalid form')
-      return
-    }
-
-    mutation.mutate(parsed.data)
+  const submitInvalid = () => {
+    setFormError('Invalid form')
+    setFormSuccess(null)
   }
 
   return (
@@ -167,14 +193,16 @@ export default function ContactSection({ contact }: { contact: ContactResponse |
                   {t('contact.formTitle')}
                 </h3>
 
-                <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
+                <form
+                  className="flex flex-col gap-5"
+                  onSubmit={handleSubmit(submit, submitInvalid)}
+                >
                   <div className="flex flex-col gap-2">
                     <label className={fieldLabelClass}>
                       {t('contact.nameLabel')}
                     </label>
                     <input
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
+                      {...register('name')}
                       disabled={isSubmitting}
                       className={fieldClass}
                       placeholder={t('contact.namePlaceholder')}
@@ -187,8 +215,7 @@ export default function ContactSection({ contact }: { contact: ContactResponse |
                     </label>
                     <input
                       type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      {...register('email')}
                       disabled={isSubmitting}
                       className={fieldClass}
                       placeholder={t('contact.emailPlaceholder')}
@@ -199,29 +226,37 @@ export default function ContactSection({ contact }: { contact: ContactResponse |
                     <label className={fieldLabelClass}>
                       {t('contact.topicLabel')}
                     </label>
-                    <Select
-                      value={topic}
-                      onValueChange={(v) => setTopic(v as TopicKey | '')}
-                      disabled={isSubmitting}
-                    >
-                      <SelectTrigger className="h-12 w-full rounded-[8px] border-[#ebeff4] bg-[#f4fafd] px-4 text-sm leading-5 text-[#32393f] focus:border-[#d7e6ef] focus:bg-[#f4fafd] focus:ring-0 focus:ring-offset-0 focus-visible:ring-0">
-                        <SelectValue placeholder={t('contact.topicPlaceholder')} />
-                      </SelectTrigger>
-                      <SelectContent className="rounded-xl border-[#ebeff4] bg-white">
-                        <SelectItem value="membership" className={selectItemCheckedClass}>
-                          {t('contact.topics.membership')}
-                        </SelectItem>
-                        <SelectItem value="tender" className={selectItemCheckedClass}>
-                          {t('contact.topics.tender')}
-                        </SelectItem>
-                        <SelectItem value="partnership" className={selectItemCheckedClass}>
-                          {t('contact.topics.partnership')}
-                        </SelectItem>
-                        <SelectItem value="support" className={selectItemCheckedClass}>
-                          {t('contact.topics.support')}
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <Controller
+                      name="type"
+                      control={control}
+                      render={({ field }) => (
+                        <Select
+                          value={field.value || undefined}
+                          onValueChange={(value) =>
+                            field.onChange(value as ContactFormValues['type'])
+                          }
+                          disabled={isSubmitting}
+                        >
+                          <SelectTrigger className="h-12 w-full rounded-[8px] border-[#ebeff4] bg-[#f4fafd] px-4 text-sm leading-5 text-[#32393f] focus:border-[#d7e6ef] focus:bg-[#f4fafd] focus:ring-0 focus:ring-offset-0 focus-visible:ring-0">
+                            <SelectValue placeholder={t('contact.topicPlaceholder')} />
+                          </SelectTrigger>
+                          <SelectContent className="rounded-xl border-[#ebeff4] bg-white">
+                            <SelectItem value="membership" className={selectItemCheckedClass}>
+                              {t('contact.topics.membership')}
+                            </SelectItem>
+                            <SelectItem value="tender" className={selectItemCheckedClass}>
+                              {t('contact.topics.tender')}
+                            </SelectItem>
+                            <SelectItem value="partnership" className={selectItemCheckedClass}>
+                              {t('contact.topics.partnership')}
+                            </SelectItem>
+                            <SelectItem value="support" className={selectItemCheckedClass}>
+                              {t('contact.topics.support')}
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
                   </div>
 
                   <div className="flex flex-col gap-2">
@@ -229,8 +264,7 @@ export default function ContactSection({ contact }: { contact: ContactResponse |
                       {t('contact.messageLabel')}
                     </label>
                     <textarea
-                      value={message}
-                      onChange={(e) => setMessage(e.target.value)}
+                      {...register('message')}
                       disabled={isSubmitting}
                       className={fieldTextareaClass}
                       placeholder={t('contact.messagePlaceholder')}

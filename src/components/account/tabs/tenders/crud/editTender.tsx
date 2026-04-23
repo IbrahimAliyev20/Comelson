@@ -6,7 +6,6 @@ import {
   AlignRight,
   Bold,
   CalendarDays,
-  ChevronDown,
   ChevronLeft,
   Code,
   ImageIcon,
@@ -19,10 +18,18 @@ import {
   Underline,
 } from 'lucide-react'
 import type { ComponentType, ReactNode } from 'react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import PhoneInput from 'react-phone-input-2'
 import 'react-phone-input-2/lib/style.css'
+import { Controller, useForm } from 'react-hook-form'
 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { getCompanyCategoriesQuery } from '@/services/company-categories/queries'
 import { getCompaniesQuery } from '@/services/companies/queries'
 import { getCountriesQuery } from '@/services/members/queries'
@@ -68,6 +75,14 @@ function mergeForm(partial?: Partial<CreateTenderForm>): CreateTenderForm {
   return { ...DEFAULT_FORM, ...partial }
 }
 
+function setDateTimeField(
+  data: CreateTenderForm,
+  key: 'startAt' | 'endAt',
+  nextValue: string
+): CreateTenderForm {
+  return { ...data, [key]: nextValue }
+}
+
 export type EditTenderProps = {
   tenderId: number
   initialValues?: Partial<CreateTenderForm>
@@ -81,32 +96,7 @@ function FieldLabel({ children }: { children: ReactNode }) {
 }
 
 const selectTriggerClass =
-  'h-12 w-full rounded-[8px] border-[#ebeff4] bg-[#f4fafd] px-4 text-sm leading-5 text-[#32393f] focus:border-[#d7e6ef] focus:bg-[#f4fafd] focus:ring-0 focus:ring-offset-0 focus-visible:ring-0'
-
-function NativeSelect({
-  className,
-  children,
-  ...rest
-}: React.ComponentProps<'select'>) {
-  return (
-    <div className="relative w-full">
-      <select
-        className={cn(
-          selectTriggerClass,
-          'cursor-pointer appearance-none pr-10',
-          className
-        )}
-        {...rest}
-      >
-        {children}
-      </select>
-      <ChevronDown
-        className="pointer-events-none absolute right-3 top-1/2 size-5 -translate-y-1/2 text-[#1d212a]"
-        aria-hidden
-      />
-    </div>
-  )
-}
+  'h-12 w-full rounded-lg border border-[#ebeff4] bg-[#f4fafd] px-4 text-sm text-[#1d212a] outline-none placeholder:text-[#889097] focus:border-[#0f477d]/40 focus:ring-4 focus:ring-[#0f477d]/10'
 
 function DateInput({
   value,
@@ -181,14 +171,14 @@ function ToolbarIconButton({
 
 function EditorField({
   label,
+  placeholder,
   value,
   onChange,
-  placeholder,
 }: {
   label: string
-  value: string
-  onChange: React.ChangeEventHandler<HTMLTextAreaElement>
   placeholder: string
+  value: string
+  onChange: (nextValue: string) => void
 }) {
   return (
     <div className="flex w-full flex-col gap-2">
@@ -232,7 +222,7 @@ function EditorField({
         </div>
         <textarea
           value={value}
-          onChange={onChange}
+          onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
           rows={5}
           className="min-h-[120px] w-full resize-y border-0 bg-transparent px-4 py-4 text-sm leading-5 text-[#1d212a] outline-none placeholder:text-[#889097]"
@@ -346,36 +336,30 @@ export default function EditTender({
     return res.data as TenderDetailLike
   })()
 
-  const [form, setForm] = useState<CreateTenderForm>(() =>
-    mergeForm(initialValues)
-  )
+  const { register, handleSubmit, control, reset, watch } =
+    useForm<CreateTenderForm>({
+      defaultValues: mergeForm(initialValues),
+    })
+
+  const categoryId = watch('categoryId')
+  const countryId = watch('countryId')
+  const companyId = watch('company')
 
   useEffect(() => {
     if (tenderDetail) {
-      setForm(mergeForm(tenderToInitialValues(tenderDetail)))
+      reset(mergeForm(tenderToInitialValues(tenderDetail)))
       return
     }
-    setForm(mergeForm(initialValues))
-  }, [initialValues, tenderDetail])
-
-  const handleChange =
-    (field: keyof CreateTenderForm) =>
-    (
-      event: React.ChangeEvent<
-        HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-      >
-    ) => {
-      setForm((prev) => ({ ...prev, [field]: event.target.value }))
-    }
+    reset(mergeForm(initialValues))
+  }, [initialValues, reset, tenderDetail])
 
   const handleCancel = () => {
     onCancel?.()
     onBack?.()
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    onSubmit?.(form)
+  const submit = (data: CreateTenderForm) => {
+    onSubmit?.(data)
   }
 
   if (isLoadingTender) {
@@ -448,7 +432,7 @@ export default function EditTender({
       </div>
 
       <form
-        onSubmit={handleSubmit}
+        onSubmit={handleSubmit(submit)}
         className="flex flex-col gap-12 px-6 pt-8 sm:px-12"
       >
         <section className="flex flex-col gap-9">
@@ -460,53 +444,61 @@ export default function EditTender({
             <label className="flex flex-col gap-2">
               <FieldLabel>Tender başlığı</FieldLabel>
               <input
-                name="title"
                 type="text"
                 placeholder="Tender başlığı daxil edin"
-                value={form.title}
-                onChange={handleChange('title')}
+                {...register('title')}
                 className={inputClass}
               />
             </label>
 
             <div className="flex flex-col gap-2">
               <FieldLabel>Kateqoriya</FieldLabel>
-              <NativeSelect
+              <Controller
                 name="categoryId"
-                value={form.categoryId}
-                onChange={(e) =>
-                  setForm((prev) => ({ ...prev, categoryId: e.target.value }))
-                }
-              >
-                <option value="" disabled>
-                  Kateqoriyanı seçin
-                </option>
-                  {form.categoryId &&
-                  !(categories as CompanyCategoryResponse[]).some(
-                    (c) => String(c.id) === form.categoryId
-                  ) ? (
-                    <option value={form.categoryId}>
-                      {getLocalizedName(
-                        tenderDetail?.category?.name,
-                        locale,
-                        `#${form.categoryId}`
-                      )}
-                    </option>
-                  ) : null}
-                  {(categories as CompanyCategoryResponse[]).map((c) => (
-                    <option key={c.id} value={String(c.id)}>
-                      {c.name}
-                    </option>
-                  ))}
-              </NativeSelect>
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    onValueChange={field.onChange}
+                    value={field.value || undefined}
+                    key={categoryId}
+                  >
+                    <SelectTrigger className={selectTriggerClass}>
+                      <SelectValue placeholder="Kateqoriyanı seçin" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {field.value &&
+                      !(categories as CompanyCategoryResponse[]).some(
+                        (c) => String(c.id) === field.value
+                      ) ? (
+                        <SelectItem value={field.value}>
+                          {getLocalizedName(
+                            tenderDetail?.category?.name,
+                            locale,
+                            `#${field.value}`
+                          )}
+                        </SelectItem>
+                      ) : null}
+                      {(categories as CompanyCategoryResponse[]).map((c) => (
+                        <SelectItem key={String(c.id)} value={String(c.id)}>
+                          {c.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
             </div>
 
             <div className="flex flex-col gap-2">
               <FieldLabel>Başlama tarixi və saatı</FieldLabel>
               <DateInput
                 name="startAt"
-                value={form.startAt}
-                onChange={handleChange('startAt')}
+                value={watch('startAt')}
+                onChange={(e) => {
+                  const v = e.target.value
+                  const current = watch()
+                  reset(setDateTimeField(current, 'startAt', v))
+                }}
                 placeholder="YYYY-MM-DD --:--"
               />
             </div>
@@ -515,8 +507,12 @@ export default function EditTender({
               <FieldLabel>Bitmə tarixi və saatı</FieldLabel>
               <DateInput
                 name="endAt"
-                value={form.endAt}
-                onChange={handleChange('endAt')}
+                value={watch('endAt')}
+                onChange={(e) => {
+                  const v = e.target.value
+                  const current = watch()
+                  reset(setDateTimeField(current, 'endAt', v))
+                }}
                 placeholder="YYYY-MM-DD --:--"
               />
             </div>
@@ -524,73 +520,87 @@ export default function EditTender({
 
           <div className="flex flex-col gap-2">
             <FieldLabel>Ölkə</FieldLabel>
-            <NativeSelect
+            <Controller
               name="countryId"
-              value={form.countryId}
-              onChange={(e) =>
-                setForm((prev) => ({ ...prev, countryId: e.target.value }))
-              }
-            >
-              <option value="" disabled>
-                Ölkə seçin
-              </option>
-                {form.countryId &&
-                !(countries as CountryResponse[]).some(
-                  (c) => String(c.id) === form.countryId
-                ) ? (
-                  <option value={form.countryId}>
-                    {getLocalizedName(
-                      tenderDetail?.country?.name,
-                      locale,
-                      `#${form.countryId}`
-                    )}
-                  </option>
-                ) : null}
-                {(countries as CountryResponse[]).map((c) => (
-                  <option key={c.id} value={String(c.id)}>
-                    {c.name}
-                  </option>
-                ))}
-            </NativeSelect>
+              control={control}
+              render={({ field }) => (
+                <Select
+                  onValueChange={field.onChange}
+                  value={field.value || undefined}
+                  key={countryId}
+                >
+                  <SelectTrigger className={selectTriggerClass}>
+                    <SelectValue placeholder="Ölkə seçin" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {field.value &&
+                    !(countries as CountryResponse[]).some(
+                      (c) => String(c.id) === field.value
+                    ) ? (
+                      <SelectItem value={field.value}>
+                        {getLocalizedName(
+                          tenderDetail?.country?.name,
+                          locale,
+                          `#${field.value}`
+                        )}
+                      </SelectItem>
+                    ) : null}
+                    {(countries as CountryResponse[]).map((c) => (
+                      <SelectItem key={String(c.id)} value={String(c.id)}>
+                        {c.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
           </div>
 
           <div className="flex flex-col gap-2">
             <FieldLabel>Şirkət</FieldLabel>
-            <NativeSelect
+            <Controller
               name="company"
-              value={form.company}
-              onChange={(e) =>
-                setForm((prev) => ({ ...prev, company: e.target.value }))
-              }
-            >
-              <option value="" disabled>
-                Şirkəti seçin
-              </option>
-                {form.company &&
-                !companies.some((c) => String(c.id) === form.company) ? (
-                  <option value={form.company}>
-                    {tenderDetail?.company?.name ?? `#${form.company}`}
-                  </option>
-                ) : null}
-                {companies.map((c) => (
-                  <option key={c.id} value={String(c.id)}>
-                    {c.name}
-                  </option>
-                ))}
-            </NativeSelect>
+              control={control}
+              render={({ field }) => (
+                <Select
+                  onValueChange={field.onChange}
+                  value={field.value || undefined}
+                  key={companyId}
+                >
+                  <SelectTrigger className={selectTriggerClass}>
+                    <SelectValue placeholder="Şirkəti seçin" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {field.value &&
+                    !companies.some((c) => String(c.id) === field.value) ? (
+                      <SelectItem value={field.value}>
+                        {tenderDetail?.company?.name ?? `#${field.value}`}
+                      </SelectItem>
+                    ) : null}
+                    {companies.map((c) => (
+                      <SelectItem key={String(c.id)} value={String(c.id)}>
+                        {c.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
           </div>
 
           <EditorField
             label="Tender haqqında"
-            value={form.about}
-            onChange={handleChange('about')}
+            value={watch('about')}
+            onChange={(nextValue) => reset({ ...watch(), about: nextValue })}
             placeholder="Tender haqqında məlumat daxil edin"
           />
 
           <EditorField
             label="Tələb olunan sənədlər"
-            value={form.requiredDocuments}
-            onChange={handleChange('requiredDocuments')}
+            value={watch('requiredDocuments')}
+            onChange={(nextValue) =>
+              reset({ ...watch(), requiredDocuments: nextValue })
+            }
             placeholder="Tələb olunan sənədlər barədə məlumatları daxil edin"
           />
         </section>
@@ -604,11 +614,9 @@ export default function EditTender({
             <label className="flex flex-col gap-2">
               <FieldLabel>Ad,soyad</FieldLabel>
               <input
-                name="fullName"
                 type="text"
                 placeholder="Ad və soyadınızı daxil edin"
-                value={form.fullName}
-                onChange={handleChange('fullName')}
+                {...register('fullName')}
                 className={inputClass}
               />
             </label>
@@ -616,11 +624,9 @@ export default function EditTender({
             <label className="flex flex-col gap-2">
               <FieldLabel>Vəzifə</FieldLabel>
               <input
-                name="position"
                 type="text"
                 placeholder="Vəzifənizi daxil edin"
-                value={form.position}
-                onChange={handleChange('position')}
+                {...register('position')}
                 className={inputClass}
               />
             </label>
@@ -628,51 +634,53 @@ export default function EditTender({
             <label className="flex flex-col gap-2">
               <FieldLabel>Email</FieldLabel>
               <input
-                name="email"
                 type="email"
                 placeholder="Email adresinizi daxil edin"
-                value={form.email}
-                onChange={handleChange('email')}
+                {...register('email')}
                 className={inputClass}
               />
             </label>
 
             <div className="flex flex-col gap-2">
               <FieldLabel>Telefon nömrəsi</FieldLabel>
-              <input type="hidden" name="phone" value={form.phone} />
-              <PhoneInput
-                country="az"
-                value={form.phone}
-                onChange={(value) =>
-                  setForm((prev) => ({ ...prev, phone: value }))
-                }
-                placeholder="Nömrənizi daxil edin"
-                inputStyle={{
-                  width: '100%',
-                  height: '48px',
-                  borderRadius: '0 12px 12px 0',
-                  border: '1px solid #ebeff4',
-                  borderLeft: 'none',
-                  backgroundColor: '#f4fafd',
-                  fontSize: '16px',
-                  paddingLeft: '48px',
-                }}
-                buttonStyle={{
-                  border: '1px solid #ebeff4',
-                  borderRadius: '12px 0 0 12px',
-                  backgroundColor: '#f4fafd',
-                }}
-                containerStyle={{ width: '100%' }}
+              <Controller
+                name="phone"
+                control={control}
+                render={({ field }) => (
+                  <>
+                    <input type="hidden" name={field.name} value={field.value} />
+                    <PhoneInput
+                      country="az"
+                      value={field.value}
+                      onChange={(value) => field.onChange(String(value))}
+                      placeholder="Nömrənizi daxil edin"
+                      inputStyle={{
+                        width: '100%',
+                        height: '48px',
+                        borderRadius: '0 12px 12px 0',
+                        border: '1px solid #ebeff4',
+                        borderLeft: 'none',
+                        backgroundColor: '#f4fafd',
+                        fontSize: '16px',
+                        paddingLeft: '48px',
+                      }}
+                      buttonStyle={{
+                        border: '1px solid #ebeff4',
+                        borderRadius: '12px 0 0 12px',
+                        backgroundColor: '#f4fafd',
+                      }}
+                      containerStyle={{ width: '100%' }}
+                    />
+                  </>
+                )}
               />
             </div>
 
             <label className="flex flex-col gap-2">
               <FieldLabel>Instagram</FieldLabel>
               <input
-                name="instagram"
                 type="url"
-                value={form.instagram}
-                onChange={handleChange('instagram')}
+                {...register('instagram')}
                 className={inputClass}
               />
             </label>
@@ -680,10 +688,8 @@ export default function EditTender({
             <label className="flex flex-col gap-2">
               <FieldLabel>Facebook</FieldLabel>
               <input
-                name="facebook"
                 type="url"
-                value={form.facebook}
-                onChange={handleChange('facebook')}
+                {...register('facebook')}
                 className={inputClass}
               />
             </label>
@@ -691,10 +697,8 @@ export default function EditTender({
             <label className="flex flex-col gap-2">
               <FieldLabel>LinkedIn</FieldLabel>
               <input
-                name="linkedin"
                 type="url"
-                value={form.linkedin}
-                onChange={handleChange('linkedin')}
+                {...register('linkedin')}
                 className={inputClass}
               />
             </label>
@@ -702,10 +706,8 @@ export default function EditTender({
             <label className="flex flex-col gap-2">
               <FieldLabel>X/Twitter</FieldLabel>
               <input
-                name="twitter"
                 type="url"
-                value={form.twitter}
-                onChange={handleChange('twitter')}
+                {...register('twitter')}
                 className={inputClass}
               />
             </label>

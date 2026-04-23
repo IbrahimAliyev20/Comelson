@@ -1,7 +1,13 @@
+'use client'
+
 import Image from 'next/image'
 
 import { cn } from '@/lib/utils'
-import Link from 'next/link'
+import { useQuery } from '@tanstack/react-query'
+import { useLocale } from 'next-intl'
+
+import { Link } from '@/i18n/navigation'
+import { getSettingsQuery } from '@/services/settings/queries'
 
 export const AUTH_HERO_IMAGE_SRC = '/images/herobg.jpg'
 export const AUTH_LOGO_SRC = '/images/Logo.svg'
@@ -16,6 +22,10 @@ export interface AuthSplitLayoutProps {
 }
 
 export function AuthSplitLayout({ children, mainClassName }: AuthSplitLayoutProps) {
+  const locale = useLocale()
+  const { data: settingsResponse } = useQuery(getSettingsQuery(locale))
+  const mobileLogoSrc = settingsResponse?.siteLogo ?? AUTH_LOGO_SRC
+
   return (
     <section className="min-h-screen w-full bg-white">
       <div className="grid min-h-screen w-full grid-cols-1 xl:grid-cols-[minmax(0,720px)_minmax(0,1fr)]">
@@ -57,7 +67,22 @@ export function AuthSplitLayout({ children, mainClassName }: AuthSplitLayoutProp
             mainClassName
           )}
         >
-          {children}
+          <div className="flex w-full max-w-[498px] flex-col">
+            <div className="mb-6 flex items-center justify-center xl:hidden">
+              <Link href="/" aria-label="Ana səhifə">
+                <Image
+                  src={mobileLogoSrc}
+                  alt="Comelson"
+                  width={160}
+                  height={44}
+                  priority
+                  className="h-11 w-auto"
+                />
+              </Link>
+            </div>
+
+            {children}
+          </div>
         </main>
       </div>
     </section>

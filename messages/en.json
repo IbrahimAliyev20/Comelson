@@ -84,9 +84,14 @@
       "about": "About",
       "tenders": "Tenders",
       "members": "Members",
-      "news": "News",
+      "media": "Media",
       "contact": "Contact",
-      "events": "Events"
+      "events": "Events",
+      "news": "News"
+    },
+    "mediaDropdown": {
+      "events": "Events",
+      "news": "News"
     },
     "aboutDropdown": {
       "about": "About",

@@ -54,14 +54,14 @@ export default function EventsSection({
                 <Link
                   key={`${item.slug}-${item.created_at}`}
                   href={`/${locale}/events/${item.slug}`}
-                  className="flex w-full flex-col gap-4 rounded-2xl border border-[#eaf1fa] bg-white px-2 pb-5 pt-2"
+                  className="group flex w-full flex-col gap-4 rounded-2xl border border-[#eaf1fa] bg-white px-2 pb-5 pt-2"
                 >
                   <div className="relative h-[240px] w-full overflow-hidden rounded-xl sm:h-[280px] md:h-[320px]">
                     <Image
                       src={item.image}
                       alt={item.name}
                       fill
-                      className="object-cover"
+                      className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
                       sizes="(max-width: 1024px) 100vw, 421px"
                     />
                   </div>

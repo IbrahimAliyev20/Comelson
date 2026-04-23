@@ -11,7 +11,6 @@ export const heroNavigationItems = [
   { key: "about" as const, href: "/about", hasDropdown: true },
   { key: "tenders" as const, href: "/tenders", hasDropdown: false },
   { key: "members" as const, href: "/members", hasDropdown: false },
-  { key: "events" as const, href: "/events", hasDropdown: false },
-  { key: "news" as const, href: "/news", hasDropdown: false },
+  { key: "media" as const, href: "/events", hasDropdown: true },
   { key: "contact" as const, href: "/contact", hasDropdown: false },
 ]

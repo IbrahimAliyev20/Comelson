@@ -84,9 +84,14 @@
       "about": "Hakkımızda",
       "tenders": "İhaleler",
       "members": "Üyeler",
-      "news": "Haberler",
+      "media": "Medya",
       "contact": "İletişim",
-      "events": "Etkinlikler"
+      "events": "Etkinlikler",
+      "news": "Haberler"
+    },
+    "mediaDropdown": {
+      "events": "Etkinlikler",
+      "news": "Haberler"
     },
     "aboutDropdown": {
       "about": "Hakkımızda",

@@ -17,9 +17,10 @@ import {
   Underline,
 } from 'lucide-react'
 import type { ComponentType, ReactNode } from 'react'
-import { useRef, useState } from 'react'
+import { useRef } from 'react'
 import PhoneInput from 'react-phone-input-2'
 import 'react-phone-input-2/lib/style.css'
+import { Controller, useForm } from 'react-hook-form'
 
 import {
   Select,
@@ -32,7 +33,11 @@ import { getCompanyCategoriesQuery } from '@/services/company-categories/queries
 import { getCompaniesQuery } from '@/services/companies/queries'
 import { getCountriesQuery } from '@/services/members/queries'
 import { cn } from '@/lib/utils'
-import type { CompanyCategoryResponse, CompanyResponse, CountryResponse } from '@/types/types'
+import type {
+  CompanyCategoryResponse,
+  CompanyResponse,
+  CountryResponse,
+} from '@/types/types'
 import { useQuery } from '@tanstack/react-query'
 import { useLocale } from 'next-intl'
 import { toast } from 'sonner'
@@ -54,7 +59,6 @@ export type CreateTenderForm = {
   fullName: string
   position: string
   email: string
-  /** `react-phone-input-2` dəyəri (rəqəmlər, ölkə kodu daxil) */
   phone: string
   instagram: string
   facebook: string
@@ -66,6 +70,25 @@ export type CreateTenderProps = {
   onBack?: () => void
   onCancel?: () => void
   onSubmit?: (data: CreateTenderForm) => void
+}
+
+const DEFAULT_FORM_VALUES: CreateTenderForm = {
+  title: '',
+  categoryId: '',
+  countryId: '',
+  startAt: '',
+  endAt: '',
+  company: '',
+  about: '',
+  requiredDocuments: '',
+  fullName: '',
+  position: '',
+  email: '',
+  phone: '',
+  instagram: '',
+  facebook: '',
+  linkedin: '',
+  twitter: '',
 }
 
 function FieldLabel({ children }: { children: ReactNode }) {
@@ -108,6 +131,11 @@ function DateInput({
 
   return (
     <div className="relative w-full">
+      {!value ? (
+        <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm text-[#889097] sm:hidden">
+          {placeholder}
+        </span>
+      ) : null}
       <input
         ref={inputRef}
         name={name}
@@ -121,7 +149,6 @@ function DateInput({
           'pr-3 text-[#32393f] [color-scheme:light] sm:min-w-0'
         )}
       />
- 
     </div>
   )
 }
@@ -230,92 +257,46 @@ export default function CreateTender({
     getCompaniesQuery({ locale, per_page: 100 })
   )
   const companies = (companiesResponse?.data ?? []) as CompanyResponse[]
-
-  const [form, setForm] = useState<CreateTenderForm>({
-    title: '',
-    categoryId: '',
-    countryId: '',
-    startAt: '',
-    endAt: '',
-    company: '',
-    about: '',
-    requiredDocuments: '',
-    fullName: '',
-    position: '',
-    email: '',
-    phone: '',
-    instagram: '',
-    facebook: '',
-    linkedin: '',
-    twitter: '',
+  const { register, control, handleSubmit } = useForm<CreateTenderForm>({
+    defaultValues: DEFAULT_FORM_VALUES,
   })
-
-  const handleChange =
-    (field: keyof CreateTenderForm) =>
-    (
-      event: React.ChangeEvent<
-        HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-      >
-    ) => {
-      setForm((prev) => ({ ...prev, [field]: event.target.value }))
-    }
 
   const handleCancel = () => {
     onCancel?.()
     onBack?.()
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!form.title.trim()) {
-      toast.error('Tender başlığını daxil edin')
-      return
+  const submit = (data: CreateTenderForm) => {
+    if (!data.title.trim()) return void toast.error('Tender başlığını daxil edin')
+    if (!data.categoryId) return void toast.error('Kateqoriya seçin')
+    if (!data.startAt.trim()) {
+      return void toast.error('Başlama tarixini və saatı seçin')
     }
-    if (!form.categoryId) {
-      toast.error('Kateqoriya seçin')
-      return
+    if (!data.endAt.trim()) {
+      return void toast.error('Bitmə tarixini və saatı seçin')
     }
-    if (!form.startAt.trim()) {
-      toast.error('Başlama tarixini və saatı seçin')
-      return
+    if (!data.countryId) return void toast.error('Ölkə seçin')
+    if (!data.company) return void toast.error('Şirkət seçin')
+    if (!data.about.trim()) {
+      return void toast.error('Tender haqqında məlumat daxil edin')
     }
-    if (!form.endAt.trim()) {
-      toast.error('Bitmə tarixini və saatı seçin')
-      return
+    if (!data.requiredDocuments.trim()) {
+      return void toast.error('Tələb olunan sənədlər barədə məlumat daxil edin')
     }
-    if (!form.countryId) {
-      toast.error('Ölkə seçin')
-      return
+    if (!data.fullName.trim()) {
+      return void toast.error('Ad və soyadı daxil edin')
     }
-    if (!form.company) {
-      toast.error('Şirkət seçin')
-      return
+    if (!data.position.trim()) {
+      return void toast.error('Vəzifəni daxil edin')
     }
-    if (!form.about.trim()) {
-      toast.error('Tender haqqında məlumat daxil edin')
-      return
+    if (!data.email.trim()) {
+      return void toast.error('Email ünvanını daxil edin')
     }
-    if (!form.requiredDocuments.trim()) {
-      toast.error('Tələb olunan sənədlər barədə məlumat daxil edin')
-      return
+    if (!phoneHasEnoughDigits(data.phone)) {
+      return void toast.error('Telefon nömrəsini daxil edin')
     }
-    if (!form.fullName.trim()) {
-      toast.error('Ad və soyadı daxil edin')
-      return
-    }
-    if (!form.position.trim()) {
-      toast.error('Vəzifəni daxil edin')
-      return
-    }
-    if (!form.email.trim()) {
-      toast.error('Email ünvanını daxil edin')
-      return
-    }
-    if (!phoneHasEnoughDigits(form.phone)) {
-      toast.error('Telefon nömrəsini daxil edin')
-      return
-    }
-    onSubmit?.(form)
+
+    onSubmit?.(data)
   }
 
   return (
@@ -336,7 +317,7 @@ export default function CreateTender({
 
       <form
         noValidate
-        onSubmit={handleSubmit}
+        onSubmit={handleSubmit(submit)}
         className="flex flex-col gap-12 px-6 pt-8 sm:px-12"
       >
         <section className="flex flex-col gap-9">
@@ -350,11 +331,9 @@ export default function CreateTender({
                 Tender başlığı <RequiredMark />
               </FieldLabel>
               <input
-                name="title"
                 type="text"
-                placeholder="Tender başlığı daxil edin"
-                value={form.title}
-                onChange={handleChange('title')}
+                placeholder="Tender başlığını daxil edin"
+                {...register('title')}
                 aria-required="true"
                 className={inputClass}
               />
@@ -364,39 +343,46 @@ export default function CreateTender({
               <FieldLabel>
                 Kateqoriya <RequiredMark />
               </FieldLabel>
-              <Select
-                value={form.categoryId}
-                onValueChange={(v) =>
-                  setForm((prev) => ({ ...prev, categoryId: v }))
-                }
-              >
-                <SelectTrigger className={selectTriggerClass}>
-                  <SelectValue placeholder="Kateqoriyanı seçin" />
-                </SelectTrigger>
-                <SelectContent className="rounded-xl  border-[#ebeff4] bg-white">
-                  {(categories as CompanyCategoryResponse[]).map((c) => (
-                    <SelectItem
-                      key={c.id}
-                      value={String(c.id)}
-                      className={selectItemCheckedClass}
-                    >
-                      {c.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Controller
+                name="categoryId"
+                control={control}
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger className={selectTriggerClass}>
+                      <SelectValue placeholder="Kateqoriyanı seçin" />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-xl  border-[#ebeff4] bg-white">
+                      {(categories as CompanyCategoryResponse[]).map((c) => (
+                        <SelectItem
+                          key={c.id}
+                          value={String(c.id)}
+                          className={selectItemCheckedClass}
+                        >
+                          {c.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
             </div>
 
             <div className="flex flex-col gap-2">
               <FieldLabel>
                 Başlama tarixi və saatı <RequiredMark />
               </FieldLabel>
-              <DateInput
+              <Controller
                 name="startAt"
-                value={form.startAt}
-                onChange={handleChange('startAt')}
-                placeholder="YYYY-MM-DD --:--"
-                ariaRequired
+                control={control}
+                render={({ field }) => (
+                  <DateInput
+                    name={field.name}
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder="YYYY-MM-DD --:--"
+                    ariaRequired
+                  />
+                )}
               />
             </div>
 
@@ -404,12 +390,18 @@ export default function CreateTender({
               <FieldLabel>
                 Bitmə tarixi və saatı <RequiredMark />
               </FieldLabel>
-              <DateInput
+              <Controller
                 name="endAt"
-                value={form.endAt}
-                onChange={handleChange('endAt')}
-                placeholder="YYYY-MM-DD --:--"
-                ariaRequired
+                control={control}
+                render={({ field }) => (
+                  <DateInput
+                    name={field.name}
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder="YYYY-MM-DD --:--"
+                    ariaRequired
+                  />
+                )}
               />
             </div>
           </div>
@@ -418,68 +410,84 @@ export default function CreateTender({
             <FieldLabel>
               Ölkə <RequiredMark />
             </FieldLabel>
-            <Select
-              value={form.countryId}
-              onValueChange={(v) =>
-                setForm((prev) => ({ ...prev, countryId: v }))
-              }
-            >
-              <SelectTrigger className={selectTriggerClass}>
-                <SelectValue placeholder="Ölkə seçin" />
-              </SelectTrigger>
-              <SelectContent className="rounded-xl border-[#ebeff4] bg-white">
-                {(countries as CountryResponse[]).map((c) => (
-                  <SelectItem
-                    key={c.id}
-                    value={String(c.id)}
-                    className={selectItemCheckedClass}
-                  >
-                    {c.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Controller
+              name="countryId"
+              control={control}
+              render={({ field }) => (
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger className={selectTriggerClass}>
+                    <SelectValue placeholder="Ölkə seçin" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl border-[#ebeff4] bg-white">
+                    {(countries as CountryResponse[]).map((c) => (
+                      <SelectItem
+                        key={c.id}
+                        value={String(c.id)}
+                        className={selectItemCheckedClass}
+                      >
+                        {c.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
           </div>
 
           <div className="flex flex-col gap-2">
             <FieldLabel>
               Şirkət <RequiredMark />
             </FieldLabel>
-            <Select
-              value={form.company}
-              onValueChange={(v) => setForm((prev) => ({ ...prev, company: v }))}
-            >
-              <SelectTrigger className={selectTriggerClass}>
-                <SelectValue placeholder="Şirkəti seçin" />
-              </SelectTrigger>
-              <SelectContent className="rounded-xl border-[#ebeff4] bg-white">
-                {companies.map((c) => (
-                  <SelectItem
-                    key={c.id}
-                    value={String(c.id)}
-                    className={selectItemCheckedClass}
-                  >
-                    {c.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Controller
+              name="company"
+              control={control}
+              render={({ field }) => (
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger className={selectTriggerClass}>
+                    <SelectValue placeholder="Şirkəti seçin" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl border-[#ebeff4] bg-white">
+                    {companies.map((c) => (
+                      <SelectItem
+                        key={c.id}
+                        value={String(c.id)}
+                        className={selectItemCheckedClass}
+                      >
+                        {c.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
           </div>
 
-          <EditorField
-            label="Tender haqqında"
-            value={form.about}
-            onChange={handleChange('about')}
-            placeholder="Tender haqqında məlumat daxil edin"
-            required
+          <Controller
+            name="about"
+            control={control}
+            render={({ field }) => (
+              <EditorField
+                label="Tender haqqında"
+                value={field.value}
+                onChange={field.onChange}
+                placeholder="Tender haqqında məlumat daxil edin"
+                required
+              />
+            )}
           />
 
-          <EditorField
-            label="Tələb olunan sənədlər"
-            value={form.requiredDocuments}
-            onChange={handleChange('requiredDocuments')}
-            placeholder="Tələb olunan sənədlər barədə məlumatları daxil edin"
-            required
+          <Controller
+            name="requiredDocuments"
+            control={control}
+            render={({ field }) => (
+              <EditorField
+                label="Tələb olunan sənədlər"
+                value={field.value}
+                onChange={field.onChange}
+                placeholder="Tələb olunan sənədlər barədə məlumatları daxil edin"
+                required
+              />
+            )}
           />
         </section>
 
@@ -491,14 +499,12 @@ export default function CreateTender({
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-x-12">
             <label className="flex flex-col gap-2">
               <FieldLabel>
-                Ad,soyad <RequiredMark />
+                Ad, soyad <RequiredMark />
               </FieldLabel>
               <input
-                name="fullName"
                 type="text"
                 placeholder="Ad və soyadınızı daxil edin"
-                value={form.fullName}
-                onChange={handleChange('fullName')}
+                {...register('fullName')}
                 aria-required="true"
                 className={inputClass}
               />
@@ -509,11 +515,9 @@ export default function CreateTender({
                 Vəzifə <RequiredMark />
               </FieldLabel>
               <input
-                name="position"
                 type="text"
                 placeholder="Vəzifənizi daxil edin"
-                value={form.position}
-                onChange={handleChange('position')}
+                {...register('position')}
                 aria-required="true"
                 className={inputClass}
               />
@@ -524,11 +528,9 @@ export default function CreateTender({
                 Email <RequiredMark />
               </FieldLabel>
               <input
-                name="email"
                 type="email"
                 placeholder="Email adresinizi daxil edin"
-                value={form.email}
-                onChange={handleChange('email')}
+                {...register('email')}
                 aria-required="true"
                 className={inputClass}
               />
@@ -538,44 +540,48 @@ export default function CreateTender({
               <FieldLabel>
                 Telefon nömrəsi <RequiredMark />
               </FieldLabel>
-              <input type="hidden" name="phone" value={form.phone} />
-              <PhoneInput
-                country="az"
-                value={form.phone}
-                onChange={(value) =>
-                  setForm((prev) => ({ ...prev, phone: value }))
-                }
-                placeholder="Nömrənizi daxil edin"
-                inputProps={{
-                  required: false,
-                  'aria-required': true,
-                }}
-                inputStyle={{
-                  width: '100%',
-                  height: '48px',
-                  borderRadius: '0 12px 12px 0',
-                  border: '1px solid #ebeff4',
-                  borderLeft: 'none',
-                  backgroundColor: '#f4fafd',
-                  fontSize: '16px',
-                  paddingLeft: '48px',
-                }}
-                buttonStyle={{
-                  border: '1px solid #ebeff4',
-                  borderRadius: '12px 0 0 12px',
-                  backgroundColor: '#f4fafd',
-                }}
-                containerStyle={{ width: '100%' }}
+              <Controller
+                name="phone"
+                control={control}
+                render={({ field }) => (
+                  <>
+                    <input type="hidden" name={field.name} value={field.value} />
+                    <PhoneInput
+                      country="az"
+                      value={field.value}
+                      onChange={(value) => field.onChange(value)}
+                      placeholder="Nömrənizi daxil edin"
+                      inputProps={{
+                        required: false,
+                        'aria-required': true,
+                      }}
+                      inputStyle={{
+                        width: '100%',
+                        height: '48px',
+                        borderRadius: '0 12px 12px 0',
+                        border: '1px solid #ebeff4',
+                        borderLeft: 'none',
+                        backgroundColor: '#f4fafd',
+                        fontSize: '16px',
+                        paddingLeft: '48px',
+                      }}
+                      buttonStyle={{
+                        border: '1px solid #ebeff4',
+                        borderRadius: '12px 0 0 12px',
+                        backgroundColor: '#f4fafd',
+                      }}
+                      containerStyle={{ width: '100%' }}
+                    />
+                  </>
+                )}
               />
             </div>
 
             <label className="flex flex-col gap-2">
               <FieldLabel>Instagram</FieldLabel>
               <input
-                name="instagram"
                 type="url"
-                value={form.instagram}
-                onChange={handleChange('instagram')}
+                {...register('instagram')}
                 placeholder="https://instagram.com/nümunə"
                 className={inputClass}
               />
@@ -584,10 +590,8 @@ export default function CreateTender({
             <label className="flex flex-col gap-2">
               <FieldLabel>Facebook</FieldLabel>
               <input
-                name="facebook"
                 type="url"
-                value={form.facebook}
-                onChange={handleChange('facebook')}
+                {...register('facebook')}
                 placeholder="https://facebook.com/nümunə"
                 className={inputClass}
               />
@@ -596,10 +600,8 @@ export default function CreateTender({
             <label className="flex flex-col gap-2">
               <FieldLabel>LinkedIn</FieldLabel>
               <input
-                name="linkedin"
                 type="url"
-                value={form.linkedin}
-                onChange={handleChange('linkedin')}
+                {...register('linkedin')}
                 placeholder="https://linkedin.com/nümunə"
                 className={inputClass}
               />
@@ -608,10 +610,8 @@ export default function CreateTender({
             <label className="flex flex-col gap-2">
               <FieldLabel>X/Twitter</FieldLabel>
               <input
-                name="twitter"
                 type="url"
-                value={form.twitter}
-                onChange={handleChange('twitter')}
+                {...register('twitter')}
                 placeholder="https://x.com/nümunə"
                 className={inputClass}
               />

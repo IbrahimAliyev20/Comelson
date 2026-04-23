@@ -5,7 +5,6 @@ import {
   AlignLeft,
   AlignRight,
   Bold,
-  ChevronDown,
   ChevronLeft,
   Code,
   ImageIcon,
@@ -20,12 +19,20 @@ import {
 } from 'lucide-react'
 import { useLocale } from 'next-intl'
 import type { ComponentType, ReactNode } from 'react'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import PhoneInput from 'react-phone-input-2'
 import 'react-phone-input-2/lib/style.css'
+import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { cn } from '@/lib/utils'
 import { getCompanyCategoriesQuery } from '@/services/company-categories/queries'
 import { updateCompanyMutation } from '@/services/companies/mutations'
@@ -54,6 +61,22 @@ export type EditableCompany = {
   linkedin?: string
 }
 
+type EditCampainFormValues = {
+  name: string
+  voen: string
+  categoryId: string
+  countryId: string
+  description: string
+  phone: string
+  email: string
+  address: string
+  website: string
+  instagram: string
+  facebook: string
+  linkedin: string
+  logo: File | null
+}
+
 function escapeHtmlPlain(text: string): string {
   return text
     .replace(/&/g, '&amp;')
@@ -78,31 +101,6 @@ function FieldLabel({ children }: { children: ReactNode }) {
   return <span className={labelClass}>{children}</span>
 }
 
-function NativeSelect({
-  className,
-  children,
-  ...rest
-}: React.ComponentProps<'select'>) {
-  return (
-    <div className="relative w-full">
-      <select
-        className={cn(
-          inputClass,
-          'cursor-pointer appearance-none pr-10 font-medium',
-          className
-        )}
-        {...rest}
-      >
-        {children}
-      </select>
-      <ChevronDown
-        className="pointer-events-none absolute right-3 top-1/2 size-5 -translate-y-1/2 text-[#1d212a]"
-        aria-hidden
-      />
-    </div>
-  )
-}
-
 export default function EditCampain({
   company,
   onCancel,
@@ -117,10 +115,33 @@ export default function EditCampain({
   const { data: categories = [], isLoading: categoriesLoading } = useQuery(
     getCompanyCategoriesQuery(locale)
   )
-  const [categoryId, setCategoryId] = useState('')
-  const [countryId, setCountryId] = useState('')
-  const [logoFile, setLogoFile] = useState<File | null>(null)
-  const [logoPreviewUrl, setLogoPreviewUrl] = useState<string>('')
+  const { register, control, setValue, watch, reset, handleSubmit } =
+    useForm<EditCampainFormValues>({
+      defaultValues: {
+        name: company.name,
+        voen: company.voen ?? '12345678',
+        categoryId: '',
+        countryId: '',
+        description: company.description,
+        phone: company.phone ?? '',
+        email: company.email ?? 'info@comelson.az',
+        address: company.address ?? 'Bakı, Azərbaycan, Əhmədli',
+        website: company.website ?? 'https://comelson.az',
+        instagram: company.instagram ?? 'https://instagram.com/comelson',
+        facebook: company.facebook ?? 'https://facebook.com/comelson',
+        linkedin: company.linkedin ?? 'https://linkedin.com/comelson',
+        logo: null,
+      },
+    })
+  const logoFile = watch('logo')
+  const logoPreviewUrl = logoFile ? URL.createObjectURL(logoFile) : ''
+  const logoSrc = logoPreviewUrl || company.logo
+
+  useEffect(() => {
+    return () => {
+      if (logoPreviewUrl) URL.revokeObjectURL(logoPreviewUrl)
+    }
+  }, [logoPreviewUrl])
 
   const updateMutation = useMutation({
     ...updateCompanyMutation(),
@@ -137,19 +158,6 @@ export default function EditCampain({
     },
   })
 
-  const [form, setForm] = useState<EditableCompany>({
-    ...company,
-    voen: company.voen ?? '12345678',
-    country: company.country,
-    phone: company.phone ?? '',
-    email: company.email ?? 'info@comelson.az',
-    address: company.address ?? 'Bakı, Azərbaycan, Əhmədli',
-    website: company.website ?? 'https://comelson.az',
-    instagram: company.instagram ?? 'https://instagram.com/comelson',
-    facebook: company.facebook ?? 'https://facebook.com/comelson',
-    linkedin: company.linkedin ?? 'https://linkedin.com/comelson',
-  })
-
   const { data: companyDetailResponse } = useQuery({
     ...getCompanyQuery({ locale, id: companyId }),
     enabled: Number.isFinite(companyId) && companyId > 0,
@@ -159,80 +167,58 @@ export default function EditCampain({
     const d = companyDetailResponse?.data
     if (!d) return
 
-    setCategoryId(String(d.category?.id ?? ''))
-    setCountryId(String(d.country?.id ?? ''))
+    reset({
+      name: d.name ?? company.name,
+      voen: d.voen ?? company.voen ?? '12345678',
+      categoryId: String(d.category?.id ?? ''),
+      countryId: String(d.country?.id ?? ''),
+      description: d.description ?? company.description,
+      phone: d.phone ?? company.phone ?? '',
+      email: d.email ?? company.email ?? 'info@comelson.az',
+      address: d.address ?? company.address ?? 'Bakı, Azərbaycan, Əhmədli',
+      website: d.website ?? company.website ?? 'https://comelson.az',
+      instagram:
+        d.instagram ?? company.instagram ?? 'https://instagram.com/comelson',
+      facebook:
+        d.facebook ?? company.facebook ?? 'https://facebook.com/comelson',
+      linkedin:
+        d.linkedin ?? company.linkedin ?? 'https://linkedin.com/comelson',
+      logo: null,
+    })
+  }, [company, companyDetailResponse, reset])
 
-    setForm((prev) => ({
-      ...prev,
-      name: d.name ?? prev.name,
-      voen: d.voen ?? prev.voen,
-      category: d.category?.name ?? prev.category,
-      country: d.country?.name ?? prev.country,
-      description: d.description ?? prev.description,
-      logo: d.logo_url ?? prev.logo,
-      phone: d.phone ?? prev.phone,
-      email: d.email ?? prev.email,
-      address: d.address ?? prev.address,
-      website: d.website ?? prev.website,
-      instagram: d.instagram ?? prev.instagram,
-      facebook: d.facebook ?? prev.facebook,
-      linkedin: d.linkedin ?? prev.linkedin,
-    }))
-  }, [companyDetailResponse])
-
-  useEffect(() => {
-    if (!logoFile) {
-      setLogoPreviewUrl('')
-      return
-    }
-    const url = URL.createObjectURL(logoFile)
-    setLogoPreviewUrl(url)
-    return () => URL.revokeObjectURL(url)
-  }, [logoFile])
-
-  const handleChange =
-    (field: keyof EditableCompany) =>
-    (
-      event: React.ChangeEvent<
-        HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-      >
-    ) => {
-      setForm((prev) => ({ ...prev, [field]: event.target.value }))
-    }
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    const id = companyId
-    if (Number.isNaN(id)) {
+  const submit = (data: EditCampainFormValues) => {
+    if (Number.isNaN(companyId)) {
       toast.error('Şirkət ID düzgün deyil')
       return
     }
-    if (!categoryId) {
+    if (!data.categoryId) {
       toast.error('Kateqoriya seçin')
       return
     }
-    if (!countryId) {
+    if (!data.countryId) {
       toast.error('Ölkə seçin')
       return
     }
-    const description = `<p>${escapeHtmlPlain(form.description)}</p>`
+
+    const description = `<p>${escapeHtmlPlain(data.description)}</p>`
     updateMutation.mutate({
       locale,
-      id,
+      id: companyId,
       body: {
-        name: form.name,
-        voen: form.voen ?? '',
-        category_id: Number(categoryId),
-        country_id: Number(countryId),
+        name: data.name,
+        voen: data.voen,
+        category_id: Number(data.categoryId),
+        country_id: Number(data.countryId),
         description,
-        phone: normalizePhone(form.phone ?? ''),
-        email: form.email ?? '',
-        address: form.address ?? '',
-        website: form.website ?? '',
-        instagram: form.instagram ?? '',
-        facebook: form.facebook ?? '',
-        linkedin: form.linkedin ?? '',
-        logo: logoFile ?? undefined,
+        phone: normalizePhone(data.phone),
+        email: data.email,
+        address: data.address,
+        website: data.website,
+        instagram: data.instagram,
+        facebook: data.facebook,
+        linkedin: data.linkedin,
+        logo: data.logo ?? undefined,
       },
     })
   }
@@ -254,27 +240,21 @@ export default function EditCampain({
       </div>
 
       <form
-        onSubmit={handleSubmit}
+        onSubmit={handleSubmit(submit)}
         className="flex flex-col gap-12 px-6 pt-8 sm:px-12"
       >
         <section className="flex flex-col gap-8">
-         
-
           <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:gap-5">
             <label className="relative flex size-[120px] shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-full border border-[#e6eff6] bg-white p-2.5">
               <input
                 type="file"
                 accept="image/jpeg,image/png,image/jpg"
                 className="sr-only"
-                onChange={(ev) => {
-                  const f = ev.target.files?.[0]
-                  setLogoFile(f ?? null)
-                }}
+                onChange={(ev) => setValue('logo', ev.target.files?.[0] ?? null)}
               />
-              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={logoPreviewUrl || form.logo}
-                alt={form.name}
+                src={logoSrc}
+                alt={watch('name')}
                 className="size-full rounded-full object-cover"
               />
               <span
@@ -300,73 +280,83 @@ export default function EditCampain({
             <label className="flex flex-col gap-2">
               <FieldLabel>Şirkətin adı</FieldLabel>
               <input
-                name="companyName"
+                {...register('name')}
                 type="text"
                 autoComplete="organization"
-                value={form.name}
-                onChange={handleChange('name')}
                 className={inputClass}
               />
             </label>
             <label className="flex flex-col gap-2">
               <FieldLabel>Şirkətin VÖEN-i</FieldLabel>
               <input
-                name="voen"
+                {...register('voen')}
                 type="text"
                 inputMode="numeric"
-                value={form.voen}
-                onChange={handleChange('voen')}
                 className={inputClass}
               />
             </label>
             <div className="flex flex-col gap-2">
               <FieldLabel>Kateqoriya</FieldLabel>
-              <NativeSelect
-                name="category"
-                value={categoryId}
-                onChange={(e) => {
-                  const v = e.target.value
-                  setCategoryId(v)
-                  const cat = categories.find((c) => String(c.id) === v)
-                  setForm((prev) => ({
-                    ...prev,
-                    category: cat?.name ?? prev.category,
-                  }))
-                }}
-                disabled={categoriesLoading}
-              >
-                <option value="" disabled>
-                  {categoriesLoading ? 'Yüklənir…' : 'Kateqoriyanı seçin'}
-                </option>
-                {categories.map((c) => (
-                  <option key={c.id} value={String(c.id)}>
-                    {c.name}
-                  </option>
-                ))}
-              </NativeSelect>
+              <Controller
+                name="categoryId"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    disabled={categoriesLoading}
+                    onValueChange={field.onChange}
+                    value={field.value || undefined}
+                  >
+                    <SelectTrigger className={cn(inputClass, 'justify-between')}>
+                      <SelectValue
+                        placeholder={
+                          categoriesLoading ? 'Yüklənir...' : 'Kateqoriyanı seçin'
+                        }
+                      />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-xl border-[#ebeff4] bg-white">
+                      {categories.map((c) => (
+                        <SelectItem key={String(c.id)} value={String(c.id)}>
+                          {c.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
             </div>
             <div className="flex flex-col gap-2">
               <FieldLabel>Ölkə</FieldLabel>
-              <NativeSelect
-                name="country"
-                value={countryId}
-                onChange={(e) => setCountryId(e.target.value)}
-                disabled={countriesLoading}
-              >
-                <option value="" disabled>
-                  {countriesLoading ? 'Yüklənir…' : 'Ölkəni seçin'}
-                </option>
-                {countries.map((c) => (
-                  <option key={c.id} value={String(c.id)}>
-                    {c.name}
-                  </option>
-                ))}
-              </NativeSelect>
+              <Controller
+                name="countryId"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    disabled={countriesLoading}
+                    onValueChange={field.onChange}
+                    value={field.value || undefined}
+                  >
+                    <SelectTrigger className={cn(inputClass, 'justify-between')}>
+                      <SelectValue
+                        placeholder={countriesLoading ? 'Yüklənir...' : 'Ölkəni seçin'}
+                      />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-xl border-[#ebeff4] bg-white">
+                      {countries.map((c) => (
+                        <SelectItem key={String(c.id)} value={String(c.id)}>
+                          {c.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
             </div>
           </div>
 
           <div className="flex flex-col gap-2">
-            <span className={cn(labelClass, 'text-[#32393f]')}>Şirkət haqqında</span>
+            <span className={cn(labelClass, 'text-[#32393f]')}>
+              Şirkət haqqında
+            </span>
             <div className="overflow-hidden rounded-xl border border-[#b5b8bb] bg-[#f4fafd]">
               <div
                 className="flex flex-wrap items-center gap-2 border-b border-[#b5b8bb] px-4 py-3 sm:gap-3"
@@ -395,22 +385,20 @@ export default function EditCampain({
                   type="button"
                   className="rounded-md px-1.5 py-1 text-sm font-medium text-[#1d212a] transition-colors hover:bg-[#eaf1fa]"
                 >
-                  x²
+                  x2
                 </button>
                 <button
                   type="button"
                   className="rounded-md px-1.5 py-1 text-sm font-medium text-[#1d212a] transition-colors hover:bg-[#eaf1fa]"
                 >
-                  x₂
+                  x2
                 </button>
                 <div className="mx-1 hidden h-6 w-px bg-[#aeaeb2]/40 sm:block" />
                 <ToolbarIconButton label="Şəkil" icon={ImageIcon} />
                 <ToolbarIconButton label="Cədvəl" icon={Table2} />
               </div>
               <textarea
-                name="about"
-                value={form.description}
-                onChange={handleChange('description')}
+                {...register('description')}
                 rows={8}
                 className="min-h-[180px] w-full resize-y border-0 bg-transparent px-4 py-4 text-sm leading-5 text-[#14171a] outline-none"
               />
@@ -426,39 +414,41 @@ export default function EditCampain({
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-x-8">
             <div className="flex flex-col gap-2">
               <FieldLabel>Telefon nömrəsi</FieldLabel>
-              <PhoneInput
-                country="az"
-                value={form.phone || ''}
-                onChange={(value) =>
-                  setForm((prev) => ({ ...prev, phone: value }))
-                }
-                placeholder="Nömrənizi daxil edin"
-                inputStyle={{
-                  width: '100%',
-                  height: '48px',
-                  borderRadius: '0 12px 12px 0',
-                  border: '1px solid #ebeff4',
-                  borderLeft: 'none',
-                  backgroundColor: '#f4fafd',
-                  fontSize: '16px',
-                  paddingLeft: '48px',
-                }}
-                buttonStyle={{
-                  border: '1px solid #ebeff4',
-                  borderRadius: '12px 0 0 12px',
-                  backgroundColor: '#f4fafd',
-                }}
-                containerStyle={{ width: '100%' }}
+              <Controller
+                name="phone"
+                control={control}
+                render={({ field }) => (
+                  <PhoneInput
+                    country="az"
+                    value={field.value}
+                    onChange={(value) => field.onChange(value)}
+                    placeholder="Nömrənizi daxil edin"
+                    inputStyle={{
+                      width: '100%',
+                      height: '48px',
+                      borderRadius: '0 12px 12px 0',
+                      border: '1px solid #ebeff4',
+                      borderLeft: 'none',
+                      backgroundColor: '#f4fafd',
+                      fontSize: '16px',
+                      paddingLeft: '48px',
+                    }}
+                    buttonStyle={{
+                      border: '1px solid #ebeff4',
+                      borderRadius: '12px 0 0 12px',
+                      backgroundColor: '#f4fafd',
+                    }}
+                    containerStyle={{ width: '100%' }}
+                  />
+                )}
               />
             </div>
             <label className="flex flex-col gap-2">
               <FieldLabel>Email</FieldLabel>
               <input
-                name="email"
+                {...register('email')}
                 type="email"
                 autoComplete="email"
-                value={form.email}
-                onChange={handleChange('email')}
                 className={inputClass}
               />
             </label>
@@ -466,13 +456,7 @@ export default function EditCampain({
 
           <label className="flex flex-col gap-2">
             <FieldLabel>Ünvan</FieldLabel>
-            <input
-              name="address"
-              type="text"
-              value={form.address}
-              onChange={handleChange('address')}
-              className={inputClass}
-            />
+            <input {...register('address')} type="text" className={inputClass} />
           </label>
         </section>
 
@@ -484,41 +468,29 @@ export default function EditCampain({
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-x-8">
             <label className="flex flex-col gap-2">
               <FieldLabel>Website</FieldLabel>
-              <input
-                name="website"
-                type="url"
-                value={form.website}
-                onChange={handleChange('website')}
-                className={inputClass}
-              />
+              <input {...register('website')} type="url" className={inputClass} />
             </label>
             <label className="flex flex-col gap-2">
               <FieldLabel>Instagram</FieldLabel>
               <input
-                name="instagram"
+                {...register('instagram')}
                 type="url"
-                value={form.instagram}
-                onChange={handleChange('instagram')}
                 className={inputClass}
               />
             </label>
             <label className="flex flex-col gap-2">
               <FieldLabel>Facebook</FieldLabel>
               <input
-                name="facebook"
+                {...register('facebook')}
                 type="url"
-                value={form.facebook}
-                onChange={handleChange('facebook')}
                 className={inputClass}
               />
             </label>
             <label className="flex flex-col gap-2">
               <FieldLabel>LinkedIn</FieldLabel>
               <input
-                name="linkedin"
+                {...register('linkedin')}
                 type="url"
-                value={form.linkedin}
-                onChange={handleChange('linkedin')}
                 className={inputClass}
               />
             </label>
@@ -538,7 +510,7 @@ export default function EditCampain({
             disabled={updateMutation.isPending}
             className="inline-flex h-12 flex-1 cursor-pointer items-center justify-center rounded-2xl bg-[#0f477d] px-6 text-base font-medium leading-6 text-white transition-colors hover:bg-[#0c3a66] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:opacity-60"
           >
-            {updateMutation.isPending ? 'Saxlanılır…' : 'Yadda saxla'}
+            {updateMutation.isPending ? 'Saxlanılır...' : 'Yadda saxla'}
           </button>
         </div>
       </form>
