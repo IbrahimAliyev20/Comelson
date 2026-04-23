@@ -217,7 +217,7 @@ export default function InfoAccount({
           type="button"
           disabled={!canSave}
           onClick={handleSave}
-          className="inline-flex h-12 min-w-[200px] cursor-pointer items-center justify-center gap-2 rounded-2xl bg-[#0f477d] px-6 text-base font-medium leading-6 text-white transition-opacity hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-[#0f477d] px-6 text-base font-medium leading-6 text-white transition-opacity hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:min-w-[200px]"
         >
           {isPending ? (
             <Loader2 className="size-5 animate-spin" aria-hidden />

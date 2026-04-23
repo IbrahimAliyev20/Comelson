@@ -68,11 +68,11 @@ function CompanyStatusPill({ status }: { status?: number }) {
 
 function EmptyCompanyState({ onAdd }: { onAdd: () => void }) {
   return (
-    <div className="flex flex-col items-center gap-9 px-6 py-7 sm:px-8">
+    <div className="flex flex-col items-center gap-7 px-3 py-6 sm:gap-9 sm:px-8 sm:py-7">
       <div className="flex w-full max-w-[354px] flex-col items-center gap-8 text-center">
         <BuildingInBadge />
         <div className="flex flex-col gap-4">
-          <p className="text-xl font-medium leading-7 text-[#14171a]">
+          <p className="text-lg font-medium leading-7 text-[#14171a] sm:text-xl">
             Hazırda əlavə edilmiş şirkət yoxdur
           </p>
           <p className="text-sm font-normal leading-5 text-[#6b6e71]">
@@ -381,7 +381,7 @@ export default function CampainsList({
 
   if (isLoading) {
     return (
-      <div className="flex flex-col gap-4 px-6 py-12 sm:px-12">
+      <div className="flex flex-col gap-4 px-3 py-8 sm:px-12 sm:py-12">
         <p className="text-center text-sm text-[#6b6e71]">Yüklənir…</p>
       </div>
     )
@@ -389,7 +389,7 @@ export default function CampainsList({
 
   if (isError) {
     return (
-      <div className="flex flex-col items-center gap-4 px-6 py-12 sm:px-12">
+      <div className="flex flex-col items-center gap-4 px-3 py-8 sm:px-12 sm:py-12">
         <p className="text-center text-sm text-[#6b6e71]">Yükləmə alınmadı</p>
         <button
           type="button"
@@ -404,13 +404,16 @@ export default function CampainsList({
 
   return (
     <>
-    <div className="flex flex-col gap-6 px-6 pt-8 sm:px-12">
+    <div className="flex flex-col gap-4 px-3 pt-6 sm:gap-6 sm:px-12 sm:pt-8">
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#eaf1fa] pb-6">
-        <h2 className="text-2xl font-medium leading-8 text-[#1d212a]">
+        <h2 className="text-lg font-medium leading-7 text-[#1d212a] sm:text-2xl sm:leading-8">
           Şirkətlərim
         </h2>
         {items.length > 0 ? (
-          <AddCompanyButton onClick={() => onViewChange('create')} />
+          <AddCompanyButton
+            onClick={() => onViewChange('create')}
+            className="w-full sm:w-auto"
+          />
         ) : null}
       </div>
       {items.length === 0 ? (

@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useLocale, useTranslations } from 'next-intl'
+import Cookies from 'js-cookie'
 
 import { Link, usePathname } from '@/i18n/navigation'
 import { cn } from '@/lib/utils'
@@ -21,6 +22,7 @@ export function Header() {
   const pathname = usePathname()
   const locale = useLocale()
   const isHero = pathname === '/'
+  const isAccountRoute = pathname === '/account' || pathname.startsWith('/account/')
   const headerRef = useRef<HTMLElement | null>(null)
   const aboutDropdownRef = useRef<HTMLDivElement | null>(null)
   const mediaDropdownRef = useRef<HTMLDivElement | null>(null)
@@ -34,6 +36,7 @@ export function Header() {
   const [headerHeight, setHeaderHeight] = useState(0)
   const aboutCloseTimeoutRef = useRef<number | null>(null)
   const mediaCloseTimeoutRef = useRef<number | null>(null)
+  const [hasMounted, setHasMounted] = useState(false)
 
   const isGlassMode = hasTopHero || isHero
   const showHeroGlass = isGlassMode && !heroScrolled
@@ -44,17 +47,33 @@ export function Header() {
     ? settingsResponse?.siteDarkLogo ?? '/images/Logo.svg'
     : (settingsResponse?.siteLogo ?? '/images/Logo.svg')
 
-  const { data: profileResponse, isSuccess: profileOk } = useQuery({
+  const {
+    data: profileResponse,
+    isSuccess: profileOk,
+    isFetching: profileFetching,
+  } = useQuery({
     ...getProfileQuery(),
     retry: false,
   })
   const profileUser = profileResponse?.user
   const isAuthed = profileOk && Boolean(profileUser)
+  // Avoid SSR/hydration flash: server can't read browser cookies, so treat auth
+  // state as "unknown" until mount. This prevents 1s login/register flicker.
+  const hasTokenCookie = hasMounted ? Boolean(Cookies.get('access_token')) : false
+  const authResolved = hasMounted
+  const showAuthCtas = authResolved && !hasTokenCookie && !isAuthed
+  const showUserMenu = isAuthed && Boolean(profileUser)
+  const showUserMenuSkeleton =
+    (!authResolved || hasTokenCookie) && !showUserMenu && profileFetching
 
   const spacerStyle = useMemo(() => {
     if (!showSpacer) return undefined
     return { height: headerHeight }
   }, [headerHeight, showSpacer])
+
+  useEffect(() => {
+    setHasMounted(true)
+  }, [])
 
   useEffect(() => {
     function resolveHeroEl() {
@@ -515,7 +534,7 @@ export function Header() {
                 aria-hidden
               />
               <div className="flex min-w-0 items-center gap-2 lg:gap-5">
-                {!isAuthed ? (
+                {showAuthCtas ? (
                   <>
                     <Link
                       href="/login"
@@ -532,21 +551,39 @@ export function Header() {
                       <ArrowRight className="size-5 shrink-0" aria-hidden />
                     </Link>
                   </>
-                ) : profileUser ? (
-                  <Suspense
-                    fallback={
+                ) : (
+                  <div
+                    className={cn(
+                      // Hide user-menu on mobile for /account routes only
+                      isAccountRoute ? 'hidden lg:block' : 'block',
+                      'min-w-0'
+                    )}
+                  >
+                    {showUserMenu && profileUser ? (
+                      <Suspense
+                        fallback={
+                          <div
+                            className="size-11 shrink-0 animate-pulse rounded-full bg-white/20"
+                            aria-hidden
+                          />
+                        }
+                      >
+                        <HeaderUserMenu
+                          user={profileUser}
+                          variant={showHeroGlass ? 'onDark' : 'default'}
+                        />
+                      </Suspense>
+                    ) : showUserMenuSkeleton ? (
                       <div
-                        className="size-11 shrink-0 animate-pulse rounded-full bg-white/20"
+                        className={cn(
+                          'size-11 shrink-0 animate-pulse rounded-full',
+                          showHeroGlass ? 'bg-white/20' : 'bg-black/10'
+                        )}
                         aria-hidden
                       />
-                    }
-                  >
-                    <HeaderUserMenu
-                      user={profileUser}
-                      variant={showHeroGlass ? 'onDark' : 'default'}
-                    />
-                  </Suspense>
-                ) : null}
+                    ) : null}
+                  </div>
+                )}
               </div>
 
               <button
@@ -714,7 +751,7 @@ export function Header() {
                   })}
                 </nav>
 
-                {!isAuthed ? (
+                {showAuthCtas ? (
                   <>
                     <div
                       className={cn(

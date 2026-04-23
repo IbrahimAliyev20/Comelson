@@ -168,15 +168,15 @@ function AddTenderButton({
 
 function EmptyTenderState({ onAdd }: { onAdd: () => void }) {
   return (
-    <div className="flex flex-1 flex-col items-center justify-center px-6 py-10 sm:px-8">
-      <div className="flex w-full max-w-[402px] flex-col items-center gap-9 rounded-xl bg-white px-6 py-7 text-center">
+    <div className="flex flex-1 flex-col items-center justify-center px-3 py-8 sm:px-8 sm:py-10">
+      <div className="flex w-full max-w-[402px] flex-col items-center gap-7 rounded-xl bg-white px-3 py-6 text-center sm:gap-9 sm:px-6 sm:py-7">
         <div className="flex flex-col items-center gap-8">
           <div className="flex items-center rounded-lg bg-[#e6eff6] p-3" aria-hidden>
             <FileText className="size-8 text-[#0f477d]" strokeWidth={1.8} />
           </div>
 
           <div className="flex w-full max-w-[354px] flex-col gap-4">
-            <p className="text-[20px] font-medium leading-7 text-[#14171a]">
+            <p className="text-lg font-medium leading-7 text-[#14171a] sm:text-[20px]">
               Hazırda əlavə edilmiş tender yoxdur
             </p>
             <p className="text-sm leading-5 text-[#6b6e71]">
@@ -195,14 +195,19 @@ function EmptyTenderState({ onAdd }: { onAdd: () => void }) {
 function FilterButton({
   label,
   icon,
+  className,
 }: {
   label: string
   icon?: 'chevron' | 'calendar'
+  className?: string
 }) {
   return (
     <button
       type="button"
-      className="inline-flex h-12 cursor-pointer items-center justify-between rounded-xl border border-[#dadee2] bg-white px-3.5 text-base leading-6 text-[#32393f]"
+      className={cn(
+        'inline-flex h-12 cursor-pointer items-center justify-between rounded-xl border border-[#dadee2] bg-white px-3.5 text-base leading-6 text-[#32393f]',
+        className
+      )}
     >
       <span>{label}</span>
       {icon === 'calendar' ? (
@@ -337,7 +342,7 @@ function TenderTable({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-4 xl:flex-row xl:items-center">
+      <div className="flex flex-col gap-4">
         <div className="relative min-w-0 flex-1">
           <Search
             className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-[#889097]"
@@ -352,14 +357,14 @@ function TenderTable({
           />
         </div>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 xl:w-auto">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
           <div className="relative">
             <select
               value={statusFilter}
               onChange={(e) =>
                 setStatusFilter(e.target.value as TenderStatusFilter)
               }
-              className="h-12 w-full appearance-none rounded-xl border border-[#dadee2] bg-white px-3.5 pr-10 text-base leading-6 text-[#32393f] outline-none"
+              className="h-12 w-full appearance-none rounded-xl border border-[#dadee2] bg-white px-3.5 pr-10 text-sm leading-6 text-[#32393f] outline-none sm:text-base"
             >
               <option value="active">Aktiv elanlar</option>
               <option value="all">Bütün elanlar</option>
@@ -374,7 +379,7 @@ function TenderTable({
             <select
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
-              className="h-12 w-full appearance-none rounded-xl border border-[#dadee2] bg-white px-3.5 pr-10 text-base leading-6 text-[#32393f] outline-none"
+              className="h-12 w-full appearance-none rounded-xl border border-[#dadee2] bg-white px-3.5 pr-10 text-sm leading-6 text-[#32393f] outline-none sm:text-base"
             >
               <option value="all">Kateqoriya</option>
               {categories.map((category) => (
@@ -389,7 +394,11 @@ function TenderTable({
             />
           </div>
 
-          <FilterButton label="Tarix" icon="calendar" />
+          <FilterButton
+            label="Tarix"
+            icon="calendar"
+            className="sm:col-span-2 xl:col-span-1"
+          />
         </div>
       </div>
 
@@ -641,8 +650,8 @@ export default function TenderList() {
   return (
     <>
     <div className="flex h-full min-h-0 w-full flex-col rounded-xl border border-[#eaf1fa] bg-white">
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#eaf1fa] px-8 py-6">
-        <h2 className="text-2xl font-medium leading-8 text-[#1d212a]">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#eaf1fa] px-3 py-4 sm:px-8 sm:py-6">
+        <h2 className="text-lg font-medium leading-7 text-[#1d212a] sm:text-2xl sm:leading-8">
           Tenderlərim
         </h2>
         {items.length > 0 ? (
@@ -653,13 +662,13 @@ export default function TenderList() {
         ) : null}
       </div>
 
-      <div className="flex-1 px-0 py-8 sm:px-8">
+      <div className="flex-1 px-0 py-6 sm:px-8 sm:py-8">
         {isLoading ? (
-          <div className="px-6 py-10 text-center text-sm text-[#6b6e71]">
+          <div className="px-3 py-8 text-center text-sm text-[#6b6e71] sm:px-6 sm:py-10">
             Yüklənir…
           </div>
         ) : isError ? (
-          <div className="flex flex-col items-center gap-4 px-6 py-10 text-center">
+          <div className="flex flex-col items-center gap-4 px-3 py-8 text-center sm:px-6 sm:py-10">
             <p className="text-sm text-[#6b6e71]">Yükləmə alınmadı</p>
             <button
               type="button"

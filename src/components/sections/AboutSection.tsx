@@ -9,7 +9,6 @@ export default async function AboutSection({ about }: { about: AboutResponse | u
         <div className="flex flex-col gap-8">
           <div className="flex flex-col gap-8 md:flex-row md:items-stretch md:gap-10">
             <div className="shrink-0">
-              <div className="h-full w-[3px] rounded-full bg-[#3bbae9]" aria-hidden />
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex flex-col gap-4 sm:gap-6" dangerouslySetInnerHTML={{ __html: about?.description ?? '' }} />

@@ -189,7 +189,7 @@ export default function CreateCampain({
 
   return (
     <div className="flex w-full flex-col bg-white pb-12" data-name="create-company">
-      <div className="flex shrink-0 items-center gap-3 border-b border-[#eaf1fa] px-8 py-6">
+      <div className="flex shrink-0 items-center gap-3 border-b border-[#eaf1fa] px-3 py-4 sm:px-8 sm:py-6">
         <button
           type="button"
           onClick={onBack}
@@ -198,7 +198,7 @@ export default function CreateCampain({
         >
           <ChevronLeft className="size-6" aria-hidden />
         </button>
-        <h2 className="text-2xl font-medium leading-8 text-[#1d212a]">
+        <h2 className="text-lg font-medium leading-7 text-[#1d212a] sm:text-2xl sm:leading-8">
           Şirkət əlavə et
         </h2>
       </div>
@@ -206,7 +206,7 @@ export default function CreateCampain({
       <form
         noValidate
         onSubmit={handleSubmit(submit)}
-        className="flex flex-col gap-12 px-6 sm:px-12"
+        className="flex flex-col gap-8 px-3 pt-2 sm:gap-12 sm:px-12 sm:pt-0"
       >
         <section className="flex flex-col gap-8 py-5">
           <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:gap-5">
@@ -508,14 +508,14 @@ export default function CreateCampain({
           <button
             type="button"
             onClick={handleCancel}
-            className="inline-flex h-12 flex-1 cursor-pointer items-center justify-center rounded-2xl bg-[#e6eff6] px-6 text-base font-medium leading-6 text-[#0f477d] transition-colors hover:bg-[#d7e6f2] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f477d]"
+            className="inline-flex py-2 h-12 flex-1 cursor-pointer items-center justify-center rounded-lg md:rounded-2xl bg-[#e6eff6] px-6 text-base font-medium leading-6 text-[#0f477d] transition-colors hover:bg-[#d7e6f2] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f477d]"
           >
             Ləğv et
           </button>
           <button
             type="submit"
             disabled={createMutation.isPending}
-            className="inline-flex h-12 flex-1 cursor-pointer items-center justify-center rounded-2xl bg-[#0f477d] px-6 text-base font-medium leading-6 text-white transition-colors hover:bg-[#0c3a66] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:opacity-60"
+            className="inline-flex py-2 h-12 flex-1 cursor-pointer items-center justify-center rounded-lg md:rounded-2xl bg-[#0f477d] px-6 text-base font-medium leading-6 text-white transition-colors hover:bg-[#0c3a66] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:opacity-60"
           >
             {createMutation.isPending ? 'Göndərilir...' : 'Əlavə et'}
           </button>

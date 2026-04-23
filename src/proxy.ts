@@ -5,12 +5,11 @@ import { NextResponse } from 'next/server'
 import { routing } from './i18n/routing'
 
 /**
- * Next.js 16+: `middleware.ts` əvəzinə `proxy.ts` — eyni məqsəd (request tamamlanmazdan əvvəl).
- * next-intl burada qoşulur.
- *
- * Auth üçün qeyd:
- * - Protected route redirect / token yoxlaması sonradan əlavə oluna bilər.
- * - `access_token` cookie — `@/lib/api/client.ts` ilə uyğunlaşdırın.
+ * Next.js 16+: `proxy.ts` replaces `middleware.ts`.
+ * Responsibilities:
+ *  1. next-intl locale handling.
+ *  2. Bounce authenticated users away from the auth-only pages.
+ *  3. Bounce unauthenticated users away from protected pages.
  */
 const intlMiddleware = createMiddleware({
   ...routing,
@@ -18,7 +17,10 @@ const intlMiddleware = createMiddleware({
   localeDetection: false,
 })
 
-const AUTH_PATHS = new Set([
+const ACCESS_TOKEN_COOKIE = 'access_token'
+
+/** Pages that MUST redirect authenticated users away. */
+const AUTH_ONLY_PATHS = new Set([
   '/login',
   '/register',
   '/forgetpassword',
@@ -26,8 +28,17 @@ const AUTH_PATHS = new Set([
   '/new-password',
 ])
 
+/** Pages that require a valid session. Add more as needed. */
+const PROTECTED_PATHS: ReadonlyArray<string> = ['/account']
+
+function isProtected(pathname: string): boolean {
+  return PROTECTED_PATHS.some(
+    (path) => pathname === path || pathname.startsWith(`${path}/`)
+  )
+}
+
 export function proxy(request: NextRequest) {
-  const token = request.cookies.get('access_token')?.value
+  const token = request.cookies.get(ACCESS_TOKEN_COOKIE)?.value
   const { pathname } = request.nextUrl
 
   const localePrefix = routing.locales.find(
@@ -38,11 +49,19 @@ export function proxy(request: NextRequest) {
     ? pathname.slice(localePrefix.length + 1) || '/'
     : pathname
 
-  if (token && AUTH_PATHS.has(normalizedPath)) {
-    const locale = localePrefix ?? routing.defaultLocale
+  const locale = localePrefix ?? routing.defaultLocale
+
+  if (token && AUTH_ONLY_PATHS.has(normalizedPath)) {
     const url = request.nextUrl.clone()
     url.pathname = `/${locale}/account`
     url.search = ''
+    return NextResponse.redirect(url)
+  }
+
+  if (!token && isProtected(normalizedPath)) {
+    const url = request.nextUrl.clone()
+    url.pathname = `/${locale}/login`
+    url.searchParams.set('redirect', pathname)
     return NextResponse.redirect(url)
   }
 

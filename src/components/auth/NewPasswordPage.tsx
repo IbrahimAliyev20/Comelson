@@ -103,6 +103,15 @@ export default function NewPasswordPage() {
     }
   }, [showSuccess])
 
+  useEffect(() => {
+    if (!showSuccess) return
+    const id = window.setTimeout(() => {
+      closeSuccessAndGoToLogin()
+    }, 4500)
+    return () => window.clearTimeout(id)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showSuccess])
+
   function closeSuccessAndGoToLogin() {
     setShowSuccess(false)
     router.push('/login')

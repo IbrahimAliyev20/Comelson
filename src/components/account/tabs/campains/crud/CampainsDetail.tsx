@@ -59,7 +59,7 @@ export default function CampainsDetail({
 
   return (
     <div className="flex w-full flex-col bg-white pb-12" data-name="company-detail">
-      <div className="flex shrink-0 items-center gap-3 border-b border-[#eaf1fa] px-8 py-6">
+      <div className="flex shrink-0 items-center gap-3 border-b border-[#eaf1fa] px-3 py-4 sm:px-8 sm:py-6">
         <button
           type="button"
           onClick={onBack}
@@ -68,7 +68,7 @@ export default function CampainsDetail({
         >
           <ChevronLeft className="size-6" aria-hidden />
         </button>
-        <h2 className="min-w-0 flex-1 truncate text-2xl font-medium leading-8 text-[#1d212a]">
+        <h2 className="min-w-0 flex-1 truncate text-lg font-medium leading-7 text-[#1d212a] sm:text-2xl sm:leading-8">
           {company.name}
         </h2>
         {onEdit ? (
@@ -83,7 +83,7 @@ export default function CampainsDetail({
         ) : null}
       </div>
 
-      <div className="flex flex-col gap-6 px-6 pt-8 sm:px-12">
+      <div className="flex flex-col gap-4 px-3 pt-6 sm:gap-6 sm:px-12 sm:pt-8">
         <div className="rounded-xl border border-[#eaf1fa] bg-[#fafdff] p-5">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-5">
             <div className="relative size-[84px] shrink-0 overflow-hidden rounded-full border border-[#f1f2f6] bg-white">

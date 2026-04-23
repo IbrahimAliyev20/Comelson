@@ -24,7 +24,7 @@ function DetailHeader({
   onEdit?: () => void
 }) {
   return (
-    <div className="flex shrink-0 items-center gap-3 border-b border-[#eaf1fa] px-8 py-6">
+    <div className="flex shrink-0 items-center gap-3 border-b border-[#eaf1fa] px-3 py-4 sm:px-8 sm:py-6">
       <button
         type="button"
         onClick={onBack}
@@ -33,7 +33,7 @@ function DetailHeader({
       >
         <ChevronLeft className="size-6" aria-hidden />
       </button>
-      <h2 className="min-w-0 flex-1 truncate text-2xl font-medium leading-8 text-[#1d212a]">
+      <h2 className="min-w-0 flex-1 truncate text-lg font-medium leading-7 text-[#1d212a] sm:text-2xl sm:leading-8">
         {title}
       </h2>
       {onEdit ? (
@@ -107,7 +107,7 @@ export default function TenderDetail({
     return (
       <div className="flex w-full flex-col bg-white pb-12" data-name="tender-detail-loading">
         <DetailHeader title="Tender" onBack={onBack} onEdit={onEdit} />
-        <div className="px-6 py-10 text-center text-sm text-[#6b6e71] sm:px-12">
+        <div className="px-3 py-8 text-center text-sm text-[#6b6e71] sm:px-12 sm:py-10">
           Yüklənir…
         </div>
       </div>
@@ -118,7 +118,7 @@ export default function TenderDetail({
     return (
       <div className="flex w-full flex-col bg-white pb-12" data-name="tender-detail-error">
         <DetailHeader title="Tender" onBack={onBack} onEdit={onEdit} />
-        <div className="flex flex-col items-center gap-4 px-6 py-10 text-center sm:px-12">
+        <div className="flex flex-col items-center gap-4 px-3 py-8 text-center sm:px-12 sm:py-10">
           <p className="text-sm text-[#6b6e71]">Yükləmə alınmadı</p>
           <button
             type="button"
@@ -139,7 +139,7 @@ export default function TenderDetail({
     return (
       <div className="flex w-full flex-col bg-white pb-12" data-name="tender-detail-empty">
         <DetailHeader title="Tender" onBack={onBack} onEdit={onEdit} />
-        <div className="px-6 py-10 text-center text-sm text-[#6b6e71] sm:px-12">
+        <div className="px-3 py-8 text-center text-sm text-[#6b6e71] sm:px-12 sm:py-10">
           Məlumat tapılmadı
         </div>
       </div>
@@ -153,7 +153,7 @@ export default function TenderDetail({
     <div className="flex w-full flex-col bg-white pb-12" data-name="tender-detail">
       <DetailHeader title={tender.title} onBack={onBack} onEdit={onEdit} />
 
-      <div className="flex flex-col gap-6 px-6 pt-8 sm:px-12">
+      <div className="flex flex-col gap-4 px-3 pt-6 sm:gap-6 sm:px-12 sm:pt-8">
         <div className="rounded-xl border border-[#eaf1fa] bg-white p-5">
           <p className="text-sm font-medium text-[#6b6e71]">Tender məlumatları</p>
           <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-x-8">

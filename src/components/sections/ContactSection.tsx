@@ -30,6 +30,22 @@ type ContactFormValues = {
   locale?: string
 }
 
+function extractIframeSrc(raw: string | null | undefined): string | null {
+  if (!raw) return null
+  const trimmed = raw.trim()
+  if (!trimmed) return null
+
+  // Backend sometimes returns a full `<iframe ...></iframe>` HTML string.
+  // We only need the `src` URL for a real iframe element.
+  const srcMatch = trimmed.match(/\ssrc\s*=\s*"([^"]+)"/i)
+  if (srcMatch?.[1]) return srcMatch[1]
+
+  // If backend already returns a URL, accept it.
+  if (/^https?:\/\//i.test(trimmed)) return trimmed
+
+  return null
+}
+
 export default function ContactSection({ contact }: { contact: ContactResponse | undefined }) {
   const t = useTranslations('home')
   const locale = useLocale()
@@ -125,6 +141,8 @@ export default function ContactSection({ contact }: { contact: ContactResponse |
     setFormError('Invalid form')
     setFormSuccess(null)
   }
+
+  const mapSrc = useMemo(() => extractIframeSrc(contact?.map), [contact?.map])
 
   return (
     <section className="bg-[#f8fafc] py-8 md:py-[70px]">
@@ -289,13 +307,15 @@ export default function ContactSection({ contact }: { contact: ContactResponse |
               </div>
 
               <div className="relative min-h-[320px] flex-1 overflow-hidden rounded-xl bg-[#e6eff6] md:min-h-[420px]">
-                {contact?.map && <iframe
-                  title="Map"
-                  className="absolute inset-0 h-full w-full"
-                  loading="lazy"
-                  referrerPolicy="strict-origin-when-cross-origin"
-                  src={contact?.map}
-                />}
+                {mapSrc ? (
+                  <iframe
+                    title="Map"
+                    className="absolute inset-0 h-full w-full"
+                    loading="lazy"
+                    referrerPolicy="strict-origin-when-cross-origin"
+                    src={mapSrc}
+                  />
+                ) : null}
               </div>
             </div>
           </div>

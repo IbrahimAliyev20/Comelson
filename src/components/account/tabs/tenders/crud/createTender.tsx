@@ -301,7 +301,7 @@ export default function CreateTender({
 
   return (
     <div className="flex w-full flex-col bg-white pb-12" data-name="create-tender">
-      <div className="flex shrink-0 items-center gap-3 border-b border-[#eaf1fa] px-8 py-6">
+      <div className="flex shrink-0 items-center gap-3 border-b border-[#eaf1fa] px-3 py-4 sm:px-8 sm:py-6">
         <button
           type="button"
           onClick={onBack}
@@ -310,7 +310,7 @@ export default function CreateTender({
         >
           <ChevronLeft className="size-6" aria-hidden />
         </button>
-        <h2 className="text-2xl font-medium leading-8 text-[#1d212a]">
+        <h2 className="text-lg font-medium leading-7 text-[#1d212a] sm:text-2xl sm:leading-8">
           Tender əlavə et
         </h2>
       </div>
@@ -318,10 +318,10 @@ export default function CreateTender({
       <form
         noValidate
         onSubmit={handleSubmit(submit)}
-        className="flex flex-col gap-12 px-6 pt-8 sm:px-12"
+        className="flex flex-col gap-8 px-3 pt-6 sm:gap-12 sm:px-12 sm:pt-8"
       >
         <section className="flex flex-col gap-9">
-          <h3 className="text-2xl font-semibold leading-8 text-[#14171a]">
+          <h3 className="text-lg font-semibold leading-7 text-[#14171a] sm:text-2xl sm:leading-8">
             Tender məlumatları
           </h3>
 
@@ -492,7 +492,7 @@ export default function CreateTender({
         </section>
 
         <section className="flex flex-col gap-9">
-          <h3 className="text-2xl font-semibold leading-8 text-[#14171a]">
+          <h3 className="text-lg font-semibold leading-7 text-[#14171a] sm:text-2xl sm:leading-8">
             Əlaqə məlumatları
           </h3>
 
@@ -636,13 +636,13 @@ export default function CreateTender({
           <button
             type="button"
             onClick={handleCancel}
-            className="inline-flex h-12 flex-1 cursor-pointer items-center justify-center rounded-2xl bg-[#e6eff6] px-6 text-base font-medium leading-6 text-[#0f477d] transition-colors hover:bg-[#d7e6f2] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f477d]"
+            className="inline-flex py-2 h-12 flex-1 cursor-pointer items-center justify-center  rounded-lg md:rounded-2xl bg-[#e6eff6] px-6 text-base font-medium leading-6 text-[#0f477d] transition-colors hover:bg-[#d7e6f2] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f477d]"
           >
             Ləğv et
           </button>
           <button
             type="submit"
-            className="inline-flex h-12 flex-1 cursor-pointer items-center justify-center rounded-2xl bg-[#0f477d] px-6 text-base font-medium leading-6 text-white transition-colors hover:bg-[#0c3a66] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+            className="inline-flex py-2 h-12 flex-1 cursor-pointer items-center justify-center rounded-lg md:rounded-2xl bg-[#0f477d] px-6 text-base font-medium leading-6 text-white transition-colors hover:bg-[#0c3a66] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
           >
             Tender sorğusunu əlavə et
           </button>

@@ -9,7 +9,6 @@ import {
   Code,
   ImageIcon,
   Italic,
-  ImagePlus,
   Link2,
   List,
   ListOrdered,
@@ -225,7 +224,7 @@ export default function EditCampain({
 
   return (
     <div className="flex w-full flex-col bg-white pb-12" data-name="edit-company">
-      <div className="flex shrink-0 items-center gap-3 border-b border-[#eaf1fa] px-8 py-6">
+      <div className="flex shrink-0 items-center gap-3 border-b border-[#eaf1fa] px-3 py-4 sm:px-8 sm:py-6">
         <button
           type="button"
           onClick={onCancel}
@@ -234,18 +233,18 @@ export default function EditCampain({
         >
           <ChevronLeft className="size-6" aria-hidden />
         </button>
-        <h2 className="text-2xl font-medium leading-8 text-[#1d212a]">
+        <h2 className="text-lg font-medium leading-7 text-[#1d212a] sm:text-2xl sm:leading-8">
           Şirkəti redaktə et
         </h2>
       </div>
 
       <form
         onSubmit={handleSubmit(submit)}
-        className="flex flex-col gap-12 px-6 pt-8 sm:px-12"
+        className="flex flex-col gap-8 px-3 pt-6 sm:gap-12 sm:px-12 sm:pt-8"
       >
         <section className="flex flex-col gap-8">
-          <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:gap-5">
-            <label className="relative flex size-[120px] shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-full border border-[#e6eff6] bg-white p-2.5">
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:gap-10">
+            <label className="relative flex size-[100px] shrink-0 cursor-pointer items-center justify-center overflow-visible rounded-full border border-[#e6eff6] bg-white p-0.5">
               <input
                 type="file"
                 accept="image/jpeg,image/png,image/jpg"
@@ -257,11 +256,31 @@ export default function EditCampain({
                 alt={watch('name')}
                 className="size-full rounded-full object-cover"
               />
-              <span
-                className="pointer-events-none absolute right-0 top-0 z-10 flex size-9 items-center justify-center rounded-full border-2 border-white bg-[#e6eff6] text-[#0f477d] shadow-[0_2px_8px_rgba(15,71,125,0.25)] ring-1 ring-[#0f477d]/15"
-                aria-hidden
-              >
-                <ImagePlus className="size-5 shrink-0 stroke-[2.25]" />
+              <span className="absolute -right-1 top-0 z-10 inline-flex size-9 -translate-y-1 items-center justify-center rounded-full border border-[#dfeaf5] bg-white text-[#6b6e71] shadow-[0_1px_2px_rgba(15,71,125,0.08)]">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  className="shrink-0"
+                  aria-hidden
+                >
+                  <g clipPath="url(#logo-edit-icon-clip)">
+                    <path
+                      d="M11.2526 5.41627L14.5859 8.7496M13.3359 15.8329H18.3359M3.33594 16.6663H6.66927L15.4193 7.91627C15.6381 7.6974 15.8118 7.43756 15.9302 7.15159C16.0487 6.86563 16.1096 6.55913 16.1096 6.2496C16.1096 5.94007 16.0487 5.63357 15.9302 5.34761C15.8118 5.06164 15.6381 4.8018 15.4193 4.58293C15.2004 4.36406 14.9406 4.19045 14.6546 4.072C14.3686 3.95354 14.0621 3.89258 13.7526 3.89258C13.4431 3.89258 13.1366 3.95354 12.8506 4.072C12.5646 4.19045 12.3048 4.36406 12.0859 4.58293L3.33594 13.3329V16.6663Z"
+                      stroke="#6B6E71"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </g>
+                  <defs>
+                    <clipPath id="logo-edit-icon-clip">
+                      <rect width="20" height="20" fill="white" />
+                    </clipPath>
+                  </defs>
+                </svg>
               </span>
               <span className="sr-only">Logo yüklə</span>
             </label>
@@ -501,14 +520,14 @@ export default function EditCampain({
           <button
             type="button"
             onClick={onCancel}
-            className="inline-flex h-12 flex-1 cursor-pointer items-center justify-center rounded-2xl bg-[#e6eff6] px-6 text-base font-medium leading-6 text-[#0f477d] transition-colors hover:bg-[#d7e6f2] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f477d]"
+            className="inline-flex py-2 h-12 flex-1 cursor-pointer items-center justify-center rounded-lg md:rounded-2xl bg-[#e6eff6] px-6 text-base font-medium leading-6 text-[#0f477d] transition-colors hover:bg-[#d7e6f2] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f477d]"
           >
             Ləğv et
           </button>
           <button
             type="submit"
             disabled={updateMutation.isPending}
-            className="inline-flex h-12 flex-1 cursor-pointer items-center justify-center rounded-2xl bg-[#0f477d] px-6 text-base font-medium leading-6 text-white transition-colors hover:bg-[#0c3a66] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:opacity-60"
+            className="inline-flex py-2 h-12 flex-1 cursor-pointer items-center justify-center rounded-lg md:rounded-2xl bg-[#0f477d] px-6 text-base font-medium leading-6 text-white transition-colors hover:bg-[#0c3a66] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:opacity-60"
           >
             {updateMutation.isPending ? 'Saxlanılır...' : 'Yadda saxla'}
           </button>

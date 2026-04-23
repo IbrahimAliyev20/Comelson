@@ -7,15 +7,48 @@ import axios, {
   AxiosRequestConfig,
 } from 'axios'
 import Cookies from 'js-cookie'
-import { getAcceptLanguageHeader } from '@/lib/utils'
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL
-const TOKEN_COOKIE_NAME = 'access_token'
-const COUNTRY_ID_COOKIE_NAME = 'country_id'
-const COUNTRY_ID_HEADER = 'X-Country-Id'
+import {
+  ACCESS_TOKEN_COOKIE,
+  COUNTRY_ID_COOKIE,
+  COUNTRY_ID_HEADER,
+  clearAccessTokenCookieClient,
+  clearAccessTokenCookieServer,
+  setAccessTokenCookieClient,
+  setAccessTokenCookieServer,
+} from '@/lib/auth/cookies'
+import { getAcceptLanguageHeader, getServerLocale } from '@/lib/utils'
+
+/**
+ * Validate env BEFORE creating the axios instance so we fail loudly in dev
+ * rather than throwing `ERR_INVALID_URL` at the first request.
+ */
+function resolveBaseUrl(): string {
+  const raw = process.env.NEXT_PUBLIC_API_BASE_URL
+  if (!raw || typeof raw !== 'string') {
+    throw new Error(
+      'NEXT_PUBLIC_API_BASE_URL is not defined. Set it in your `.env` file.'
+    )
+  }
+  return raw.replace(/\/$/, '')
+}
+
+const API_BASE_URL = resolveBaseUrl()
 const REFRESH_PATH = '/auth/refresh'
 
-type RetryableAxiosConfig = InternalAxiosRequestConfig & {
+/** Endpoints that must never trigger the refresh-retry loop. */
+const AUTH_SKIP_REFRESH_PATHS = [
+  '/auth/login',
+  '/auth/register',
+  '/auth/verify-otp',
+  '/auth/resend-otp',
+  '/auth/forgot-password',
+  '/auth/reset-password',
+  '/auth/refresh',
+  '/auth/logout',
+]
+
+export type RetryableAxiosConfig = InternalAxiosRequestConfig & {
   _retry?: boolean
   _skipAuthRefresh?: boolean
 }
@@ -32,55 +65,59 @@ const client: AxiosInstance = axios.create({
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
+    Accept: 'application/json',
   },
 })
 
-const getAuthToken = (): string | null => {
-  if (typeof window === 'undefined') return null
-  return Cookies.get(TOKEN_COOKIE_NAME) || null
+const isBrowser = (): boolean => typeof window !== 'undefined'
+
+const getAuthTokenClient = (): string | null => {
+  if (!isBrowser()) return null
+  return Cookies.get(ACCESS_TOKEN_COOKIE) || null
 }
 
 const getAuthTokenServer = async (): Promise<string | null> => {
   try {
-    const mod = await import('next/headers')
-    const store = await mod.cookies()
-    const token = store.get(TOKEN_COOKIE_NAME)?.value
-    return token || null
+    const { cookies } = await import('next/headers')
+    const jar = await cookies()
+    return jar.get(ACCESS_TOKEN_COOKIE)?.value ?? null
   } catch {
     return null
   }
 }
 
-const resolveAuthToken = async (): Promise<string | null> => {
-  if (typeof window !== 'undefined') return getAuthToken()
-  return await getAuthTokenServer()
-}
+const resolveAuthToken = async (): Promise<string | null> =>
+  isBrowser() ? getAuthTokenClient() : await getAuthTokenServer()
 
-const getCountryId = (): string | null => {
-  const raw = Cookies.get(COUNTRY_ID_COOKIE_NAME)
+const getCountryIdClient = (): string | null => {
+  if (!isBrowser()) return null
+  const raw = Cookies.get(COUNTRY_ID_COOKIE)
   if (!raw) return null
   const parsed = Number(raw)
-  if (!Number.isFinite(parsed) || parsed <= 0) return null
-  return String(parsed)
+  return Number.isFinite(parsed) && parsed > 0 ? String(parsed) : null
 }
 
 const getCountryIdServer = async (): Promise<string | null> => {
   try {
-    const mod = await import('next/headers')
-    const store = await mod.cookies()
-    const raw = store.get(COUNTRY_ID_COOKIE_NAME)?.value
+    const { cookies } = await import('next/headers')
+    const jar = await cookies()
+    const raw = jar.get(COUNTRY_ID_COOKIE)?.value
     if (!raw) return null
     const parsed = Number(raw)
-    if (!Number.isFinite(parsed) || parsed <= 0) return null
-    return String(parsed)
+    return Number.isFinite(parsed) && parsed > 0 ? String(parsed) : null
   } catch {
     return null
   }
 }
 
-const resolveCountryId = async (): Promise<string | null> => {
-  if (typeof window !== 'undefined') return getCountryId()
-  return await getCountryIdServer()
+const resolveCountryId = async (): Promise<string | null> =>
+  isBrowser() ? getCountryIdClient() : await getCountryIdServer()
+
+const resolveAcceptLanguage = async (override?: string): Promise<string> => {
+  if (override) return getAcceptLanguageHeader(override)
+  if (isBrowser()) return getAcceptLanguageHeader()
+  const locale = await getServerLocale()
+  return getAcceptLanguageHeader(locale)
 }
 
 function setRequestHeader(
@@ -89,69 +126,66 @@ function setRequestHeader(
   value: string
 ): InternalAxiosRequestConfig['headers'] {
   const resolved = headers ?? new AxiosHeaders()
-
   if (resolved instanceof AxiosHeaders) {
-    if (!resolved.has(key)) resolved.set(key, value)
+    resolved.set(key, value, true)
     return resolved
   }
-
-  const record = resolved as unknown as Record<string, string | undefined>
-  if (!record[key]) record[key] = value
+  ;(resolved as Record<string, string>)[key] = value
   return resolved
 }
 
-const clearAuthToken = (): void => {
-  if (typeof window === 'undefined') return
-  Cookies.remove(TOKEN_COOKIE_NAME)
+function shouldSkipRefresh(url: string | undefined): boolean {
+  if (!url) return false
+  return AUTH_SKIP_REFRESH_PATHS.some((path) => url.includes(path))
 }
 
-const handleUnauthorized = (): void => {
-  if (typeof window === 'undefined') return
-  clearAuthToken()
-}
-
-const handleApiError = (error: AxiosError): void => {
-  if (error.response?.status === 401) {
-    handleUnauthorized()
-  } else if (error.response?.status === 403) {
-    console.error('Access forbidden')
-  } else if (error.response && error.response.status >= 500) {
-    console.error('Server error:', error.response.status)
+/**
+ * Fully log out on terminal auth failure:
+ * - clear token cookie on both client & server
+ * - on client: push to `/<locale>/login`
+ */
+async function forceLogout(): Promise<void> {
+  if (isBrowser()) {
+    clearAccessTokenCookieClient()
+    const locale = window.location.pathname.split('/')[1] || 'az'
+    const target = `/${locale}/login`
+    if (window.location.pathname !== target) {
+      window.location.assign(target)
+    }
+    return
   }
+  await clearAccessTokenCookieServer()
 }
 
 let refreshPromise: Promise<string> | null = null
 
-function persistAuthToken(token: string, expiresAt?: string) {
-  if (typeof window === 'undefined') return
-
-  const opts: Cookies.CookieAttributes = { sameSite: 'lax' }
-  if (expiresAt) {
-    const date = new Date(expiresAt)
-    if (!Number.isNaN(date.getTime())) opts.expires = date
+async function persistRefreshedToken(
+  token: string,
+  expiresAt?: string
+): Promise<void> {
+  if (isBrowser()) {
+    setAccessTokenCookieClient(token, { expiresAt })
+    return
   }
-  Cookies.set(TOKEN_COOKIE_NAME, token, opts)
+  await setAccessTokenCookieServer(token, { expiresAt })
 }
 
 async function refreshAuthToken(): Promise<string> {
   const token = await resolveAuthToken()
   if (!token) throw new Error('No access token to refresh')
 
-  const locale =
-    typeof window !== 'undefined'
-      ? window.location.pathname.split('/')[1] || 'az'
-      : 'az'
-  const acceptLanguage = getAcceptLanguageHeader(locale)
+  const acceptLanguage = await resolveAcceptLanguage()
   const countryId = await resolveCountryId()
 
-  // Use a bare axios call (no interceptors) to avoid recursion.
+  // Bare axios (no interceptors) to avoid recursion; send `{}` per backend requirement.
   const res = await axios.post<RefreshResponse>(
     `${API_BASE_URL}${REFRESH_PATH}`,
-    null,
+    {},
     {
       headers: {
         Authorization: `Bearer ${token}`,
         Accept: 'application/json',
+        'Content-Type': 'application/json',
         'Accept-Language': acceptLanguage,
         ...(countryId ? { [COUNTRY_ID_HEADER]: countryId } : {}),
       },
@@ -161,17 +195,18 @@ async function refreshAuthToken(): Promise<string> {
 
   const next = res.data?.token
   if (!next) throw new Error('Refresh response missing token')
-  persistAuthToken(next, res.data?.expires_at)
+
+  await persistRefreshedToken(next, res.data?.expires_at)
   return next
 }
 
-async function getRefreshedToken(): Promise<string> {
+function getRefreshedToken(): Promise<string> {
   if (!refreshPromise) {
     refreshPromise = refreshAuthToken().finally(() => {
       refreshPromise = null
     })
   }
-  return await refreshPromise
+  return refreshPromise
 }
 
 const setupInterceptors = (): void => {
@@ -187,36 +222,38 @@ const setupInterceptors = (): void => {
 
       const token = await resolveAuthToken()
       if (token) {
-        config.headers = setRequestHeader(config.headers, 'Authorization', `Bearer ${token}`)
+        config.headers = setRequestHeader(
+          config.headers,
+          'Authorization',
+          `Bearer ${token}`
+        )
       }
 
       const countryId = await resolveCountryId()
       if (countryId) {
-        config.headers = setRequestHeader(config.headers, COUNTRY_ID_HEADER, countryId)
+        config.headers = setRequestHeader(
+          config.headers,
+          COUNTRY_ID_HEADER,
+          countryId
+        )
       }
 
-      
-      if (config.headers) {
-        const configLocale = config.params?.locale || config.headers['X-Locale']
-        
-        if (configLocale) {
-          config.headers['Accept-Language'] = getAcceptLanguageHeader(configLocale)
-        } else {
-          const currentLocale = typeof window !== 'undefined' 
-            ? window.location.pathname.split('/')[1] 
-            : 'az'
-          
-          const validLocales = ['az', 'en', 'tr', 'ru']
-          const locale = validLocales.includes(currentLocale) ? currentLocale : 'az'
-          config.headers['Accept-Language'] = getAcceptLanguageHeader(locale)
-        }
-      }
+      const localeOverride =
+        (config.params && typeof config.params === 'object'
+          ? (config.params as Record<string, unknown>).locale
+          : undefined) ??
+        (config.headers && typeof config.headers === 'object'
+          ? (config.headers as Record<string, unknown>)['X-Locale']
+          : undefined)
+
+      const accept = await resolveAcceptLanguage(
+        typeof localeOverride === 'string' ? localeOverride : undefined
+      )
+      config.headers = setRequestHeader(config.headers, 'Accept-Language', accept)
 
       return config
     },
-    (error: AxiosError) => {
-      return Promise.reject(error)
-    }
+    (error: AxiosError) => Promise.reject(error)
   )
 
   client.interceptors.response.use(
@@ -224,16 +261,26 @@ const setupInterceptors = (): void => {
     async (error: AxiosError) => {
       const status = error.response?.status
       const original = error.config as RetryableAxiosConfig | undefined
+      const url = String(original?.url ?? '')
 
-      // Client-side only: refresh token once on 401 and retry request.
-      if (
-        typeof window !== 'undefined' &&
+      /**
+       * Only attempt refresh when:
+       *  - response is 401
+       *  - caller didn't opt-out
+       *  - the URL is NOT an auth endpoint (login/register/etc.)
+       *  - a token actually existed on this request (otherwise 401 just means
+       *    "endpoint requires auth" and we should NOT blow away the session)
+       */
+      const hadToken = !!(await resolveAuthToken())
+      const canAttemptRefresh =
         status === 401 &&
-        original &&
+        !!original &&
         !original._retry &&
         !original._skipAuthRefresh &&
-        !String(original.url ?? '').includes(REFRESH_PATH)
-      ) {
+        !shouldSkipRefresh(url) &&
+        hadToken
+
+      if (canAttemptRefresh && original) {
         try {
           original._retry = true
           const nextToken = await getRefreshedToken()
@@ -244,12 +291,11 @@ const setupInterceptors = (): void => {
           )
           return await client.request(original)
         } catch {
-          handleApiError(error)
+          await forceLogout()
           return Promise.reject(error)
         }
       }
 
-      handleApiError(error)
       return Promise.reject(error)
     }
   )
@@ -257,17 +303,29 @@ const setupInterceptors = (): void => {
 
 setupInterceptors()
 
-export const get = async <T>(url: string, config?: AxiosRequestConfig): Promise<T> => {
+/** Call from server actions to immediately invalidate local session. */
+export async function clearClientSession(): Promise<void> {
+  await forceLogout()
+}
+
+export const get = async <T>(
+  url: string,
+  config?: AxiosRequestConfig
+): Promise<T> => {
   const response = await client.get<T>(url, config)
   return response.data
 }
 
-export const post = async <T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> => {
+export const post = async <T>(
+  url: string,
+  data?: unknown,
+  config?: AxiosRequestConfig
+): Promise<T> => {
   const response = await client.post<T>(url, data, config)
   return response.data
 }
 
-/** Multipart — interceptor `Content-Type`-u silir ki, boundary avtomatik qoyulsun */
+/** Multipart — interceptor strips Content-Type so axios sets the boundary. */
 export const postForm = async <T>(
   url: string,
   data: FormData,
@@ -277,17 +335,28 @@ export const postForm = async <T>(
   return response.data
 }
 
-export const put = async <T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> => {
+export const put = async <T>(
+  url: string,
+  data?: unknown,
+  config?: AxiosRequestConfig
+): Promise<T> => {
   const response = await client.put<T>(url, data, config)
   return response.data
 }
 
-export const patch = async <T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> => {
+export const patch = async <T>(
+  url: string,
+  data?: unknown,
+  config?: AxiosRequestConfig
+): Promise<T> => {
   const response = await client.patch<T>(url, data, config)
   return response.data
 }
 
-export const del = async <T>(url: string, config?: AxiosRequestConfig): Promise<T> => {
+export const del = async <T>(
+  url: string,
+  config?: AxiosRequestConfig
+): Promise<T> => {
   const response = await client.delete<T>(url, config)
   return response.data
 }
@@ -300,4 +369,4 @@ export const apiClient = {
   delete: del,
 }
 
-export default apiClient 
+export default apiClient

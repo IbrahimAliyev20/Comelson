@@ -1,7 +1,7 @@
  'use client'
 
 import Image from 'next/image'
-import { Calendar, ChevronDown } from 'lucide-react'
+import { Calendar, ChevronDown, Clock } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useLocale } from 'next-intl'
 import { useQuery } from '@tanstack/react-query'
@@ -66,14 +66,23 @@ export default function EventsSection({
                     />
                   </div>
 
-                  <div className="flex flex-col gap-3 px-2">
-                    <div className="flex items-center gap-[5px] text-[#6b6e71]">
-                      <Calendar className="size-5 shrink-0" aria-hidden />
-                      <span className="text-base leading-6">{formatEventDate(item.created_at, locale)}</span>
-                    </div>
-                    <p className="line-clamp-2 text-xl font-semibold leading-7 text-[#14171a]">
+                  <div className="flex w-full flex-col gap-6 px-2">
+                    <div className="flex flex-col gap-3">
+                      <p className="line-clamp-1 text-xl font-semibold leading-7 text-[#14171a]">
                       {item.name}
-                    </p>
+                      </p>
+                    </div>
+
+                    <div className="flex w-full items-start justify-between text-[#6b6e71]">
+                      <div className="flex items-center gap-[5px]">
+                        <Clock className="size-5 shrink-0" aria-hidden />
+                        <span className="text-base leading-6">4 dəqiqə oxuma</span>
+                      </div>
+                      <div className="flex items-center gap-[5px]">
+                        <Calendar className="size-5 shrink-0" aria-hidden />
+                        <span className="text-base leading-6">{formatEventDate(item.created_at, locale)}</span>
+                      </div>
+                    </div>
                   </div>
                 </Link>
               ))

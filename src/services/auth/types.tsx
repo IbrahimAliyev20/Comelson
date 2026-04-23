@@ -132,16 +132,29 @@ export type ApiAuthResponse<T> = ApiResponse<T>
 
 const emailSchema = z.string().trim().email()
 
+/**
+ * Shared "strong" password rules used by register + reset-password flows.
+ * Must match the UI rules in `NewPasswordPage` and backend expectations.
+ */
+export const strongPasswordSchema = z
+  .string()
+  .min(8, 'Şifrə ən azı 8 simvol olmalıdır')
+  .max(12, 'Şifrə ən çox 12 simvol ola bilər')
+  .regex(/[A-Z]/, 'Ən azı bir böyük hərf olmalıdır')
+  .regex(/[a-z]/, 'Ən azı bir kiçik hərf olmalıdır')
+  .regex(/\d/, 'Ən azı bir rəqəm olmalıdır')
+  .regex(/[^A-Za-z0-9]/, 'Ən azı bir xüsusi simvol olmalıdır')
+
 export const loginRequestSchema = z.object({
   email: emailSchema,
   password: z.string().min(1),
-  remember_me: z.boolean().optional().default(true),
+  remember_me: z.boolean(),
 })
 
 export const registerRequestSchema = z.object({
   name: z.string().trim().min(2),
   email: emailSchema,
-  password: z.string().min(8),
+  password: strongPasswordSchema,
 })
 
 export const verifyOtpRequestSchema = z.object({
@@ -162,8 +175,8 @@ export const forgotPasswordRequestSchema = z.object({
 export const resetPasswordRequestSchema = z
   .object({
     email: emailSchema,
-    new_password: z.string().min(8),
-    new_password_confirmation: z.string().min(8),
+    new_password: strongPasswordSchema,
+    new_password_confirmation: z.string().min(1),
   })
   .refine((d) => d.new_password === d.new_password_confirmation, {
     message: 'Şifrələr üst-üstə düşmür',
@@ -178,8 +191,8 @@ export const changePasswordRequestSchema = z
   .object({
     email: emailSchema,
     current_password: z.string().min(1),
-    new_password: z.string().min(8),
-    new_password_confirmation: z.string().min(8),
+    new_password: strongPasswordSchema,
+    new_password_confirmation: z.string().min(1),
   })
   .refine((d) => d.new_password === d.new_password_confirmation, {
     message: 'Yeni şifrələr üst-üstə düşmür',

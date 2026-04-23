@@ -192,7 +192,7 @@ export default function Security({ userEmail }: SecurityProps) {
           disabled={!canSubmit || isPending}
           aria-disabled={!canSubmit || isPending}
           className={cn(
-            'inline-flex h-12 cursor-pointer items-center justify-center gap-2 rounded-2xl bg-[#0f477d] px-6 text-base font-medium leading-6 text-white transition-opacity hover:opacity-95 disabled:opacity-50',
+            'inline-flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-[#0f477d] px-6 text-base font-medium leading-6 text-white transition-opacity hover:opacity-95 disabled:opacity-50 sm:w-auto sm:min-w-[200px]',
             isPending && 'cursor-wait'
           )}
         >
