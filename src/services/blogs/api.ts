@@ -11,13 +11,15 @@ const getBlogCategories = async (locale: string) => {
 const getBlogs = async (
   locale: string,
   category_id: number | null,
-  search: string
+  search: string,
+  sort?: 'asc' | 'desc'
 ) => {
   const response = await get<ApiResponse<BlogResponse[]>>('/blogs', {
     params: {
       locale,
       ...(category_id !== null ? { category_id } : {}),
-      ...(search ? { search } : {})
+      ...(search ? { search } : {}),
+      ...(sort ? { sort } : {}),
     }
   })
   return response

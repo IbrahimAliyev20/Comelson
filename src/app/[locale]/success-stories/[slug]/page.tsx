@@ -10,9 +10,10 @@ import {
 } from '@/services/success-stories/queries'
 
 function normalizeExternalUrl(url: string) {
-  if (!url) return ''
-  if (url.startsWith('http://') || url.startsWith('https://')) return url
-  return `https://${url}`
+  const trimmed = url?.trim() ?? ''
+  if (!trimmed || trimmed === '#') return ''
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) return trimmed
+  return `https://${trimmed}`
 }
 
 function getEmbedSrc(url: string) {
@@ -72,6 +73,17 @@ export default async function SuccessStoryDetailPage({
   if (!story) notFound()
 
   const embedSrc = getEmbedSrc(story.link)
+  const videoImage = (() => {
+    if (!('video_image' in story)) return null
+
+    const raw = (story as unknown as Record<string, unknown>).video_image
+    if (typeof raw !== 'string') return null
+
+    const trimmed = raw.trim()
+    if (!trimmed || trimmed === 'null') return null
+
+    return trimmed
+  })()
   const relatedStories = stories.filter((item) => item.slug !== slug).slice(0, 3)
 
   return (
@@ -97,6 +109,15 @@ export default async function SuccessStoryDetailPage({
                       className="absolute inset-0 h-full w-full"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                       allowFullScreen
+                    />
+                  ) : videoImage ? (
+                    <Image
+                      src={videoImage}
+                      alt={story.name}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 1024px) 100vw, 426px"
+                      priority
                     />
                   ) : null}
                 </div>

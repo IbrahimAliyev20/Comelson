@@ -3,18 +3,31 @@
 import Image from 'next/image'
 import { Calendar, ChevronDown, Clock } from 'lucide-react'
 import { useMemo, useState } from 'react'
-import { useLocale } from 'next-intl'
 import { useQuery } from '@tanstack/react-query'
+import { useLocale } from 'next-intl'
 
 import Container from '@/components/shared/container'
 import { Link } from '@/i18n/navigation'
 import { getEventsQuery } from '@/services/events/queries'
 import { EventResponse } from '@/types/types'
 
-function formatEventDate(value: string, locale: string) {
-  const date = new Date(value)
+function formatEventDate(value: string) {
+  const raw = value.trim()
+  const match = raw.match(/^(\d{4})-(\d{2})-(\d{2})/)
+
+  if (match) {
+    const [, year, month, day] = match
+    return `${day}.${month}.${year}`
+  }
+
+  const date = new Date(raw)
   if (Number.isNaN(date.getTime())) return value
-  return new Intl.DateTimeFormat(locale, { year: 'numeric', month: '2-digit', day: '2-digit' }).format(date)
+
+  const day = String(date.getDate()).padStart(2, '0')
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const year = date.getFullYear()
+
+  return `${day}.${month}.${year}`
 }
 
 export default function EventsSection({
@@ -76,11 +89,11 @@ export default function EventsSection({
                     <div className="flex w-full items-start justify-between text-[#6b6e71]">
                       <div className="flex items-center gap-[5px]">
                         <Clock className="size-5 shrink-0" aria-hidden />
-                        <span className="text-base leading-6">4 dəqiqə oxuma</span>
+                        <span className="text-base leading-6">{item.read_time}  oxuma vaxtı</span>
                       </div>
                       <div className="flex items-center gap-[5px]">
                         <Calendar className="size-5 shrink-0" aria-hidden />
-                        <span className="text-base leading-6">{formatEventDate(item.created_at, locale)}</span>
+                        <span className="text-base leading-6">{formatEventDate(item.created_at)}</span>
                       </div>
                     </div>
                   </div>

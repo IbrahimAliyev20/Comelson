@@ -181,3 +181,18 @@
     transform: rotate(0deg) scale(1);
   }
 }
+
+
+.comelson-ckeditor .ck.ck-editor__main > .ck-editor__editable,
+.comelson-ckeditor .ck.ck-editor__main > .ck-editor__editable.ck-focused,
+.comelson-ckeditor .ck.ck-editor__main > .ck-editor__editable:not(.ck-focused) {
+  background-color: #f4fafd;
+  border-color: transparent;
+  box-shadow: none;
+  min-height: 180px;
+}
+
+.comelson-ckeditor .ck.ck-toolbar {
+  background-color: #ffffff;
+  border-color: transparent;
+}

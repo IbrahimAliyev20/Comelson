@@ -17,15 +17,17 @@ import { useLocale } from 'next-intl'
 import type { ComponentType } from 'react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import axios from 'axios'
 import Cookies from 'js-cookie'
 import { toast } from 'sonner'
 
 import { TenderSharePopover } from '@/components/tenders/TenderSharePopover'
 import { DeleteConfirmDialog } from '@/components/ui/delete-confirm-dialog'
 import { cn } from '@/lib/utils'
+import { getCompaniesQuery } from '@/services/companies/queries'
 import { deleteTenderMutation, postTenderMutation, updateTenderMutation } from '@/services/tenders/mutations'
 import { getTendersQuery } from '@/services/tenders/queries'
-import type { CreateTenderPayload, TenderResponse } from '@/types/types'
+import type { CompanyResponse, CreateTenderPayload, TenderResponse } from '@/types/types'
 
 import CreateTender, { type CreateTenderForm } from './crud/createTender'
 import EditTender from './crud/editTender'
@@ -82,6 +84,59 @@ function normalizePhone(raw: string): string {
   return t.startsWith('+') ? t : `+${t}`
 }
 
+const FIELD_LABELS: Record<string, string> = {
+  title: 'Tender başlığı',
+  category_id: 'Kateqoriya',
+  country_id: 'Ölkə',
+  company_id: 'Şirkət',
+  start_date: 'Başlama tarixi',
+  end_date: 'Bitmə tarixi',
+  description: 'Tender haqqında',
+  required_documents: 'Tələb olunan sənədlər',
+  contact_name: 'Ad, soyad',
+  contact_position: 'Vəzifə',
+  contact_email: 'Email',
+  contact_phone: 'Telefon',
+}
+
+const RULE_LABELS: Record<string, string> = {
+  required: 'məcburidir',
+  'validation after': 'başlama tarixindən sonra olmalıdır',
+  'validation before': 'bitmə tarixindən əvvəl olmalıdır',
+  email: 'düzgün email olmalıdır',
+}
+
+function humanizeFieldError(field: string, rule: string): string {
+  const label = FIELD_LABELS[field] ?? field
+  const text = RULE_LABELS[rule.toLowerCase()] ?? rule
+  return `${label}: ${text}`
+}
+
+function extractTenderApiError(err: unknown, fallback: string): string {
+  if (!axios.isAxiosError(err)) return fallback
+  const data = err.response?.data as
+    | { message?: string; params?: Record<string, string[] | string> }
+    | undefined
+  if (!data) return fallback
+
+  const params = data.params
+  if (params && typeof params === 'object') {
+    const parts: string[] = []
+    for (const [field, rules] of Object.entries(params)) {
+      const list = Array.isArray(rules) ? rules : [String(rules)]
+      for (const rule of list) {
+        parts.push(humanizeFieldError(field, String(rule)))
+      }
+    }
+    if (parts.length > 0) return parts.join('\n')
+  }
+
+  if (data.message && data.message.toLowerCase() !== 'bad request.') {
+    return data.message
+  }
+  return fallback
+}
+
 function formToCreatePayload(form: CreateTenderForm): CreateTenderPayload {
   const categoryId = toPositiveNumber(form.categoryId) ?? 1
   const countryId =
@@ -109,21 +164,41 @@ function formToCreatePayload(form: CreateTenderForm): CreateTenderPayload {
   }
 }
 
-function getLocalizedLabel(value: Record<string, string> | undefined, locale: string): string {
+function getLocalizedLabel(
+  value: Record<string, string> | string | null | undefined,
+  locale: string
+): string {
   if (!value) return '—'
+  if (typeof value === 'string') return value.trim() || '—'
   return value[locale] ?? value.az ?? Object.values(value)[0] ?? '—'
 }
 
 function tenderResponseToListItem(t: TenderResponse, locale: string): TenderListItem {
+  const companyName = t.company?.name?.trim() || '—'
+
+  const companyLogoUrl = (() => {
+    const company = t.company
+    if (!company || typeof company !== 'object') return COMPANY_LOGO
+    if ('logo_url' in company) {
+      const raw = (company as { logo_url?: unknown }).logo_url
+      return typeof raw === 'string' && raw.trim() ? raw : COMPANY_LOGO
+    }
+    const raw = (company as { logo?: unknown }).logo
+    return typeof raw === 'string' && raw.trim() ? raw : COMPANY_LOGO
+  })()
+
+  // Backend sometimes returns `null` for `is_active` even though it's logically active.
+  const isActive = t.is_active == null ? true : Boolean(t.is_active)
+
   return {
     id: t.id,
     slug: t.slug,
     title: t.title,
-    company: '—',
-    companyLogo: COMPANY_LOGO,
+    company: companyName,
+    companyLogo: companyLogoUrl,
     category: getLocalizedLabel(t.category?.name, locale),
-    isActive: Boolean(t.is_active),
-    status: t.is_active ? 'active' : 'closed',
+    isActive,
+    status: isActive ? 'active' : 'closed',
   }
 }
 
@@ -147,16 +222,22 @@ function TenderStatusBadge({ isActive }: { isActive: boolean }) {
 function AddTenderButton({
   onClick,
   className,
+  disabled = false,
 }: {
   onClick: () => void
   className?: string
+  disabled?: boolean
 }) {
   return (
     <button
       type="button"
-      onClick={onClick}
+      onClick={disabled ? undefined : onClick}
+      disabled={disabled}
       className={cn(
-        'inline-flex h-12 cursor-pointer items-center justify-center gap-4 rounded-2xl bg-[#e6eff6] px-8 text-base font-medium leading-6 text-[#0f477d] transition-colors hover:bg-[#d7e6f2] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f477d]',
+        'inline-flex h-12 items-center justify-center gap-4 rounded-2xl bg-[#e6eff6] px-8 text-base font-medium leading-6 text-[#0f477d] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f477d]',
+        disabled
+          ? 'cursor-not-allowed opacity-60'
+          : 'cursor-pointer hover:bg-[#d7e6f2]',
         className
       )}
     >
@@ -166,7 +247,15 @@ function AddTenderButton({
   )
 }
 
-function EmptyTenderState({ onAdd }: { onAdd: () => void }) {
+function EmptyTenderState({
+  onAdd,
+  addDisabled = false,
+  helperText,
+}: {
+  onAdd: () => void
+  addDisabled?: boolean
+  helperText?: string
+}) {
   return (
     <div className="flex flex-1 flex-col items-center justify-center px-3 py-8 sm:px-8 sm:py-10">
       <div className="flex w-full max-w-[402px] flex-col items-center gap-7 rounded-xl bg-white px-3 py-6 text-center sm:gap-9 sm:px-6 sm:py-7">
@@ -183,10 +272,13 @@ function EmptyTenderState({ onAdd }: { onAdd: () => void }) {
               İlk tenderinizi yaradın, təkliflər toplayın və doğru tərəfdaşları
               tapın
             </p>
+            {helperText ? (
+              <p className="text-sm leading-5 text-[#ff3b30]">{helperText}</p>
+            ) : null}
           </div>
         </div>
 
-        <AddTenderButton onClick={onAdd} />
+        <AddTenderButton onClick={onAdd} disabled={addDisabled} />
       </div>
     </div>
   )
@@ -342,8 +434,8 @@ function TenderTable({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-4">
-        <div className="relative min-w-0 flex-1">
+      <div className="flex flex-col gap-4 xl:flex-row xl:items-center">
+        <div className="relative min-w-0 flex-1 xl:max-w-[420px]">
           <Search
             className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-[#889097]"
             aria-hidden
@@ -357,14 +449,14 @@ function TenderTable({
           />
         </div>
 
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:flex xl:flex-1 xl:items-center">
           <div className="relative">
             <select
               value={statusFilter}
               onChange={(e) =>
                 setStatusFilter(e.target.value as TenderStatusFilter)
               }
-              className="h-12 w-full appearance-none rounded-xl border border-[#dadee2] bg-white px-3.5 pr-10 text-sm leading-6 text-[#32393f] outline-none sm:text-base"
+              className="h-12 w-full appearance-none rounded-xl border border-[#dadee2] bg-white px-3.5 pr-10 text-sm leading-6 text-[#32393f] outline-none sm:text-base xl:w-[180px]"
             >
               <option value="active">Aktiv elanlar</option>
               <option value="all">Bütün elanlar</option>
@@ -379,7 +471,7 @@ function TenderTable({
             <select
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
-              className="h-12 w-full appearance-none rounded-xl border border-[#dadee2] bg-white px-3.5 pr-10 text-sm leading-6 text-[#32393f] outline-none sm:text-base"
+              className="h-12 w-full appearance-none rounded-xl border border-[#dadee2] bg-white px-3.5 pr-10 text-sm leading-6 text-[#32393f] outline-none sm:text-base xl:w-[180px]"
             >
               <option value="all">Kateqoriya</option>
               {categories.map((category) => (
@@ -397,7 +489,7 @@ function TenderTable({
           <FilterButton
             label="Tarix"
             icon="calendar"
-            className="sm:col-span-2 xl:col-span-1"
+            className="sm:col-span-2 xl:w-[180px]"
           />
         </div>
       </div>
@@ -478,27 +570,30 @@ function TenderTable({
                 </div>
               </div>
 
-              <div className="flex flex-col gap-4 lg:hidden">
+              <div className="flex flex-col gap-4 rounded-2xl border border-[#eaf1fa] bg-[#fbfdff] p-4 shadow-[0_1px_2px_rgba(15,71,125,0.04)] lg:hidden">
                 <div className="flex items-start justify-between gap-3">
-                  <div>
+                  <div className="min-w-0 flex-1">
                     <p className="text-xs font-medium leading-4 text-[#64717c]">
-                      #{index + 1}
+                      Tender #{index + 1}
                     </p>
-                    <p className="mt-2 text-base leading-6 text-[#1d212a]">
+                    <p className="mt-2 break-words text-base font-medium leading-6 text-[#1d212a]">
                       {tender.title}
+                    </p>
+                    <p className="mt-1 text-xs leading-5 text-[#6b6e71]">
+                      {tender.category}
                     </p>
                   </div>
                   <button
                     type="button"
                     onClick={() => onOpen(tender)}
-                    className="inline-flex items-center justify-center text-[#0f477d]"
+                    className="inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-[#e6eff6] text-[#0f477d]"
                     aria-label="Tenderə bax"
                   >
-                    <ChevronRight className="size-6" aria-hidden />
+                    <ChevronRight className="size-5" aria-hidden />
                   </button>
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 rounded-xl bg-white px-3 py-3">
                   <div className="relative size-10 shrink-0 overflow-hidden rounded-full border border-[rgba(69,136,183,0.12)] bg-white">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
@@ -507,25 +602,37 @@ function TenderTable({
                       className="size-full object-cover"
                     />
                   </div>
-                  <span className="text-sm font-medium leading-5 text-[#1d212a]">
+                  <span className="min-w-0 truncate text-sm font-medium leading-5 text-[#1d212a]">
                     {tender.company}
                   </span>
                 </div>
 
-                <div className="flex justify-start">
+                <div className="flex flex-wrap items-center justify-between gap-3">
                   <TenderStatusBadge isActive={tender.isActive} />
+                  <span className="text-xs font-medium uppercase tracking-[0.04em] text-[#64717c]">
+                    {tender.isActive ? 'Aktiv tender' : 'Deaktiv tender'}
+                  </span>
                 </div>
 
-                <div className="flex items-center justify-end gap-3">
-                  <TenderSharePopover
-                    slug={tender.slug}
-                    tenderTitle={tender.title}
-                  />
-                  <RowActionMenu
-                    tender={tender}
-                    onEdit={onEdit}
-                    onDelete={onDelete}
-                  />
+                <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-3">
+                  <button
+                    type="button"
+                    onClick={() => onOpen(tender)}
+                    className="inline-flex h-11 w-full items-center justify-center rounded-xl bg-[#0f477d] px-4 text-sm font-medium text-white transition-colors hover:bg-[#0c3a66]"
+                  >
+                    Ətraflı bax
+                  </button>
+                  <div className="flex items-center justify-end gap-3 rounded-xl bg-white px-3 py-1.5">
+                    <TenderSharePopover
+                      slug={tender.slug}
+                      tenderTitle={tender.title}
+                    />
+                    <RowActionMenu
+                      tender={tender}
+                      onEdit={onEdit}
+                      onDelete={onDelete}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -548,6 +655,25 @@ export default function TenderList() {
     getTendersQuery({ locale })
   )
 
+  const { data: companiesResponse } = useQuery(
+    getCompaniesQuery({ locale, per_page: 100 })
+  )
+  const companies = (companiesResponse?.data ?? []) as CompanyResponse[]
+  const hasActiveCompany = useMemo(
+    () => companies.some((c) => c.status === 1),
+    [companies]
+  )
+
+  const onTryCreateTender = () => {
+    if (!hasActiveCompany) {
+      toast.error(
+        'Tender yaratmaq üçün aktiv şirkətiniz olmalıdır. Zəhmət olmasa şirkətinizi təsdiqlədin.'
+      )
+      return
+    }
+    setView('create')
+  }
+
   const tenders = useMemo(() => data?.data ?? [], [data])
 
   const items = useMemo(() => {
@@ -565,7 +691,8 @@ export default function TenderList() {
       void queryClient.invalidateQueries({ queryKey: ['tenders'] })
       setView('list')
     },
-    onError: () => toast.error('Tender yaradılmadı'),
+    onError: (err) =>
+      toast.error(extractTenderApiError(err, 'Tender yaradılmadı')),
   })
 
   const updateTender = useMutation({
@@ -580,7 +707,8 @@ export default function TenderList() {
       setView('list')
       setSelectedTenderId(null)
     },
-    onError: () => toast.error('Tender yenilənmədi'),
+    onError: (err) =>
+      toast.error(extractTenderApiError(err, 'Tender yenilənmədi')),
   })
 
   const deleteTender = useMutation({
@@ -594,8 +722,18 @@ export default function TenderList() {
       void queryClient.invalidateQueries({ queryKey: ['tenders'] })
       setDeleteTarget(null)
     },
-    onError: () => toast.error('Tender silinmədi'),
+    onError: (err) =>
+      toast.error(extractTenderApiError(err, 'Tender silinmədi')),
   })
+
+  useEffect(() => {
+    if (view !== 'create') return
+    if (hasActiveCompany) return
+    setView('list')
+    toast.error(
+      'Tender yaratmaq üçün aktiv şirkətiniz olmalıdır. Zəhmət olmasa şirkətinizi təsdiqlədin.'
+    )
+  }, [hasActiveCompany, view])
 
   if (view === 'create') {
     return (
@@ -656,13 +794,14 @@ export default function TenderList() {
         </h2>
         {items.length > 0 ? (
           <AddTenderButton
-            onClick={() => setView('create')}
+            onClick={onTryCreateTender}
+            disabled={!hasActiveCompany}
             className="w-full sm:w-auto"
           />
         ) : null}
       </div>
 
-      <div className="flex-1 px-0 py-6 sm:px-8 sm:py-8">
+      <div className="flex-1 px-3 py-5 sm:px-8 sm:py-8">
         {isLoading ? (
           <div className="px-3 py-8 text-center text-sm text-[#6b6e71] sm:px-6 sm:py-10">
             Yüklənir…
@@ -679,7 +818,15 @@ export default function TenderList() {
             </button>
           </div>
         ) : items.length === 0 ? (
-          <EmptyTenderState onAdd={() => setView('create')} />
+          <EmptyTenderState
+            onAdd={onTryCreateTender}
+            addDisabled={!hasActiveCompany}
+            helperText={
+              hasActiveCompany
+                ? undefined
+                : 'Tender yaratmaq üçün aktiv şirkətiniz olmalıdır.'
+            }
+          />
         ) : (
           <TenderTable
             tenders={items}
@@ -711,3 +858,4 @@ export default function TenderList() {
     </>
   )
 }
+

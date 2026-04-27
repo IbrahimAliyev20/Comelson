@@ -1,23 +1,8 @@
 'use client'
 
-import {
-  AlignCenter,
-  AlignLeft,
-  AlignRight,
-  Bold,
-  ChevronLeft,
-  Code,
-  ImageIcon,
-  Italic,
-  Link2,
-  List,
-  ListOrdered,
-  Quote,
-  Table2,
-  Underline,
-} from 'lucide-react'
+import { ChevronLeft } from 'lucide-react'
 import { useLocale } from 'next-intl'
-import type { ComponentType, ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { useEffect } from 'react'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import PhoneInput from 'react-phone-input-2'
@@ -25,6 +10,7 @@ import 'react-phone-input-2/lib/style.css'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
+import Editor from '@/components/Editor'
 import {
   Select,
   SelectContent,
@@ -74,14 +60,6 @@ type EditCampainFormValues = {
   facebook: string
   linkedin: string
   logo: File | null
-}
-
-function escapeHtmlPlain(text: string): string {
-  return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
 }
 
 function normalizePhone(raw: string): string {
@@ -200,7 +178,7 @@ export default function EditCampain({
       return
     }
 
-    const description = `<p>${escapeHtmlPlain(data.description)}</p>`
+    const description = data.description
     updateMutation.mutate({
       locale,
       id: companyId,
@@ -251,6 +229,7 @@ export default function EditCampain({
                 className="sr-only"
                 onChange={(ev) => setValue('logo', ev.target.files?.[0] ?? null)}
               />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={logoSrc}
                 alt={watch('name')}
@@ -376,50 +355,13 @@ export default function EditCampain({
             <span className={cn(labelClass, 'text-[#32393f]')}>
               Şirkət haqqında
             </span>
-            <div className="overflow-hidden rounded-xl border border-[#b5b8bb] bg-[#f4fafd]">
-              <div
-                className="flex flex-wrap items-center gap-2 border-b border-[#b5b8bb] px-4 py-3 sm:gap-3"
-                role="toolbar"
-                aria-label="Mətn formatı"
-              >
-                <ToolbarIconButton label="Qalın" icon={Bold} />
-                <ToolbarIconButton label="Altıxətli" icon={Underline} />
-                <ToolbarIconButton label="Maili" icon={Italic} />
-                <ToolbarIconButton label="Keçid" icon={Link2} />
-                <ToolbarIconButton label="Kod" icon={Code} />
-                <ToolbarIconButton label="Sitat" icon={Quote} />
-                <span
-                  className="size-6 shrink-0 rounded-full bg-[#1d212a]"
-                  aria-hidden
-                />
-                <div className="mx-1 hidden h-6 w-px bg-[#aeaeb2]/40 sm:block" />
-                <ToolbarIconButton label="Sola" icon={AlignLeft} />
-                <ToolbarIconButton label="Mərkəz" icon={AlignCenter} />
-                <ToolbarIconButton label="Sağa" icon={AlignRight} />
-                <div className="mx-1 hidden h-6 w-px bg-[#aeaeb2]/40 sm:block" />
-                <ToolbarIconButton label="Siyahı" icon={List} />
-                <ToolbarIconButton label="Nömrəli siyahı" icon={ListOrdered} />
-                <div className="mx-1 hidden h-6 w-px bg-[#aeaeb2]/40 sm:block" />
-                <button
-                  type="button"
-                  className="rounded-md px-1.5 py-1 text-sm font-medium text-[#1d212a] transition-colors hover:bg-[#eaf1fa]"
-                >
-                  x2
-                </button>
-                <button
-                  type="button"
-                  className="rounded-md px-1.5 py-1 text-sm font-medium text-[#1d212a] transition-colors hover:bg-[#eaf1fa]"
-                >
-                  x2
-                </button>
-                <div className="mx-1 hidden h-6 w-px bg-[#aeaeb2]/40 sm:block" />
-                <ToolbarIconButton label="Şəkil" icon={ImageIcon} />
-                <ToolbarIconButton label="Cədvəl" icon={Table2} />
-              </div>
-              <textarea
-                {...register('description')}
-                rows={8}
-                className="min-h-[180px] w-full resize-y border-0 bg-transparent px-4 py-4 text-sm leading-5 text-[#14171a] outline-none"
+            <div className="overflow-hidden rounded-xl border border-[#b5b8bb] bg-white">
+              <Controller
+                name="description"
+                control={control}
+                render={({ field }) => (
+                  <Editor value={field.value ?? ''} onChange={field.onChange} />
+                )}
               />
             </div>
           </div>
@@ -537,20 +479,3 @@ export default function EditCampain({
   )
 }
 
-function ToolbarIconButton({
-  label,
-  icon: Icon,
-}: {
-  label: string
-  icon: ComponentType<{ className?: string; 'aria-hidden'?: boolean }>
-}) {
-  return (
-    <button
-      type="button"
-      title={label}
-      className="cursor-pointer rounded-md p-1.5 text-[#1d212a] transition-colors hover:bg-[#eaf1fa]"
-    >
-      <Icon className="size-5" aria-hidden />
-    </button>
-  )
-}

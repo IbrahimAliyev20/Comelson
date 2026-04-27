@@ -1,25 +1,30 @@
-import { queryOptions } from "@tanstack/react-query";
-import { getBlog, getBlogCategories, getBlogs } from "./api";
+import { queryOptions } from '@tanstack/react-query'
+import { getBlog, getBlogCategories, getBlogs } from './api'
 
 
 const getBlogCategoriesQuery = (locale: string) => {
-    return queryOptions({
-        queryKey: ["blog-categories", locale],
-        queryFn: () => getBlogCategories(locale),
-    });
+  return queryOptions({
+    queryKey: ['blog-categories', locale],
+    queryFn: () => getBlogCategories(locale),
+  })
 }
 
-const getBlogsQuery = (locale: string, category_id: number | null, search: string) => {
-    return queryOptions({
-        queryKey: ["blogs", locale, category_id, search],
-        queryFn: () => getBlogs(locale, category_id, search),
-    });
+const getBlogsQuery = (
+  locale: string,
+  category_id: number | null,
+  search: string,
+  sort: 'asc' | 'desc'
+) => {
+  return queryOptions({
+    queryKey: ['blogs', locale, category_id, search, sort],
+    queryFn: () => getBlogs(locale, category_id, search, sort),
+  })
 }
 
 const getBlogQuery = (locale: string, slug: string) => {
-    return queryOptions({
-        queryKey: ["blog", locale, slug],
-        queryFn: () => getBlog(locale, slug),
-    });
+  return queryOptions({
+    queryKey: ['blog', locale, slug],
+    queryFn: () => getBlog(locale, slug),
+  })
 }
-export { getBlogCategoriesQuery, getBlogsQuery, getBlogQuery };
+export { getBlogCategoriesQuery, getBlogsQuery, getBlogQuery }

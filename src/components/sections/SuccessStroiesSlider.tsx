@@ -92,7 +92,7 @@ export default function SuccessStroiesSlider({
     clear()
     intervalRef.current = window.setInterval(tick, 4000)
     return clear
-  }, [isPaused, stories.length])
+  }, [isPaused, stories.length, active])
 
   if (!hasStories || !slide) return null
 
@@ -116,7 +116,7 @@ export default function SuccessStroiesSlider({
           </h1>
         </div>
 
-        <div className="flex flex-col items-center gap-8">
+        <div className="flex flex-col items-center gap-12 sm:gap-16">
           <div className="flex w-full flex-col gap-6 lg:flex-row lg:items-stretch lg:gap-12">
             <div className="relative aspect-video w-full overflow-hidden rounded-xl lg:aspect-auto lg:h-[426px] lg:flex-1">
               {embedSrc ? (

@@ -21,6 +21,7 @@ export type { CompanyCard }
 
 type CompanyStatusVariant = {
   label: string
+  tooltip: string
   className: string
   Icon: React.ComponentType<{ className?: string; 'aria-hidden'?: boolean }>
 }
@@ -30,7 +31,8 @@ function getCompanyStatusVariant(status?: number): CompanyStatusVariant {
   // 0: pending, 1: approved/active, 2: rejected/blocked (fallback: pending).
   if (status === 1) {
     return {
-      label: 'Təsdiqlənib',
+      label: 'Təsdiqləndi',
+      tooltip: 'Şirkətiniz təsdiqləndi və platformada aktivdir.',
       className: 'bg-[#eaf8ef] text-[#34c759]',
       Icon: CheckCircle2,
     }
@@ -39,6 +41,8 @@ function getCompanyStatusVariant(status?: number): CompanyStatusVariant {
   if (status === 2) {
     return {
       label: 'İmtina',
+      tooltip:
+        'Şirkət müraciətiniz rədd edildi. Məlumatları yeniləyib yenidən göndərə bilərsiniz.',
       className: 'bg-[#ffebee] text-[#ff3b30]',
       Icon: XCircle,
     }
@@ -46,6 +50,8 @@ function getCompanyStatusVariant(status?: number): CompanyStatusVariant {
 
   return {
     label: 'Gözləmədə',
+    tooltip:
+      'Şirkətiniz hal-hazırda yoxlanış mərhələsindədir. Təsdiqdən sonra aktiv olacaq.',
     className: 'bg-[#fffae5] text-[#ff9500]',
     Icon: Clock4,
   }
@@ -54,14 +60,28 @@ function getCompanyStatusVariant(status?: number): CompanyStatusVariant {
 function CompanyStatusPill({ status }: { status?: number }) {
   const v = getCompanyStatusVariant(status)
   return (
-    <div
-      className={cn(
-        'inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl px-6 py-2 text-sm font-medium leading-5',
-        v.className
-      )}
-    >
-      <v.Icon className="size-5 shrink-0" aria-hidden />
-      <span className="font-medium">{v.label}</span>
+    <div className="group relative inline-flex w-full">
+      <div
+        tabIndex={0}
+        aria-label={v.tooltip}
+        className={cn(
+          'inline-flex h-9 w-full cursor-help items-center justify-center gap-2 rounded-2xl px-3 py-1.5 text-xs font-medium leading-4 outline-none sm:h-12 sm:px-6 sm:py-2 sm:text-sm sm:leading-5',
+          v.className
+        )}
+      >
+        <v.Icon className="size-4 shrink-0 sm:size-5" aria-hidden />
+        <span className="font-medium">{v.label}</span>
+      </div>
+      <div
+        role="tooltip"
+        className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-2 w-max max-w-[240px] -translate-x-1/2 rounded-lg bg-[#0c3a66] px-3 py-2 text-center text-xs font-normal leading-4 text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100"
+      >
+        {v.tooltip}
+        <span
+          aria-hidden
+          className="absolute left-1/2 top-full size-2 -translate-x-1/2 -translate-y-1/2 rotate-45 bg-[#0c3a66]"
+        />
+      </div>
     </div>
   )
 }
@@ -210,8 +230,8 @@ function CompanyCardItem({
       </div>
 
       <div className="flex flex-col gap-4">
-        <div className="flex items-center gap-4">
-          <div className="relative size-16 shrink-0 overflow-hidden rounded-[56px] border border-[#f1f2f6] bg-white">
+        <div className="flex items-center gap-3 sm:gap-4">
+          <div className="relative size-12 shrink-0 overflow-hidden rounded-full border border-[#f1f2f6] bg-white sm:size-16 sm:rounded-[56px]">
             {company.logo.trim().length > 0 && logoOk ? (
               <>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -232,11 +252,11 @@ function CompanyCardItem({
             )}
           </div>
 
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-xl font-medium leading-7 text-[#1d212a]">
+          <div className="min-w-0 flex-1 pr-10 sm:pr-0">
+            <p className="truncate text-base font-medium leading-6 text-[#1d212a] sm:text-xl sm:leading-7">
               {company.name}
             </p>
-            <p className="mt-1.5 text-sm leading-5 text-[#6b6e71]">
+            <p className="mt-1 text-xs leading-4 text-[#6b6e71] sm:mt-1.5 sm:text-sm sm:leading-5">
               {company.category}
             </p>
           </div>
@@ -255,10 +275,10 @@ function CompanyCardItem({
         <button
           type="button"
           onClick={() => onOpen(company)}
-          className="group cursor-pointer inline-flex h-12 items-center justify-center gap-3 rounded-2xl px-2 text-base font-medium leading-6 text-[#0f477d] transition-opacity hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f477d]"
+          className="group inline-flex h-9 shrink-0 cursor-pointer items-center justify-center gap-2 rounded-2xl px-2 text-sm font-medium leading-5 text-[#0f477d] transition-opacity hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f477d] sm:h-12 sm:gap-3 sm:text-base sm:leading-6"
         >
           Ətraflı bax
-          <ChevronRight className="size-5 transition-transform group-hover:translate-x-0.5" aria-hidden />
+          <ChevronRight className="size-4 transition-transform group-hover:translate-x-0.5 sm:size-5" aria-hidden />
         </button>
       </div>
     </article>
@@ -312,6 +332,11 @@ export default function CampainsList({
   const items = useMemo(
     () => data?.data?.map(companyResponseToCard) ?? [],
     [data]
+  )
+
+  const hasActiveCompany = useMemo(
+    () => items.some((c) => c.status === 1),
+    [items]
   )
 
   const [selectedCompany, setSelectedCompany] = useState<CompanyCard | null>(
@@ -404,7 +429,7 @@ export default function CampainsList({
 
   return (
     <>
-    <div className="flex flex-col gap-4 px-3 pt-6 sm:gap-6 sm:px-12 sm:pt-8">
+    <div className="flex flex-col gap-4 px-3 pb-8 pt-6 sm:gap-6 sm:px-12 sm:pb-12 sm:pt-8">
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#eaf1fa] pb-6">
         <h2 className="text-lg font-medium leading-7 text-[#1d212a] sm:text-2xl sm:leading-8">
           Şirkətlərim
@@ -416,6 +441,7 @@ export default function CampainsList({
           />
         ) : null}
       </div>
+
       {items.length === 0 ? (
         <EmptyCompanyState onAdd={() => onViewChange('create')} />
       ) : (

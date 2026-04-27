@@ -15,17 +15,6 @@ export default async function AboutSection({ about }: { about: AboutResponse | u
             
             </div>
           </div>
-
-          <div className="relative h-[240px] w-full overflow-hidden rounded-2xl sm:h-[320px] md:h-[480px] md:rounded-[20px]">
-            <Image
-              src={about?.image_2 ?? ""}
-              alt=""
-              fill
-              className="object-cover"
-              sizes="(max-width: 1040px) 100vw, 1040px"
-              priority
-            />
-          </div>
         </div>
       </div>
     </section>

@@ -1,24 +1,11 @@
 'use client'
 
 import {
-  AlignCenter,
-  AlignLeft,
-  AlignRight,
-  Bold,
   Camera,
   ChevronLeft,
-  Code,
-  ImageIcon,
-  Italic,
-  Link2,
-  List,
-  ListOrdered,
-  Quote,
-  Table2,
-  Underline,
 } from 'lucide-react'
 import { useLocale } from 'next-intl'
-import type { ComponentType, ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { useEffect } from 'react'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import PhoneInput from 'react-phone-input-2'
@@ -26,6 +13,7 @@ import 'react-phone-input-2/lib/style.css'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
+import Editor from '@/components/Editor'
 import {
   Select,
   SelectContent,
@@ -61,14 +49,6 @@ type CreateCampainFormValues = {
 
 function FieldLabel({ children }: { children: ReactNode }) {
   return <span className={labelClass}>{children}</span>
-}
-
-function escapeHtmlPlain(text: string): string {
-  return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
 }
 
 function normalizePhone(raw: string): string {
@@ -165,7 +145,7 @@ export default function CreateCampain({
     if (!data.email.trim()) return void toast.error('Email ünvanını daxil edin')
     if (!data.address.trim()) return void toast.error('Ünvanı daxil edin')
 
-    const description = `<p>${escapeHtmlPlain(data.about.trim())}</p>`
+    const description = data.about.trim()
 
     createMutation.mutate({
       locale,
@@ -222,6 +202,7 @@ export default function CreateCampain({
                 }}
               />
               {logoPreviewUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
                 <img src={logoPreviewUrl} alt="" className="size-full object-cover" />
               ) : (
                 <Camera className="size-9 text-[#6b6e71]" aria-hidden />
@@ -349,36 +330,13 @@ export default function CreateCampain({
                 *
               </span>
             </span>
-            <div className="overflow-hidden rounded-xl border border-[#b5b8bb] bg-[#f4fafd]">
-              <div
-                className="flex flex-wrap items-center gap-2 border-b border-[#b5b8bb] px-4 py-3 sm:gap-3"
-                role="toolbar"
-                aria-label="Mətn formatı"
-              >
-                <ToolbarIconButton label="Qalın" icon={Bold} />
-                <ToolbarIconButton label="Altıxətli" icon={Underline} />
-                <ToolbarIconButton label="Maili" icon={Italic} />
-                <ToolbarIconButton label="Keçid" icon={Link2} />
-                <ToolbarIconButton label="Kod" icon={Code} />
-                <ToolbarIconButton label="Sitat" icon={Quote} />
-                <span className="size-6 shrink-0 rounded-full bg-[#1d212a]" aria-hidden />
-                <div className="mx-1 hidden h-6 w-px bg-[#aeaeb2]/40 sm:block" />
-                <ToolbarIconButton label="Sola" icon={AlignLeft} />
-                <ToolbarIconButton label="Mərkəz" icon={AlignCenter} />
-                <ToolbarIconButton label="Sağa" icon={AlignRight} />
-                <div className="mx-1 hidden h-6 w-px bg-[#aeaeb2]/40 sm:block" />
-                <ToolbarIconButton label="Siyahı" icon={List} />
-                <ToolbarIconButton label="Nömrəli siyahı" icon={ListOrdered} />
-                <div className="mx-1 hidden h-6 w-px bg-[#aeaeb2]/40 sm:block" />
-                <ToolbarIconButton label="Şəkil" icon={ImageIcon} />
-                <ToolbarIconButton label="Cədvəl" icon={Table2} />
-              </div>
-              <textarea
-                {...register('about')}
-                placeholder="Şirkət haqqında məlumat daxil edin"
-                rows={6}
-                aria-required="true"
-                className="min-h-[140px] w-full resize-y border-0 bg-transparent px-4 py-4 text-sm leading-5 text-[#1d212a] outline-none placeholder:text-[#889097]"
+            <div className="overflow-hidden rounded-xl border border-[#b5b8bb] bg-white">
+              <Controller
+                name="about"
+                control={control}
+                render={({ field }) => (
+                  <Editor value={field.value ?? ''} onChange={field.onChange} />
+                )}
               />
             </div>
           </div>
@@ -522,23 +480,5 @@ export default function CreateCampain({
         </div>
       </form>
     </div>
-  )
-}
-
-function ToolbarIconButton({
-  label,
-  icon: Icon,
-}: {
-  label: string
-  icon: ComponentType<{ className?: string; 'aria-hidden'?: boolean }>
-}) {
-  return (
-    <button
-      type="button"
-      title={label}
-      className="cursor-pointer rounded-md p-1.5 text-[#1d212a] transition-colors hover:bg-[#eaf1fa]"
-    >
-      <Icon className="size-6" aria-hidden />
-    </button>
   )
 }

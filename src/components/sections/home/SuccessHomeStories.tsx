@@ -1,7 +1,6 @@
 'use client'
 
 import { ArrowRight } from 'lucide-react'
-import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
 
@@ -45,11 +44,18 @@ function getEmbedSrc(url: string) {
 }
 
 export default function SuccessHomeStories({
-  successStories
+  successStories,
+  labels,
 }: {
   successStories: SuccessStoriesResponse[] | undefined
+  labels: {
+    successStoriesTitleBlack: string
+    successStoriesTitleMid: string
+    successStoriesTitleGray: string
+    successStoriesCta: string
+    successStoriesSliderLabel: string
+  }
 }) {
-  const t = useTranslations('home')
   const [active, setActive] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
   const intervalRef = useRef<number | null>(null)
@@ -77,9 +83,9 @@ export default function SuccessHomeStories({
     }
 
     clear()
-    intervalRef.current = window.setInterval(tick, 7000)
+    intervalRef.current = window.setInterval(tick, 4000)
     return clear
-  }, [isPaused, stories.length])
+  }, [isPaused, stories.length, active])
 
   if (!hasStories) return null
 
@@ -92,22 +98,22 @@ export default function SuccessHomeStories({
         <div className="flex flex-col gap-8">
           <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-end">
             <h2 className="max-w-[720px] text-balance text-3xl font-semibold leading-tight text-[#14171a] md:text-[40px] md:leading-[56px]">
-              <span className="text-[#14171a]">{t('successStoriesTitleBlack')}</span>
-              <span className="text-[#14171a]">{t('successStoriesTitleMid')}</span>
-              <span className="text-[#6b6e71]">{t('successStoriesTitleGray')}</span>
+              <span className="text-[#14171a]">{labels.successStoriesTitleBlack}</span>
+              <span className="text-[#14171a]">{labels.successStoriesTitleMid}</span>
+              <span className="text-[#6b6e71]">{labels.successStoriesTitleGray}</span>
             </h2>
 
             <Link
               href="/success-stories"
               className="  hidden h-12 shrink-0 items-center justify-center gap-3 rounded-2xl px-6 py-3 text-base font-medium leading-6 text-[#14171a] transition-colors hover:text-[#0f477d] lg:inline-flex"
             >
-              {t('successStoriesCta')}
+              {labels.successStoriesCta}
               <ArrowRight className="size-6 shrink-0 transition-colors" aria-hidden />
             </Link>
           </div>
 
           <div
-            className="flex flex-col items-center gap-8 overflow-hidden rounded-2xl"
+            className="flex flex-col items-center gap-12 overflow-hidden rounded-2xl sm:gap-16"
             onMouseEnter={() => setIsPaused(true)}
             onMouseLeave={() => setIsPaused(false)}
             onFocusCapture={() => setIsPaused(true)}
@@ -163,7 +169,7 @@ export default function SuccessHomeStories({
             <div
               className="flex items-center gap-2"
               role="tablist"
-              aria-label={t('successStoriesSliderLabel')}
+              aria-label={labels.successStoriesSliderLabel}
             >
                 {stories.map((_, index) => (
                   <button
@@ -184,7 +190,7 @@ export default function SuccessHomeStories({
                 href="/success-stories"
                 className="inline-flex h-12 items-center justify-center gap-3 rounded-2xl px-6 py-3 text-base font-medium leading-6 text-[#14171a] transition-colors hover:text-[#0f477d]"
               >
-                {t('successStoriesCta')}
+                {labels.successStoriesCta}
                 <ArrowRight className="size-6 shrink-0 transition-colors" aria-hidden />
               </Link>
             </div>

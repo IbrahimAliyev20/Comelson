@@ -12,6 +12,15 @@ type TendersHomeSectionProps = {
   tenders: PublicTenderResponse[]
 }
 
+function getLocalizedCategoryName(
+  name: Record<string, string> | string | null | undefined,
+  locale: string
+): string {
+  if (!name) return '—'
+  if (typeof name === 'string') return name
+  return name[locale] ?? name.az ?? Object.values(name)[0] ?? '—'
+}
+
 function formatApiDateTime(value: string): string {
   const match = value.trim().match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}:\d{2})/)
   if (!match) return value
@@ -85,7 +94,7 @@ export default async function TendersHomeSection({
                         <div className="flex items-center justify-center gap-3">
                           <span className="relative inline-flex size-10 shrink-0 overflow-hidden rounded-full border border-[rgba(69,136,183,0.12)] bg-white">
                             <Image
-                              src="/images/Logo.svg"
+                              src={row.company?.logo_url || '/images/Logo.svg'}
                               alt=""
                               width={40}
                               height={40}
@@ -94,16 +103,13 @@ export default async function TendersHomeSection({
                             />
                           </span>
                           <span className="text-sm font-medium leading-5 text-[#1d212a]">
-                            Comelson MMC
+                            {row.company?.name || '—'}
                           </span>
                         </div>
                       </td>
                       <td className="h-[82px] border-b border-[#eaf1fa] px-6 align-middle text-sm font-normal leading-5 text-[#1d212a]">
                         <p className="max-w-[18rem]">
-                          {row.category?.name?.[locale] ??
-                            row.category?.name?.az ??
-                            Object.values(row.category?.name ?? {})[0] ??
-                            '—'}
+                          {getLocalizedCategoryName(row.category?.name, locale)}
                         </p>
                       </td>
                       <td className="h-[82px] border-b border-[#eaf1fa] px-6 align-middle whitespace-pre text-sm font-normal leading-5 text-[#1d212a]">

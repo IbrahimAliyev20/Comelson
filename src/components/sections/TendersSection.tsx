@@ -28,6 +28,7 @@ import {
 import { Link } from '@/i18n/navigation'
 import { cn } from '@/lib/utils'
 import { getAllTendersQuery } from '@/services/tenders/queries'
+import type { PublicTenderResponse } from '@/types/types'
 
 type StatusFilter = 'active' | 'closed' | 'all'
 
@@ -39,10 +40,11 @@ function formatApiDateTime(value: string): string {
 }
 
 function getLocalizedLabel(
-  value: Record<string, string> | undefined,
+  value: Record<string, string> | string | null | undefined,
   locale: string
 ): string {
   if (!value) return '—'
+  if (typeof value === 'string') return value.trim() || '—'
   return value[locale] ?? value.az ?? Object.values(value)[0] ?? '—'
 }
 
@@ -92,13 +94,16 @@ export default function TendersSection() {
       per_page: perPage,
       ...(query.trim() ? { search: query.trim() } : {}),
       ...(typeof categoryId === 'number' ? { category_id: categoryId } : {}),
-      ...(status === 'all'
-        ? {}
-        : { is_active: status === 'active' ? 1 : 0 }),
+      /**
+       * Backend often returns `is_active: null` for active tenders.
+       * Passing `is_active: 1` would exclude them, so we only send `0` when user
+       * explicitly asks for closed.
+       */
+      ...(status === 'closed' ? { is_active: 0 } : {}),
     })
   )
 
-  const rows = useMemo(() => data?.data ?? [], [data])
+  const rows = useMemo<PublicTenderResponse[]>(() => data?.data ?? [], [data])
 
   const categories = useMemo<CategoryOption[]>(() => {
     const map = new Map<number, string>()
@@ -151,7 +156,7 @@ export default function TendersSection() {
               />
             </div>
 
-            <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-3 md:w-auto md:min-w-[560px] lg:w-auto">
+            <div className="grid w-full grid-cols-2 gap-3 sm:grid-cols-3 md:w-auto md:min-w-[560px] lg:w-auto">
               <Select
                 value={status}
                 onValueChange={(v) => setStatus(v as StatusFilter)}
@@ -221,7 +226,7 @@ export default function TendersSection() {
                 type="button"
                 className={cn(
                   filterControlClass,
-                  'inline-flex w-full items-center justify-between px-3.5 text-base leading-6 sm:w-[180px]'
+                  'col-span-2 inline-flex w-full items-center justify-between px-3.5 text-base leading-6 sm:col-span-1 sm:w-[180px]'
                 )}
                 aria-label="Tarix"
               >
@@ -280,7 +285,7 @@ export default function TendersSection() {
                         <div className="flex items-center justify-center gap-3">
                           <span className="relative inline-flex size-10 shrink-0 overflow-hidden rounded-full border border-[rgba(69,136,183,0.12)] bg-white">
                             <Image
-                              src="/images/Logo.svg"
+                              src={row.company?.logo_url || '/images/Logo.svg'}
                               alt=""
                               width={40}
                               height={40}
@@ -289,7 +294,7 @@ export default function TendersSection() {
                             />
                           </span>
                           <span className="text-sm font-medium leading-5 text-[#1d212a]">
-                            Comelson MMC
+                            {row.company?.name || '—'}
                           </span>
                         </div>
                       </td>

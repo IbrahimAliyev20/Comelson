@@ -40,10 +40,38 @@ type ActionResult<T> =
 
 function toActionError(e: unknown): string {
   if (axios.isAxiosError(e)) {
-    const data = e.response?.data as { message?: string } | undefined
-    if (data?.message && typeof data.message === 'string') return data.message
+    const data = e.response?.data as
+      | { message?: string; error?: string }
+      | undefined
+    const msg = typeof data?.message === 'string' ? data.message : undefined
+    if (msg) return msg
+    const err = typeof data?.error === 'string' ? data.error : undefined
+    if (err) return err
   }
   return e instanceof Error ? e.message : 'request_failed'
+}
+
+function resolveRegisterFriendlyError(e: unknown): string | null {
+  if (!axios.isAxiosError(e)) return null
+  const status = e.response?.status
+  if (status !== 400 && status !== 409) return null
+
+  const raw =
+    typeof e.response?.data === 'string'
+      ? e.response.data
+      : JSON.stringify(e.response?.data ?? {})
+
+  // Backend sometimes responds with a generic "Bad request." when the email
+  // already exists. Convert it into a user-friendly message.
+  if (
+    raw.toLowerCase().includes('bad request') ||
+    raw.toLowerCase().includes('already') ||
+    raw.toLowerCase().includes('exists') ||
+    raw.toLowerCase().includes('email')
+  ) {
+    return 'Bu email ilə artıq qeydiyyatdan keçmisiniz'
+  }
+  return null
 }
 
 // ─── /auth/login ────────────────────────────────────────────────────────────
@@ -89,7 +117,8 @@ export async function registerAction(
     const res = await postRegister(parsed.data)
     return { ok: true, data: res }
   } catch (e) {
-    return { ok: false, error: toActionError(e) }
+    const friendly = resolveRegisterFriendlyError(e)
+    return { ok: false, error: friendly ?? toActionError(e) }
   }
 }
 

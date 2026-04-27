@@ -18,6 +18,15 @@ function normalizeTel(value: string): string {
   return value.replace(/[^\d+]/g, '')
 }
 
+function getLocalizedLabel(
+  value: Record<string, string> | string | null | undefined,
+  locale: string
+): string {
+  if (!value) return '—'
+  if (typeof value === 'string') return value.trim() || '—'
+  return value[locale] ?? value.az ?? Object.values(value)[0] ?? '—'
+}
+
 function InstagramGlyph({ className }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
@@ -56,8 +65,7 @@ export default async function TenderDetailPage({
 
   const startAt = formatDetailDateTime(tender.start_date)
   const endAt = formatDetailDateTime(tender.end_date)
-  const category =
-    tender.category?.name?.[locale] ?? tender.category?.name?.az ?? '—'
+  const category = getLocalizedLabel(tender.category?.name, locale)
 
   const contactName = tender.contact_name?.trim() || '—'
   const contactPosition = tender.contact_position?.trim() || '—'
@@ -70,8 +78,8 @@ export default async function TenderDetailPage({
   const facebook = tender.contact_facebook?.trim() || ''
   const linkedin = tender.contact_linkedin?.trim() || ''
 
-  // NOTE: Figma shows company, but public tender response currently doesn't include it.
-  const companyName = 'Comelson MMC'
+  const companyName = tender.company?.name?.trim() || '—'
+  const companyLogoUrl = tender.company?.logo_url?.trim() || ''
 
   return (
     <section className="bg-[#f8fafc] py-8 md:py-[70px]">
@@ -121,9 +129,23 @@ export default async function TenderDetailPage({
 
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-12">
                   <p className="w-full text-[#6b6e71] sm:w-[200px]">Şirkət</p>
-                  <p className="w-full font-medium text-[#14171a] sm:w-[200px]">
-                    {companyName}
-                  </p>
+                  <div className="flex w-full items-center gap-3 sm:w-[200px]">
+                    {companyLogoUrl ? (
+                      <span className="relative inline-flex size-10 shrink-0 overflow-hidden rounded-full border border-[rgba(69,136,183,0.12)] bg-white">
+                        <Image
+                          src={companyLogoUrl}
+                          alt=""
+                          width={40}
+                          height={40}
+                          className="object-cover"
+                          aria-hidden
+                        />
+                      </span>
+                    ) : null}
+                    <p className="min-w-0 flex-1 truncate font-medium text-[#14171a]">
+                      {companyName}
+                    </p>
+                  </div>
                 </div>
               </div>
 

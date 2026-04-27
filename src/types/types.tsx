@@ -6,6 +6,32 @@ export interface ApiResponse<T> {
       data: T;
 }
 
+export interface PaginationLink {
+  url: string | null;
+  label: string;
+  active: boolean;
+}
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  links: {
+    first: string | null;
+    last: string | null;
+    prev: string | null;
+    next: string | null;
+  };
+  meta: {
+    current_page: number;
+    from: number | null;
+    last_page: number;
+    links: PaginationLink[];
+    path: string;
+    per_page: number;
+    to: number | null;
+    total: number;
+  };
+}
+
 export interface SettingsResponse {
       siteLogo: string;
       siteFooterLogo: string;
@@ -24,6 +50,7 @@ export interface BreadcrumbResponse {
 export interface StatisticsResponse {
   title: string;
   number: string;
+  image: string;
 }
 
 export interface SliderResponse {
@@ -69,6 +96,7 @@ export interface SuccessStoriesResponse {
       profession: string;
       comment: string;
       link: string;
+      video_image?: string | null;
       slug: string;
       meta_title: string;
       meta_keywords: string;
@@ -97,6 +125,7 @@ export interface EventCategoriesResponse {
 
 export interface EventResponse {
   name: string;
+  read_time?: string;
   slug: string;
   image: string;
   thumb_image: string;
@@ -152,9 +181,18 @@ export interface ActivityResponse {
 }
 
 export interface MemberResponse {
-    image: string;
-    thumb_image: string;
-    company: string;
+    id?: number;
+    /**
+     * Legacy fields used by some endpoints.
+     * Newer API responses may provide `logo_url` + `name` instead.
+     */
+    image?: string;
+    thumb_image?: string;
+    company?: string;
+    /** Company logo url (preferred when present). */
+    logo_url?: string;
+    /** Company name (preferred when present). */
+    name?: string;
     catalog: string;
     description: string;
     slug: string;
@@ -293,7 +331,8 @@ export interface PublicTenderResponse {
   contact_facebook: string | null
   contact_linkedin: string | null
   contact_twitter: string | null
-  category: TenderCategoryResponse | null
+  category: { id: number; name: Record<string, string> | string } | null
+  company: { name: string | null; logo_url: string | null } | null
   notify_by_email: boolean
   is_active: boolean
   created_at: string

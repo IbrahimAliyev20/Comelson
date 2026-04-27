@@ -1,8 +1,8 @@
 import { get } from '@/lib/api'
-import { ApiResponse, SuccessStoriesResponse } from '@/types/types'
+import { ApiResponse, PaginatedResponse, SuccessStoriesResponse } from '@/types/types'
 
 const getSuccessStories = async (locale: string) => {
-  const response = await get<ApiResponse<SuccessStoriesResponse[]>>('/success-stories', {
+  const response = await get<PaginatedResponse<SuccessStoriesResponse>>('/success-stories', {
     params: { locale }
   })
   return response

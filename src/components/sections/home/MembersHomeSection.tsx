@@ -8,7 +8,23 @@ import { getServerLocale } from '@/lib/utils'
 import { MemberResponse } from '@/types/types'
 import MembersCarousel from './MembersCarousel'
 
-export default async function MembersHomeSection( { members }: { members: MemberResponse[] | undefined } ) {
+function getMemberLogoUrl(member: MemberResponse): string {
+  const logo = member.logo_url?.trim()
+  if (logo) return logo
+  const img = member.image?.trim()
+  if (img) return img
+  return '/images/Logo.svg'
+}
+
+function getMemberName(member: MemberResponse): string {
+  return member.name?.trim() || member.company?.trim() || 'Company'
+}
+
+export default async function MembersHomeSection({
+  members,
+}: {
+  members: MemberResponse[] | undefined
+}) {
   const t = await getTranslations('home')
   const locale = await getServerLocale()
 
@@ -43,8 +59,8 @@ export default async function MembersHomeSection( { members }: { members: Member
               >
                 <div className="flex h-[188px] w-full items-center justify-center overflow-hidden rounded-[10px] bg-white">
                   <Image
-                    src={list[0]!.image}
-                    alt={list[0]!.company}
+                    src={getMemberLogoUrl(list[0]!)}
+                    alt={getMemberName(list[0]!)}
                     width={720}
                     height={480}
                     className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
@@ -63,14 +79,14 @@ export default async function MembersHomeSection( { members }: { members: Member
               <Link
                 key={`${member.slug || member.company}-${member.country?.id ?? 'na'}-${idx}`}
                 href={`/${locale}/members/${member.slug}`}
-                className="group flex h-[160px] items-center justify-center overflow-hidden rounded-[10px] border border-[#e8eaed] bg-white p-6 transition-shadow hover:shadow-[0_14px_40px_rgba(15,71,125,0.10)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0f477d]/40 md:h-[180px] lg:h-[160px]"
+                className="group flex h-[160px] items-center justify-center overflow-hidden rounded-[10px] border border-[#e8eaed] bg-white p-2 transition-shadow hover:shadow-[0_14px_40px_rgba(15,71,125,0.10)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0f477d]/40 md:h-[180px] lg:h-[160px]"
               >
                 <Image
-                  src={member.image}
-                  alt={member.company}
+                  src={getMemberLogoUrl(member)}
+                  alt={getMemberName(member)}
                   width={360}
                   height={240}
-                  className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-[1.02]"
+                  className="h-full w-full rounded-lg object-cover transition-transform duration-300 group-hover:scale-[1.02]"
                   sizes="(max-width: 1024px) 100vw, 360px"
                 />
               </Link>

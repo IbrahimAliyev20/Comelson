@@ -17,8 +17,9 @@ import { Link } from '@/i18n/navigation'
 import { cn } from '@/lib/utils'
 import { ActivityResponse, CountryResponse, MemberResponse } from '@/types/types'
 
-function stripHtml(value: string) {
-  return value.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
+function stripHtml(value?: string | null) {
+  if (!value) return ''
+  return value.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ')
 }
 
 export default function MembersSection({
@@ -47,11 +48,10 @@ export default function MembersSection({
       .filter((x) => (industry ? x.activity?.name === industry : true))
       .filter((x) => {
         if (!q) return true
-        return (
-          x.company.toLowerCase().includes(q) ||
-          x.activity?.name.toLowerCase().includes(q) ||
-          stripHtml(x.description).toLowerCase().includes(q)
-        )
+        const name = (x.name ?? x.company ?? '').toLowerCase()
+        const activityName = (x.activity?.name ?? '').toLowerCase()
+        const description = stripHtml(x.description).toLowerCase()
+        return name.includes(q) || activityName.includes(q) || description.includes(q)
       })
   }, [country, industry, membersList, query])
 
@@ -84,7 +84,7 @@ export default function MembersSection({
               />
             </div>
 
-            <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2 md:w-auto md:min-w-[380px] lg:grid-cols-2 lg:gap-4">
+            <div className="grid w-full grid-cols-2 gap-3 md:w-auto md:min-w-[380px] lg:gap-4">
               <Select
                 value={country ?? 'all'}
                 onValueChange={(v) => {
@@ -95,7 +95,7 @@ export default function MembersSection({
                 <SelectTrigger
                   className={cn(
                     filterControlClass,
-                    'w-full px-3.5 text-base leading-6 sm:w-[180px]'
+                    'w-full px-3.5 text-base leading-6'
                   )}
                 >
                   <SelectValue placeholder="Ölkələr" />
@@ -129,7 +129,7 @@ export default function MembersSection({
                 <SelectTrigger
                   className={cn(
                     filterControlClass,
-                    'w-full px-3.5 text-base leading-6 sm:w-[180px]'
+                    'w-full px-3.5 text-base leading-6'
                   )}
                 >
                   <SelectValue placeholder="Fəaliyyət sahəsi" />
@@ -157,17 +157,17 @@ export default function MembersSection({
 
           <div className="flex flex-col items-center gap-10">
             <div className="grid w-full grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 lg:gap-6">
-              {shown.map((company) => (
+              {shown.map((company, idx) => (
                 <div
-                  key={company.slug}
+                  key={company.id ?? company.slug ?? idx}
                   className="flex w-full flex-col items-center gap-6 overflow-hidden rounded-xl border border-[#eaf1fa] bg-white px-5 py-6"
                 >
                   <div className="flex w-full flex-col gap-4">
                     <div className="flex w-full items-center gap-4">
                       <div className="relative size-16 shrink-0 overflow-hidden rounded-[56px] border border-[#f1f2f6]">
                         <Image
-                          src={company.image}
-                          alt={company.company}
+                          src={company.logo_url ?? company.image ?? '/images/Logo.svg'}
+                          alt={company.name ?? company.company ?? 'Company'}
                           fill
                           className="object-cover"
                           sizes="64px"
@@ -175,7 +175,7 @@ export default function MembersSection({
                       </div>
                       <div className="flex min-w-0 flex-1 flex-col gap-2">
                         <p className="truncate text-xl font-medium leading-7 text-[#1d212a]">
-                          {company.company}
+                          {company.name ?? company.company}
                         </p>
                         <p className="text-sm leading-5 text-[#6b6e71]">
                           {company.activity?.name}

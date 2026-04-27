@@ -1,13 +1,20 @@
 'use client'
 
 import Image from 'next/image'
-import { Calendar, ChevronDown, Clock, Search } from 'lucide-react'
+import { ArrowUpDown, Calendar, ChevronDown, Clock, Search } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
 import { useQuery } from '@tanstack/react-query'
 
 import Container from '@/components/shared/container'
 import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Link } from '@/i18n/navigation'
 import { getBlogsQuery } from '@/services/blogs/queries'
 import { BlogCategoryResponse, BlogResponse } from '@/types/types'
@@ -53,6 +60,7 @@ export default function NewsSection({
   const initialTabKey = tabs[0]?.key ?? 'all'
   const [activeTabKey, setActiveTabKey] = useState<string>(initialTabKey)
   const [query, setQuery] = useState('')
+  const [sort, setSort] = useState<'asc' | 'desc'>('desc')
   const [visible, setVisible] = useState(9)
 
   const activeTab = useMemo(() => {
@@ -62,7 +70,7 @@ export default function NewsSection({
   const categoryId = activeTab?.categoryId ?? null
 
   const blogsQuery = useQuery({
-    ...getBlogsQuery(locale, categoryId, query.trim()),
+    ...getBlogsQuery(locale, categoryId, query.trim(), sort),
     initialData:
       activeTabKey === initialTabKey && query.trim() === ''
         ? { status: true, message: '', data: initialBlogs }
@@ -120,14 +128,29 @@ export default function NewsSection({
               />
             </div>
 
-            <button
-              type="button"
-              className="inline-flex h-12 w-full items-center justify-between gap-2 rounded-xl border border-[#dadee2] bg-white px-4 text-base leading-6 text-[#32393f] md:w-[200px]"
-              aria-label={t('news.filterDate')}
-            >
-              <span>{t('news.filterDate')}</span>
-              <Calendar className="size-5 text-[#32393f]" aria-hidden />
-            </button>
+            <Select value={sort} onValueChange={(v) => setSort(v as 'asc' | 'desc')}>
+              <SelectTrigger className="inline-flex h-12 w-auto items-center gap-3 rounded-xl border-[#dadee2] bg-white px-4 text-base leading-6 text-[#32393f] focus-visible:ring-0">
+                <ArrowUpDown
+                  className="size-5 shrink-0 text-[#32393f]"
+                  aria-hidden
+                />
+                <SelectValue placeholder="Ən yeni paylaşılanlar" />
+              </SelectTrigger>
+              <SelectContent className="rounded-xl">
+                <SelectItem
+                  value="desc"
+                  className="data-[state=checked]:bg-[#e6eff6] data-[state=checked]:text-[#0f477d] data-[state=checked]:[&_svg]:!text-[#0f477d]"
+                >
+                  Ən yeni paylaşılanlar
+                </SelectItem>
+                <SelectItem
+                  value="asc"
+                  className="data-[state=checked]:bg-[#e6eff6] data-[state=checked]:text-[#0f477d] data-[state=checked]:[&_svg]:!text-[#0f477d]"
+                >
+                  Ən köhnə paylaşılanlar
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">

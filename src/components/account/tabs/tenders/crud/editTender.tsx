@@ -1,28 +1,13 @@
 'use client'
 
-import {
-  AlignCenter,
-  AlignLeft,
-  AlignRight,
-  Bold,
-  CalendarDays,
-  ChevronLeft,
-  Code,
-  ImageIcon,
-  Italic,
-  Link2,
-  List,
-  ListOrdered,
-  Quote,
-  Table2,
-  Underline,
-} from 'lucide-react'
-import type { ComponentType, ReactNode } from 'react'
+import { CalendarDays, ChevronLeft } from 'lucide-react'
+import type { ReactNode } from 'react'
 import { useEffect, useRef } from 'react'
 import PhoneInput from 'react-phone-input-2'
 import 'react-phone-input-2/lib/style.css'
 import { Controller, useForm } from 'react-hook-form'
 
+import Editor from '@/components/Editor'
 import {
   Select,
   SelectContent,
@@ -151,82 +136,21 @@ function DateInput({
   )
 }
 
-function ToolbarIconButton({
-  label,
-  icon: Icon,
-}: {
-  label: string
-  icon: ComponentType<{ className?: string; 'aria-hidden'?: boolean }>
-}) {
-  return (
-    <button
-      type="button"
-      title={label}
-      className="cursor-pointer rounded-md p-1.5 text-[#1d212a] transition-colors hover:bg-[#eaf1fa]"
-    >
-      <Icon className="size-5" aria-hidden />
-    </button>
-  )
-}
-
 function EditorField({
   label,
-  placeholder,
   value,
   onChange,
 }: {
   label: string
-  placeholder: string
+  placeholder?: string
   value: string
   onChange: (nextValue: string) => void
 }) {
   return (
     <div className="flex w-full flex-col gap-2">
       <span className={cn(labelClass, 'text-[#32393f]')}>{label}</span>
-      <div className="overflow-hidden rounded-xl border border-[#b5b8bb] bg-[#f4fafd]">
-        <div
-          className="flex flex-wrap items-center gap-2 border-b border-[#b5b8bb] px-4 py-3 sm:gap-3"
-          role="toolbar"
-          aria-label={`${label} formatı`}
-        >
-          <ToolbarIconButton label="Qalın" icon={Bold} />
-          <ToolbarIconButton label="Altıxətli" icon={Underline} />
-          <ToolbarIconButton label="Maili" icon={Italic} />
-          <ToolbarIconButton label="Keçid" icon={Link2} />
-          <ToolbarIconButton label="Kod" icon={Code} />
-          <ToolbarIconButton label="Sitat" icon={Quote} />
-          <span className="size-6 shrink-0 rounded-full bg-[#1d212a]" aria-hidden />
-          <div className="mx-1 hidden h-6 w-px bg-[#aeaeb2]/40 sm:block" />
-          <ToolbarIconButton label="Sola" icon={AlignLeft} />
-          <ToolbarIconButton label="Mərkəz" icon={AlignCenter} />
-          <ToolbarIconButton label="Sağa" icon={AlignRight} />
-          <div className="mx-1 hidden h-6 w-px bg-[#aeaeb2]/40 sm:block" />
-          <ToolbarIconButton label="Siyahı" icon={List} />
-          <ToolbarIconButton label="Nömrəli siyahı" icon={ListOrdered} />
-          <div className="mx-1 hidden h-6 w-px bg-[#aeaeb2]/40 sm:block" />
-          <button
-            type="button"
-            className="cursor-pointer rounded-md px-1.5 py-1 text-sm font-medium text-[#1d212a] transition-colors hover:bg-[#eaf1fa]"
-          >
-            x2
-          </button>
-          <button
-            type="button"
-            className="cursor-pointer rounded-md px-1.5 py-1 text-sm font-medium text-[#1d212a] transition-colors hover:bg-[#eaf1fa]"
-          >
-            x2
-          </button>
-          <div className="mx-1 hidden h-6 w-px bg-[#aeaeb2]/40 sm:block" />
-          <ToolbarIconButton label="Şəkil" icon={ImageIcon} />
-          <ToolbarIconButton label="Cədvəl" icon={Table2} />
-        </div>
-        <textarea
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder={placeholder}
-          rows={5}
-          className="min-h-[120px] w-full resize-y border-0 bg-transparent px-4 py-4 text-sm leading-5 text-[#1d212a] outline-none placeholder:text-[#889097]"
-        />
+      <div className="overflow-hidden rounded-xl border border-[#b5b8bb] bg-white">
+        <Editor value={value ?? ''} onChange={onChange} />
       </div>
     </div>
   )
@@ -440,7 +364,7 @@ export default function EditTender({
             Tender məlumatları
           </h3>
 
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-x-12">
+          <div className="grid grid-cols-1 gap-3 lg:grid-cols-2 lg:gap-x-12">
             <label className="flex flex-col gap-2">
               <FieldLabel>Tender başlığı</FieldLabel>
               <input
@@ -610,7 +534,7 @@ export default function EditTender({
             Əlaqə məlumatları
           </h3>
 
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-x-12">
+          <div className="grid grid-cols-1 gap-3 lg:grid-cols-2 lg:gap-x-12">
             <label className="flex flex-col gap-2">
               <FieldLabel>Ad,soyad</FieldLabel>
               <input
