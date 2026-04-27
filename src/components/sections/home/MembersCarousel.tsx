@@ -8,6 +8,14 @@ import type { MemberResponse } from '@/types/types'
 
 const AUTOPLAY_MS = 2600
 
+function getMemberName(member: MemberResponse): string {
+  return member.name ?? member.company ?? 'Company'
+}
+
+function getMemberImage(member: MemberResponse): string {
+  return member.logo_url ?? member.image ?? '/images/Logo.svg'
+}
+
 export default function MembersCarousel({
   members,
   locale
@@ -52,9 +60,9 @@ export default function MembersCarousel({
       className="flex w-full gap-5 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       style={{ scrollSnapType: 'x mandatory' }}
     >
-      {items.map((member) => (
+      {items.map((member, idx) => (
         <Link
-          key={member.slug}
+          key={member.id ?? member.slug ?? idx}
           href={`/${locale}/members/${member.slug}`}
           data-carousel-item
           className="group w-[82%] shrink-0 overflow-hidden rounded-[10px] border border-[#e8eaed] bg-white p-6 transition-shadow hover:shadow-[0_14px_40px_rgba(15,71,125,0.10)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0f477d]/40 min-[420px]:w-[70%] sm:w-[46%] md:w-[32%]"
@@ -62,8 +70,8 @@ export default function MembersCarousel({
         >
           <div className="flex h-[188px] items-center justify-center overflow-hidden rounded-[10px] bg-white">
             <Image
-              src={member.image}
-              alt={member.company}
+              src={getMemberImage(member)}
+              alt={getMemberName(member)}
               width={360}
               height={240}
               className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"

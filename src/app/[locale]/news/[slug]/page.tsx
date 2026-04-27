@@ -26,7 +26,9 @@ export default async function NewsDetailPage({
   const { locale, slug } = await params
   const queryClient = getServerQueryClient()
 
-  const blogsResponse = await queryClient.fetchQuery(getBlogsQuery(locale, null, ''))
+  const blogsResponse = await queryClient.fetchQuery(
+    getBlogsQuery(locale, null, '', 'desc')
+  )
   const allBlogs = blogsResponse?.data ?? []
 
   let post = null
@@ -49,7 +51,9 @@ export default async function NewsDetailPage({
 
   if (relatedCategoryId !== null) {
     try {
-      const relatedResponse = await queryClient.fetchQuery(getBlogsQuery(locale, relatedCategoryId, ''))
+      const relatedResponse = await queryClient.fetchQuery(
+        getBlogsQuery(locale, relatedCategoryId, '', 'desc')
+      )
       relatedSource = relatedResponse?.data ?? allBlogs
     } catch {
       relatedSource = allBlogs
