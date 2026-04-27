@@ -331,7 +331,7 @@ export function Header() {
                     fill
                     priority
                     sizes="158px"
-                    className="object-contain"
+                    className="object-cover"
                   />
                 </div>
               </Link>
