@@ -44,6 +44,9 @@ function buildCreateCompanyFormData(body: CreateCompanyPayload): FormData {
   if (body.logo) {
     fd.append('logo', body.logo)
   }
+  if (body.profil) {
+    fd.append('profil', body.profil)
+  }
   return fd
 }
 
@@ -66,7 +69,6 @@ const postCompany = async ({ locale, body }: PostCompanyVariables) => {
   })
 }
 
-/** POST /companies/:id — form-data (API update üçün POST istifadə edir) */
 const updateCompany = async ({ locale, id, body }: UpdateCompanyVariables) => {
   const formData = buildCreateCompanyFormData(body)
   return postForm<ApiResponse<CompanyResponse>>(`/companies/${id}`, formData, {

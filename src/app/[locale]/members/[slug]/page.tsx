@@ -8,8 +8,17 @@ import { cn } from '@/lib/utils'
 import { getServerQueryClient } from '@/providers/server'
 import { getMemberQuery, getMembersQuery } from '@/services/members/queries'
 
-function stripHtml(value: string) {
+function stripHtml(value?: string | null) {
+  if (!value) return ''
   return value.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
+}
+
+function getMemberName(member: { name?: string | null; company?: string | null }) {
+  return member.name || member.company || '—'
+}
+
+function getMemberLogo(member: { logo_url?: string | null; image?: string | null }) {
+  return member.logo_url || member.image || '/images/Logo.svg'
 }
 
 export default async function MemberDetailPage({
@@ -23,23 +32,20 @@ export default async function MemberDetailPage({
   const membersResponse = await queryClient.fetchQuery(getMembersQuery(locale))
   const members = membersResponse?.data ?? []
 
-  let company = null
+  let company = members.find((item) => item.slug === slug) ?? null
 
   try {
     const singleResponse = await queryClient.fetchQuery(getMemberQuery(locale, slug))
-    company = singleResponse?.data ?? singleResponse ?? null
+    company = singleResponse?.data ?? company
   } catch {
-    company = members.find((item) => item.slug === slug) ?? null
-  }
-
-  if (!company) {
-    company = members.find((item) => item.slug === slug) ?? null
+    // fall back to list response
   }
 
   if (!company) notFound()
 
   const about = stripHtml(company.description)
   const others = members.filter((item) => item.slug !== slug).slice(0, 2)
+  const companyName = getMemberName(company)
 
   return (
     <section className="bg-[#f8fafc] py-8 md:py-[70px]">
@@ -52,7 +58,7 @@ export default async function MemberDetailPage({
               </Link>
               <span className="text-[#6b6e71]">/</span>
               <span className="line-clamp-1 font-medium text-[#32393f]">
-                {company.company}
+                {companyName}
               </span>
             </nav>
 
@@ -60,8 +66,8 @@ export default async function MemberDetailPage({
               <div className="flex items-center gap-6">
                 <div className="relative aspect-square size-[96px] shrink-0 overflow-hidden rounded-full border border-[#f1f2f6] sm:size-[120px]">
                   <Image
-                    src={company.image}
-                    alt={company.company}
+                    src={getMemberLogo(company)}
+                    alt={companyName}
                     fill
                     className="object-cover"
                     sizes="(max-width: 640px) 96px, 120px"
@@ -70,10 +76,10 @@ export default async function MemberDetailPage({
 
                 <div className="flex min-w-0 flex-col gap-1">
                   <p className="break-words text-2xl font-semibold leading-8 text-[#1d212a] sm:text-[32px] sm:leading-[44px]">
-                    {company.company}
+                    {companyName}
                   </p>
                   <p className="text-base leading-6 text-[#6b6e71]">
-                    {company.activity?.name}
+                    {company.activity?.name ?? ''}
                   </p>
                 </div>
               </div>
@@ -133,8 +139,8 @@ export default async function MemberDetailPage({
                         <div className="flex items-center gap-4">
                           <div className="relative size-20 shrink-0 overflow-hidden rounded-[56px] border border-[#f1f2f6]">
                             <Image
-                              src={item.image}
-                              alt={item.company}
+                              src={getMemberLogo(item)}
+                              alt={getMemberName(item)}
                               fill
                               className="object-cover"
                               sizes="80px"
@@ -142,10 +148,10 @@ export default async function MemberDetailPage({
                           </div>
                           <div className="flex min-w-0 flex-1 flex-col gap-2">
                             <p className="truncate text-xl font-medium leading-7 text-[#1d212a]">
-                              {item.company}
+                              {getMemberName(item)}
                             </p>
                             <p className="text-sm leading-5 text-[#6b6e71]">
-                              {item.activity?.name}
+                              {item.activity?.name ?? ''}
                             </p>
                           </div>
                         </div>

@@ -45,6 +45,7 @@ type CreateCampainFormValues = {
   facebook: string
   linkedin: string
   logo: File | null
+  profil: File | null
 }
 
 function FieldLabel({ children }: { children: ReactNode }) {
@@ -96,17 +97,26 @@ export default function CreateCampain({
         facebook: '',
         linkedin: '',
         logo: null,
+        profil: null,
       },
     })
 
   const logoFile = watch('logo')
+  const profilFile = watch('profil')
   const logoPreviewUrl = logoFile ? URL.createObjectURL(logoFile) : ''
+  const profilPreviewUrl = profilFile ? URL.createObjectURL(profilFile) : ''
 
   useEffect(() => {
     return () => {
       if (logoPreviewUrl) URL.revokeObjectURL(logoPreviewUrl)
     }
   }, [logoPreviewUrl])
+
+  useEffect(() => {
+    return () => {
+      if (profilPreviewUrl) URL.revokeObjectURL(profilPreviewUrl)
+    }
+  }, [profilPreviewUrl])
 
   const createMutation = useMutation({
     ...postCompanyMutation(),
@@ -163,6 +173,7 @@ export default function CreateCampain({
         facebook: data.facebook.trim(),
         linkedin: data.linkedin.trim(),
         logo: data.logo,
+        profil: data.profil,
       },
     })
   }
@@ -189,36 +200,79 @@ export default function CreateCampain({
         className="flex flex-col gap-8 px-3 pt-2 sm:gap-12 sm:px-12 sm:pt-0"
       >
         <section className="flex flex-col gap-8 py-5">
-          <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:gap-5">
-            <label className="relative flex size-[120px] shrink-0 cursor-pointer flex-col items-center justify-center overflow-hidden rounded-full border border-[#eaf1fa] bg-[#e6eff6] p-2.5">
-              <input
-                type="file"
-                accept="image/jpeg,image/png,image/jpg"
-                className="sr-only"
-                aria-required="true"
-                onChange={(ev) => {
-                  const file = ev.target.files?.[0] ?? null
-                  setValue('logo', file)
-                }}
-              />
-              {logoPreviewUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={logoPreviewUrl} alt="" className="size-full object-cover" />
-              ) : (
-                <Camera className="size-9 text-[#6b6e71]" aria-hidden />
-              )}
-              <span className="sr-only">Logo yüklə</span>
-            </label>
-            <div className="flex min-w-0 flex-col gap-2.5">
-              <p className="text-sm font-medium leading-5 text-[#14171a]">
-                Şirkətinizin rəsmi logosunu əlavə edin{' '}
+          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 sm:gap-10">
+            <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:gap-5">
+              <label className="relative flex size-[120px] shrink-0 cursor-pointer flex-col items-center justify-center overflow-hidden rounded-full border border-[#eaf1fa] bg-[#e6eff6] p-2.5">
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/jpg"
+                  className="sr-only"
+                  aria-required="true"
+                  onChange={(ev) => {
+                    const file = ev.target.files?.[0] ?? null
+                    setValue('logo', file)
+                  }}
+                />
+                {logoPreviewUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={logoPreviewUrl}
+                    alt=""
+                    className="size-full object-cover"
+                  />
+                ) : (
+                  <Camera className="size-9 text-[#6b6e71]" aria-hidden />
+                )}
+                <span className="sr-only">Logo yüklə</span>
+              </label>
+              <div className="flex min-w-0 flex-col gap-2.5">
+                <p className="text-sm font-medium leading-5 text-[#14171a]">
+                Şirkət səhifəsində görünəcək
+
+                  <span className="text-[#ff3b30]" aria-hidden>
+                    *
+                  </span>
+                </p>
+                <p className="text-xs leading-4 text-[#6b6e71]">
+                  JPG, JPEG və ya PNG formatı • Maksimum 5 MB
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:gap-5">
+              <label className="relative flex size-[120px] shrink-0 cursor-pointer flex-col items-center justify-center overflow-hidden rounded-full border border-[#eaf1fa] bg-[#e6eff6] p-2.5">
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/jpg"
+                  className="sr-only"
+                  onChange={(ev) => {
+                    const file = ev.target.files?.[0] ?? null
+                    setValue('profil', file)
+                  }}
+                />
+                {profilPreviewUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={profilPreviewUrl}
+                    alt=""
+                    className="size-full object-cover"
+                  />
+                ) : (
+                  <Camera className="size-9 text-[#6b6e71]" aria-hidden />
+                )}
+                <span className="sr-only">Profil şəkli yüklə</span>
+              </label>
+              <div className="flex min-w-0 flex-col gap-2.5">
+                <p className="text-sm font-medium leading-5 text-[#14171a]">
+                Üzvlük bölməsində böyük ölçüdə istifadə olunur
                 <span className="text-[#ff3b30]" aria-hidden>
                   *
                 </span>
-              </p>
-              <p className="text-xs leading-4 text-[#6b6e71]">
-                JPG, JPEG və ya PNG formatı • Maksimum 5 MB
-              </p>
+                </p>
+                <p className="text-xs leading-4 text-[#6b6e71]">
+                  JPG, JPEG və ya PNG formatı • Maksimum 5 MB
+                </p>
+              </div>
             </div>
           </div>
 

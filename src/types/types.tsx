@@ -170,7 +170,6 @@ export interface CountryResponse {
   flag: string; 
 }
 
-/** GET /company-categories — siyahı elementi */
 export interface CompanyCategoryResponse {
   id: number;
   name: string;
@@ -182,16 +181,11 @@ export interface ActivityResponse {
 
 export interface MemberResponse {
     id?: number;
-    /**
-     * Legacy fields used by some endpoints.
-     * Newer API responses may provide `logo_url` + `name` instead.
-     */
     image?: string;
     thumb_image?: string;
     company?: string;
-    /** Company logo url (preferred when present). */
     logo_url?: string;
-    /** Company name (preferred when present). */
+    profil?: string;
     name?: string;
     catalog: string;
     description: string;
@@ -226,6 +220,7 @@ export interface CompanyResponse {
   };
   description: string;
   logo_url: string;
+  profil?: string;
   phone: string;
   email: string;
   address: string;
@@ -411,6 +406,7 @@ export interface CreateCompanyPayload {
   linkedin: string;
   /** Şirkət loqosu — server `logo` açarı ilə gözləyir */
   logo?: File | Blob | null;
+  profil?: File | Blob | null;
 }
 
 /** Hesab → Şirkətlərim — siyahı / detal / redaktə kartı */
@@ -420,6 +416,7 @@ export interface CompanyCard {
   category: string;
   description: string;
   logo: string;
+  profil?: string;
   /** API: CompanyResponse.status */
   status?: number;
   voen?: string;

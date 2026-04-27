@@ -9,7 +9,7 @@ import { MemberResponse } from '@/types/types'
 import MembersCarousel from './MembersCarousel'
 
 function getMemberLogoUrl(member: MemberResponse): string {
-  const logo = member.logo_url?.trim()
+  const logo = member.profil?.trim()
   if (logo) return logo
   const img = member.image?.trim()
   if (img) return img

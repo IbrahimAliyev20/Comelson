@@ -45,7 +45,7 @@ type TenderListItem = {
   category: string
   /** API `is_active` */
   isActive: boolean
-  status: 'active' | 'closed'
+  status: 'active' | 'pending'
 }
 
 const COMPANY_LOGO =
@@ -198,7 +198,7 @@ function tenderResponseToListItem(t: TenderResponse, locale: string): TenderList
     companyLogo: companyLogoUrl,
     category: getLocalizedLabel(t.category?.name, locale),
     isActive,
-    status: isActive ? 'active' : 'closed',
+    status: isActive ? 'active' : 'pending',
   }
 }
 
@@ -214,7 +214,7 @@ function TenderStatusBadge({ isActive }: { isActive: boolean }) {
   return (
     <span className="inline-flex h-9 w-full max-w-[152px] items-center justify-center gap-2 rounded-2xl bg-[#fffae5] px-3 text-xs font-medium leading-5 text-[#ff9500] sm:text-sm sm:leading-5">
       <Clock4 className="size-4 shrink-0" aria-hidden />
-      Deaktiv
+      Gözləmədə
     </span>
   )
 }
@@ -405,7 +405,7 @@ function TenderTable({
   onDelete: (tender: TenderListItem) => void
 }) {
   const [query, setQuery] = useState('')
-  const [statusFilter, setStatusFilter] = useState<TenderStatusFilter>('active')
+  const [statusFilter, setStatusFilter] = useState<TenderStatusFilter>('all')
   const [categoryFilter, setCategoryFilter] = useState<string>('all')
 
   const categories = useMemo(
@@ -610,7 +610,7 @@ function TenderTable({
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <TenderStatusBadge isActive={tender.isActive} />
                   <span className="text-xs font-medium uppercase tracking-[0.04em] text-[#64717c]">
-                    {tender.isActive ? 'Aktiv tender' : 'Deaktiv tender'}
+                    {tender.isActive ? 'Aktiv tender' : 'Gözləmədə'}
                   </span>
                 </div>
 
@@ -658,11 +658,11 @@ export default function TenderList() {
   const { data: companiesResponse } = useQuery(
     getCompaniesQuery({ locale, per_page: 100 })
   )
-  const companies = (companiesResponse?.data ?? []) as CompanyResponse[]
-  const hasActiveCompany = useMemo(
-    () => companies.some((c) => c.status === 1),
-    [companies]
+  const companies = useMemo(
+    () => (companiesResponse?.data ?? []) as CompanyResponse[],
+    [companiesResponse?.data]
   )
+  const hasActiveCompany = useMemo(() => companies.some((c) => c.status === 1), [companies])
 
   const onTryCreateTender = () => {
     if (!hasActiveCompany) {

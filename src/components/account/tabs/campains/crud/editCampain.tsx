@@ -1,6 +1,9 @@
 'use client'
 
-import { ChevronLeft } from 'lucide-react'
+import {
+  Camera,
+  ChevronLeft,
+} from 'lucide-react'
 import { useLocale } from 'next-intl'
 import type { ReactNode } from 'react'
 import { useEffect } from 'react'
@@ -44,6 +47,7 @@ export type EditableCompany = {
   instagram?: string
   facebook?: string
   linkedin?: string
+  profil?: string
 }
 
 type EditCampainFormValues = {
@@ -60,6 +64,7 @@ type EditCampainFormValues = {
   facebook: string
   linkedin: string
   logo: File | null
+  profil: File | null
 }
 
 function normalizePhone(raw: string): string {
@@ -92,6 +97,10 @@ export default function EditCampain({
   const { data: categories = [], isLoading: categoriesLoading } = useQuery(
     getCompanyCategoriesQuery(locale)
   )
+  const { data: companyDetailResponse } = useQuery({
+    ...getCompanyQuery({ locale, id: companyId }),
+    enabled: Number.isFinite(companyId) && companyId > 0,
+  })
   const { register, control, setValue, watch, reset, handleSubmit } =
     useForm<EditCampainFormValues>({
       defaultValues: {
@@ -108,17 +117,28 @@ export default function EditCampain({
         facebook: company.facebook ?? 'https://facebook.com/comelson',
         linkedin: company.linkedin ?? 'https://linkedin.com/comelson',
         logo: null,
+        profil: null,
       },
     })
   const logoFile = watch('logo')
+  const profilFile = watch('profil')
   const logoPreviewUrl = logoFile ? URL.createObjectURL(logoFile) : ''
+  const profilPreviewUrl = profilFile ? URL.createObjectURL(profilFile) : ''
   const logoSrc = logoPreviewUrl || company.logo
+  const profilSrc =
+    profilPreviewUrl || companyDetailResponse?.data?.profil || company.profil || ''
 
   useEffect(() => {
     return () => {
       if (logoPreviewUrl) URL.revokeObjectURL(logoPreviewUrl)
     }
   }, [logoPreviewUrl])
+
+  useEffect(() => {
+    return () => {
+      if (profilPreviewUrl) URL.revokeObjectURL(profilPreviewUrl)
+    }
+  }, [profilPreviewUrl])
 
   const updateMutation = useMutation({
     ...updateCompanyMutation(),
@@ -133,11 +153,6 @@ export default function EditCampain({
     onError: () => {
       toast.error('Yadda saxlanılmadı')
     },
-  })
-
-  const { data: companyDetailResponse } = useQuery({
-    ...getCompanyQuery({ locale, id: companyId }),
-    enabled: Number.isFinite(companyId) && companyId > 0,
   })
 
   useEffect(() => {
@@ -161,6 +176,7 @@ export default function EditCampain({
       linkedin:
         d.linkedin ?? company.linkedin ?? 'https://linkedin.com/comelson',
       logo: null,
+      profil: null,
     })
   }, [company, companyDetailResponse, reset])
 
@@ -179,12 +195,14 @@ export default function EditCampain({
     }
 
     const description = data.description
+    const fixedName = companyDetailResponse?.data?.name ?? company.name
+    const fixedVoen = companyDetailResponse?.data?.voen ?? company.voen ?? data.voen
     updateMutation.mutate({
       locale,
       id: companyId,
       body: {
-        name: data.name,
-        voen: data.voen,
+        name: fixedName,
+        voen: fixedVoen,
         category_id: Number(data.categoryId),
         country_id: Number(data.countryId),
         description,
@@ -196,6 +214,7 @@ export default function EditCampain({
         facebook: data.facebook,
         linkedin: data.linkedin,
         logo: data.logo ?? undefined,
+        profil: data.profil ?? undefined,
       },
     })
   }
@@ -221,56 +240,125 @@ export default function EditCampain({
         className="flex flex-col gap-8 px-3 pt-6 sm:gap-12 sm:px-12 sm:pt-8"
       >
         <section className="flex flex-col gap-8">
-          <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:gap-10">
-            <label className="relative flex size-[100px] shrink-0 cursor-pointer items-center justify-center overflow-visible rounded-full border border-[#e6eff6] bg-white p-0.5">
-              <input
-                type="file"
-                accept="image/jpeg,image/png,image/jpg"
-                className="sr-only"
-                onChange={(ev) => setValue('logo', ev.target.files?.[0] ?? null)}
-              />
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={logoSrc}
-                alt={watch('name')}
-                className="size-full rounded-full object-cover"
-              />
-              <span className="absolute -right-1 top-0 z-10 inline-flex size-9 -translate-y-1 items-center justify-center rounded-full border border-[#dfeaf5] bg-white text-[#6b6e71] shadow-[0_1px_2px_rgba(15,71,125,0.08)]">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 20 20"
-                  fill="none"
-                  className="shrink-0"
-                  aria-hidden
-                >
-                  <g clipPath="url(#logo-edit-icon-clip)">
-                    <path
-                      d="M11.2526 5.41627L14.5859 8.7496M13.3359 15.8329H18.3359M3.33594 16.6663H6.66927L15.4193 7.91627C15.6381 7.6974 15.8118 7.43756 15.9302 7.15159C16.0487 6.86563 16.1096 6.55913 16.1096 6.2496C16.1096 5.94007 16.0487 5.63357 15.9302 5.34761C15.8118 5.06164 15.6381 4.8018 15.4193 4.58293C15.2004 4.36406 14.9406 4.19045 14.6546 4.072C14.3686 3.95354 14.0621 3.89258 13.7526 3.89258C13.4431 3.89258 13.1366 3.95354 12.8506 4.072C12.5646 4.19045 12.3048 4.36406 12.0859 4.58293L3.33594 13.3329V16.6663Z"
-                      stroke="#6B6E71"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </g>
-                  <defs>
-                    <clipPath id="logo-edit-icon-clip">
-                      <rect width="20" height="20" fill="white" />
-                    </clipPath>
-                  </defs>
-                </svg>
-              </span>
-              <span className="sr-only">Logo yüklə</span>
-            </label>
+          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 sm:gap-10">
+            <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:gap-10">
+              <label className="relative flex size-[100px] shrink-0 cursor-pointer items-center justify-center overflow-visible rounded-full border border-[#e6eff6] bg-white p-0.5">
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/jpg"
+                  className="sr-only"
+                  onChange={(ev) =>
+                    setValue('logo', ev.target.files?.[0] ?? null)
+                  }
+                />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={logoSrc}
+                  alt={watch('name')}
+                  className="size-full rounded-full object-cover"
+                />
+                <span className="absolute -right-1 top-0 z-10 inline-flex size-9 -translate-y-1 items-center justify-center rounded-full border border-[#dfeaf5] bg-white text-[#6b6e71] shadow-[0_1px_2px_rgba(15,71,125,0.08)]">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    className="shrink-0"
+                    aria-hidden
+                  >
+                    <g clipPath="url(#logo-edit-icon-clip)">
+                      <path
+                        d="M11.2526 5.41627L14.5859 8.7496M13.3359 15.8329H18.3359M3.33594 16.6663H6.66927L15.4193 7.91627C15.6381 7.6974 15.8118 7.43756 15.9302 7.15159C16.0487 6.86563 16.1096 6.55913 16.1096 6.2496C16.1096 5.94007 16.0487 5.63357 15.9302 5.34761C15.8118 5.06164 15.6381 4.8018 15.4193 4.58293C15.2004 4.36406 14.9406 4.19045 14.6546 4.072C14.3686 3.95354 14.0621 3.89258 13.7526 3.89258C13.4431 3.89258 13.1366 3.95354 12.8506 4.072C12.5646 4.19045 12.3048 4.36406 12.0859 4.58293L3.33594 13.3329V16.6663Z"
+                        stroke="#6B6E71"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </g>
+                    <defs>
+                      <clipPath id="logo-edit-icon-clip">
+                        <rect width="20" height="20" fill="white" />
+                      </clipPath>
+                    </defs>
+                  </svg>
+                </span>
+                <span className="sr-only">Logo yüklə</span>
+              </label>
 
-            <div className="flex min-w-0 flex-col gap-2.5">
-              <p className="text-sm font-medium leading-5 text-[#14171a]">
-                Şirkətinizin rəsmi logosunu əlavə edin
-              </p>
-              <p className="text-xs leading-4 text-[#6b6e71]">
-                JPG, JPEG və ya PNG formatı • Maksimum 5 MB
-              </p>
+              <div className="flex min-w-0 flex-col gap-2.5">
+                <p className="text-sm font-medium leading-5 text-[#14171a]">
+                  Şirkət səhifəsində görünəcək
+                  <span className="text-[#ff3b30]" aria-hidden>
+                    *
+                  </span>
+                </p>
+                <p className="text-xs leading-4 text-[#6b6e71]">
+                  JPG, JPEG və ya PNG formatı • Maksimum 5 MB
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:gap-10">
+              <label className="relative flex size-[100px] shrink-0 cursor-pointer items-center justify-center overflow-visible rounded-full border border-[#e6eff6] bg-[#f4fafd] p-0.5">
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/jpg"
+                  className="sr-only"
+                  onChange={(ev) =>
+                    setValue('profil', ev.target.files?.[0] ?? null)
+                  }
+                />
+                {profilSrc ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={profilSrc}
+                    alt=""
+                    className="size-full rounded-full object-cover"
+                  />
+                ) : (
+                  <Camera className="size-8 text-[#6b6e71]" aria-hidden />
+                )}
+                <span className="absolute -right-1 top-0 z-10 inline-flex size-9 -translate-y-1 items-center justify-center rounded-full border border-[#dfeaf5] bg-white text-[#6b6e71] shadow-[0_1px_2px_rgba(15,71,125,0.08)]">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    className="shrink-0"
+                    aria-hidden
+                  >
+                    <g clipPath="url(#profil-edit-icon-clip)">
+                      <path
+                        d="M11.2526 5.41627L14.5859 8.7496M13.3359 15.8329H18.3359M3.33594 16.6663H6.66927L15.4193 7.91627C15.6381 7.6974 15.8118 7.43756 15.9302 7.15159C16.0487 6.86563 16.1096 6.55913 16.1096 6.2496C16.1096 5.94007 16.0487 5.63357 15.9302 5.34761C15.8118 5.06164 15.6381 4.8018 15.4193 4.58293C15.2004 4.36406 14.9406 4.19045 14.6546 4.072C14.3686 3.95354 14.0621 3.89258 13.7526 3.89258C13.4431 3.89258 13.1366 3.95354 12.8506 4.072C12.5646 4.19045 12.3048 4.36406 12.0859 4.58293L3.33594 13.3329V16.6663Z"
+                        stroke="#6B6E71"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </g>
+                    <defs>
+                      <clipPath id="profil-edit-icon-clip">
+                        <rect width="20" height="20" fill="white" />
+                      </clipPath>
+                    </defs>
+                  </svg>
+                </span>
+                <span className="sr-only">Profil şəkli yüklə</span>
+              </label>
+
+              <div className="flex min-w-0 flex-col gap-2.5">
+                <p className="text-sm font-medium leading-5 text-[#14171a]">
+                  Üzvlük bölməsində böyük ölçüdə istifadə olunur
+                  <span className="text-[#ff3b30]" aria-hidden>
+                    *
+                  </span>
+                </p>
+                <p className="text-xs leading-4 text-[#6b6e71]">
+                  JPG, JPEG və ya PNG formatı • Maksimum 5 MB
+                </p>
+              </div>
             </div>
           </div>
 
@@ -281,7 +369,10 @@ export default function EditCampain({
                 {...register('name')}
                 type="text"
                 autoComplete="organization"
-                className={inputClass}
+                readOnly
+                aria-readonly="true"
+                tabIndex={-1}
+                className={cn(inputClass, 'cursor-not-allowed opacity-70')}
               />
             </label>
             <label className="flex flex-col gap-2">
@@ -290,7 +381,10 @@ export default function EditCampain({
                 {...register('voen')}
                 type="text"
                 inputMode="numeric"
-                className={inputClass}
+                readOnly
+                aria-readonly="true"
+                tabIndex={-1}
+                className={cn(inputClass, 'cursor-not-allowed opacity-70')}
               />
             </label>
             <div className="flex flex-col gap-2">
@@ -478,4 +572,3 @@ export default function EditCampain({
     </div>
   )
 }
-
