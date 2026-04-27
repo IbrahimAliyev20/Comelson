@@ -156,7 +156,7 @@ export default function TendersSection() {
               />
             </div>
 
-            <div className="grid w-full grid-cols-2 gap-3 sm:grid-cols-3 md:w-auto md:min-w-[560px] lg:w-auto">
+            <div className="grid w-full grid-cols-2 gap-3  md:w-auto md:max-w-[560px] lg:w-auto">
               <Select
                 value={status}
                 onValueChange={(v) => setStatus(v as StatusFilter)}
@@ -222,17 +222,6 @@ export default function TendersSection() {
                 </SelectContent>
               </Select>
 
-              <button
-                type="button"
-                className={cn(
-                  filterControlClass,
-                  'col-span-2 inline-flex w-full items-center justify-between px-3.5 text-base leading-6 sm:col-span-1 sm:w-[180px]'
-                )}
-                aria-label="Tarix"
-              >
-                <span>Tarix</span>
-                <Image src="/icons/calendar-event.svg" alt="" width={20} height={20} aria-hidden />
-              </button>
             </div>
           </div>
 

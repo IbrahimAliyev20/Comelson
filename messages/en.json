@@ -2,8 +2,8 @@
   "home": {
     "heroTitle": "Connect Your Business With the Right People",
     "heroSubtitle": "Comelson brings companies together to build a strong business network for collaboration, partnership, and new opportunities.",
-    "heroCta": "Tender query",
-    "partnersLabel": "Meet our partners:",
+    "heroCta": "Contact us",
+    "partnersLabel": "Meet our forms:",
     "aboutCta": "Learn more",
     "membersTitleMain": "Meet our",
     "membersTitleAccent": "members",
@@ -22,15 +22,15 @@
     "successStoriesCta": "View all",
     "successStoriesSliderLabel": "Success story slides",
     "pricePackages": {
-      "titleLine1": "Explore our",
-      "titleLine2": "Partnership Packages",
-      "headerCta": "Our partners",
+      "titleLine1": "Explore the plan",
+      "titleLine2": "Best for you",
+      "headerCta": "Our members",
       "badge": "Most popular",
       "button": "Become a member"
     },
     "tenders": {
       "titleBlack": "Explore",
-      "titleGray": " tenders",
+      "titleGray": "tenders",
       "cta": "View all",
       "columns": {
         "no": "#",
@@ -75,7 +75,21 @@
         "tender": "Tender",
         "partnership": "Partnership",
         "support": "Support"
-      }
+      },
+      "sending": "Sending...",
+      "requestFailed": "Request failed"
+    },
+    "events": {
+      "loadFailed": "Could not load events",
+      "empty": "No events found"
+    },
+    "blogs": {
+      "loadFailed": "Could not load blogs",
+      "empty": "No blogs found"
+    },
+    "members": {
+      "countries": "Countries",
+      "activityArea": "Activity area"
     }
   },
   "navigation": {
@@ -98,21 +112,313 @@
       "successStories": "Success stories",
       "partnership": "Partnership"
     },
-    "headerCta": "Tender query",
+    "headerCta": "Sign up",
     "loginCta": "Sign in",
     "accountNav": "My account",
     "userMenu": {
       "account": "My account",
-      "company": "My company",
+      "company": "My companies",
       "tenders": "My tenders",
       "logout": "Log out"
-    }
+    },
+    "authHomeAria": "Home",
+    "desktopPrimaryAria": "Primary navigation",
+    "mobilePrimaryAria": "Mobile primary navigation",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
   },
   "common": {
     "loading": "Loading...",
     "pagination": {
       "previous": "Previous",
+      "next": "Next",
+      "goPrevious": "Go to previous page",
+      "goNext": "Go to next page",
+      "morePages": "More pages"
+    },
+    "actions": {
+      "close": "Close",
+      "cancel": "Cancel",
+      "continue": "Continue",
+      "confirm": "Confirm",
+      "share": "Share",
+      "shareWithLabel": "Share:",
+      "details": "Details",
+      "view": "View",
+      "save": "Save",
+      "saveChanges": "Save changes",
+      "search": "Search..",
+      "loadingWait": "Please wait...",
+      "loadingWaitEllipsis": "Please wait…"
+    },
+    "status": {
+      "loadFailed": "Failed to load",
+      "changingCountry": "Changing country...",
+      "retry": "Try again",
+      "submitted": "Submitted"
+    },
+    "share": {
+      "title": "Share",
+      "copyLink": "Copy link",
+      "copied": "Link copied",
+      "copyFailed": "Copy failed",
+      "whatsappLabel": "WhatsApp",
+      "telegramLabel": "Telegram",
+      "facebookLabel": "Facebook",
+      "xLabel": "X",
+      "facebook": "Share on Facebook",
+      "instagram": "Instagram / system share",
+      "x": "Share on X",
+      "tiktok": "TikTok / system share",
+      "whatsapp": "Share on WhatsApp"
+    },
+    "carousel": {
+      "previousSlide": "Previous slide",
+      "nextSlide": "Next slide"
+    },
+    "mapTitle": "Map"
+  },
+  "auth": {
+    "login": {
+      "passwordPlaceholder": "Enter your password",
+      "noAccount": "Don't have an account?"
+    },
+    "register": {
+      "hasAccount": "Already have an account?"
+    },
+    "otp": {
+      "missingEmailInvalid": "Email not found or request is invalid",
+      "missingEmailRetry": "Email not found. Please retry from the previous step.",
+      "enterCode": "Enter the 6-digit code",
+      "didNotReceive": "Didn't receive the code?"
+    },
+    "newPassword": {
+      "invalidFlow": "This page is only for the password reset flow.",
+      "missingEmail": "Email not found. Go back to the OTP step.",
+      "hint": "Your password must be 8–12 characters long."
+    }
+  },
+  "account": {
+    "logout": "Log out",
+    "tabs": {
+      "info": {
+        "loadFailed": "Could not load profile information. Try again.",
+        "nameMin": "Name must be at least 2 characters.",
+        "changeProfileImage": "Change profile picture",
+        "fullName": "Full name"
+      },
+      "security": {
+        "currentPasswordPlaceholder": "Enter your current password",
+        "newPasswordPlaceholder": "Enter your new password",
+        "confirmPasswordPlaceholder": "Re-enter your password",
+        "updateButton": "Update password"
+      }
+    }
+  },
+  "company": {
+    "list": {
+      "title": "My companies",
+      "deleted": "Company deleted",
+      "deleteFailed": "Company was not deleted",
+      "confirmDelete": "Are you sure you want to delete the company?",
+      "menuAria": "Menu",
+      "edit": "Edit",
+      "delete": "Delete company",
+      "viewDetails": "View details",
+      "emptyTitle": "No companies added yet",
+      "emptyBody": "Start now to manage your company and benefit from new opportunities.",
+      "loading": "Loading…",
+      "errorGeneric": "Something went wrong",
+      "status": {
+        "approved": "Approved",
+        "approvedTooltip": "Your company has been approved and is active on the platform.",
+        "rejected": "Rejected",
+        "rejectedTooltip": "Your company application was rejected. You can update the info and resubmit.",
+        "pending": "Pending",
+        "pendingTooltip": "Your company is currently under review. It will become active after approval."
+      }
+    },
+    "detail": {
+      "about": "About the company",
+      "contacts": "Contact methods"
+    },
+    "form": {
+      "addButton": "Add company",
+      "created": "Company added",
+      "createFailed": "Company was not added",
+      "saved": "Saved",
+      "saveFailed": "Not saved",
+      "invalidId": "Invalid company ID",
+      "backAria": "Back",
+      "titleCreate": "Add company",
+      "titleEdit": "Edit company",
+      "logoUpload": "Upload logo",
+      "profileImageUpload": "Upload profile image",
+      "logoDescription": "Will be displayed on the company page",
+      "profileDescription": "Used in large size in the members section",
+      "fileHint": "JPG, JPEG or PNG • Max 5 MB",
+      "companyName": "Company name",
+      "companyNamePlaceholder": "Enter company name",
+      "voen": "Company tax ID",
+      "voenPlaceholder": "Enter company tax ID",
+      "category": "Category",
+      "categoryPlaceholder": "Select a category",
+      "country": "Country",
+      "countryPlaceholder": "Select a country",
+      "about": "About the company",
+      "contacts": "Contact methods",
+      "phone": "Phone number",
+      "phonePlaceholder": "Enter your number",
+      "email": "Email",
+      "emailPlaceholder": "Enter email address",
+      "address": "Address",
+      "addressPlaceholder": "Enter company address",
+      "socials": "Social media",
+      "website": "Website",
+      "instagram": "Instagram",
+      "facebook": "Facebook",
+      "linkedin": "LinkedIn",
+      "submit": "Add",
+      "submitting": "Submitting...",
+      "validation": {
+        "logoRequired": "Upload a logo",
+        "categoryCountryRequired": "Select a category and country",
+        "nameVoenRequired": "Company name and tax ID are required",
+        "aboutRequired": "Enter company information",
+        "phoneRequired": "Enter phone number",
+        "emailRequired": "Enter email address",
+        "addressRequired": "Enter address",
+        "categoryRequired": "Select a category",
+        "countryRequired": "Select a country"
+      }
+    }
+  },
+  "tender": {
+    "detailPage": {
+      "company": "Company"
+    },
+    "detail": {
+      "title": "Tender information",
+      "about": "About the tender",
+      "requiredDocuments": "Required documents"
+    },
+    "list": {
+      "activeAds": "Active listings",
+      "allAds": "All listings",
+      "actions": "Actions",
+      "viewAria": "View tender",
+      "created": "Tender created",
+      "updated": "Tender updated",
+      "deleted": "Tender deleted",
+      "confirmDelete": "Are you sure you want to delete the tender?"
+    },
+    "form": {
+      "backAria": "Back",
+      "titleCreate": "Add tender",
+      "titleEdit": "Edit tender",
+      "sectionInfo": "Tender details",
+      "title": "Tender title",
+      "titlePlaceholder": "Enter tender title",
+      "category": "Category",
+      "categoryPlaceholder": "Select a category",
+      "startAt": "Start date and time",
+      "endAt": "End date and time",
+      "datePlaceholder": "YYYY-MM-DD --:--",
+      "dateTimePlaceholder": "Select date and time",
+      "country": "Country",
+      "countryPlaceholder": "Select a country",
+      "company": "Company",
+      "companyPlaceholder": "Select a company",
+      "about": "About the tender",
+      "aboutPlaceholder": "Enter details about the tender",
+      "requiredDocuments": "Required documents",
+      "requiredDocumentsPlaceholder": "Enter information about the required documents",
+      "contactInfo": "Contact information",
+      "fullName": "Full name",
+      "fullNamePlaceholder": "Enter your full name",
+      "position": "Position",
+      "positionPlaceholder": "Enter your position",
+      "email": "Email",
+      "emailPlaceholder": "Enter email address",
+      "phone": "Phone number",
+      "phonePlaceholder": "Enter your number",
+      "instagram": "Instagram",
+      "instagramPlaceholder": "https://instagram.com/example",
+      "facebook": "Facebook",
+      "facebookPlaceholder": "https://facebook.com/example",
+      "linkedin": "LinkedIn",
+      "linkedinPlaceholder": "https://linkedin.com/example",
+      "twitter": "X/Twitter",
+      "twitterPlaceholder": "https://x.com/example",
+      "submit": "Add tender request",
+      "adminNotice": "Your tender request will be reviewed by an administrator before being published. After approval, it will appear on the platform.",
+      "loading": "Loading…",
+      "retry": "Try again",
+      "loadFailed": "Tender data could not be loaded",
+      "validation": {
+        "titleRequired": "Enter tender title",
+        "startRequired": "Select start date and time",
+        "endRequired": "Select end date and time",
+        "companyRequired": "Select a company",
+        "aboutRequired": "Enter tender information",
+        "documentsRequired": "Enter required documents information",
+        "fullNameRequired": "Enter full name",
+        "positionRequired": "Enter position",
+        "emailRequired": "Enter email address",
+        "phoneRequired": "Enter phone number"
+      }
+    }
+  },
+  "eventsPage": {
+    "publishedAt": "Published:",
+    "registrationLink": "Registration link",
+    "selectedForYou": "For you",
+    "picks": "Our picks"
+  },
+  "newsPage": {
+    "breadcrumb": "News",
+    "share": "Share",
+    "sortNewest": "Newest first",
+    "sortOldest": "Oldest first",
+    "relatedPrefix": "For you",
+    "relatedTitle": "Our picks"
+  },
+  "successStoriesPage": {
+    "titlePrefix": "Success",
+    "titleSuffix": "Listen"
+  },
+  "footer": {
+    "followUs": "Follow us",
+    "countrySelection": "Country selection",
+    "links": "Links",
+    "contact": "Contact",
+    "copyright": "All rights reserved"
+  },
+  "ui": {
+    "pagination": {
+      "previous": "Previous",
       "next": "Next"
+    },
+    "contactForm": {
+      "invalidForm": "Form is invalid",
+      "topicRequired": "Subject is required",
+      "messageMin": "Message must be at least 3 characters."
+    },
+    "eventsSection": {
+      "loading": "Loading...",
+      "loadFailed": "Failed to load events",
+      "empty": "No events found"
+    },
+    "newsSection": {
+      "loadFailed": "Failed to load blogs",
+      "empty": "No blogs found"
+    }
+  },
+  "staticText": {
+    "events": {
+      "breadcrumb": "Events and Forums",
+      "about": "About the event",
+      "readTime": "read time"
     }
   }
 }

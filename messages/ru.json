@@ -3,7 +3,7 @@
     "heroTitle": "Соедините ваш бизнес с нужными людьми",
     "heroSubtitle": "Comelson объединяет компании, создавая сильную деловую сеть для сотрудничества, партнерства и новых возможностей.",
     "heroCta": "Связаться с нами",
-    "partnersLabel": "Познакомьтесь с нашими партнерами:",
+    "partnersLabel": "Ознакомьтесь с нашими формами:",
     "aboutCta": "Подробнее",
     "membersTitleMain": "Познакомьтесь с",
     "membersTitleAccent": "нашими участниками",
@@ -22,9 +22,9 @@
     "successStoriesCta": "Посмотреть все",
     "successStoriesSliderLabel": "Слайдер историй успеха",
     "pricePackages": {
-      "titleLine1": "Выберите",
-      "titleLine2": "подходящий план ",
-      "headerCta": "Наши партнеры",
+      "titleLine1": "Откройте план",
+      "titleLine2": "Лучший для вас",
+      "headerCta": "Наши участники",
       "badge": "Самый популярный",
       "button": "Стать участником"
     },
@@ -75,7 +75,21 @@
         "tender": "Тендер",
         "partnership": "Партнерство",
         "support": "Поддержка"
-      }
+      },
+      "sending": "Отправка...",
+      "requestFailed": "Запрос не выполнен"
+    },
+    "events": {
+      "loadFailed": "Не удалось загрузить события",
+      "empty": "События не найдены"
+    },
+    "blogs": {
+      "loadFailed": "Не удалось загрузить блоги",
+      "empty": "Блоги не найдены"
+    },
+    "members": {
+      "countries": "Страны",
+      "activityArea": "Сфера деятельности"
     }
   },
   "navigation": {
@@ -98,21 +112,313 @@
       "successStories": "Истории успеха",
       "partnership": "Партнерство"
     },
-    "headerCta": "Запрос по тендеру",
+    "headerCta": "Регистрация",
     "loginCta": "Войти",
     "accountNav": "Мой аккаунт",
     "userMenu": {
       "account": "Мой аккаунт",
-      "company": "Моя компания",
+      "company": "Мои компании",
       "tenders": "Мои тендеры",
       "logout": "Выйти"
-    }
+    },
+    "authHomeAria": "Главная",
+    "desktopPrimaryAria": "Основная навигация",
+    "mobilePrimaryAria": "Мобильное меню",
+    "openMenu": "Открыть меню",
+    "closeMenu": "Закрыть меню"
   },
   "common": {
     "loading": "Загрузка...",
     "pagination": {
       "previous": "Назад",
+      "next": "Вперёд",
+      "goPrevious": "На предыдущую страницу",
+      "goNext": "На следующую страницу",
+      "morePages": "Больше страниц"
+    },
+    "actions": {
+      "close": "Закрыть",
+      "cancel": "Отмена",
+      "continue": "Продолжить",
+      "confirm": "Подтвердить",
+      "share": "Поделиться",
+      "shareWithLabel": "Поделиться:",
+      "details": "Подробнее",
+      "view": "Просмотр",
+      "save": "Сохранить",
+      "saveChanges": "Сохранить изменения",
+      "search": "Поиск..",
+      "loadingWait": "Пожалуйста, подождите...",
+      "loadingWaitEllipsis": "Пожалуйста, подождите…"
+    },
+    "status": {
+      "loadFailed": "Не удалось загрузить",
+      "changingCountry": "Смена страны...",
+      "retry": "Повторить",
+      "submitted": "Отправлено"
+    },
+    "share": {
+      "title": "Поделиться",
+      "copyLink": "Скопировать ссылку",
+      "copied": "Ссылка скопирована",
+      "copyFailed": "Не удалось скопировать",
+      "whatsappLabel": "WhatsApp",
+      "telegramLabel": "Telegram",
+      "facebookLabel": "Facebook",
+      "xLabel": "X",
+      "facebook": "Поделиться в Facebook",
+      "instagram": "Instagram / системная отправка",
+      "x": "Поделиться в X",
+      "tiktok": "TikTok / системная отправка",
+      "whatsapp": "Поделиться в WhatsApp"
+    },
+    "carousel": {
+      "previousSlide": "Предыдущий слайд",
+      "nextSlide": "Следующий слайд"
+    },
+    "mapTitle": "Карта"
+  },
+  "auth": {
+    "login": {
+      "passwordPlaceholder": "Введите пароль",
+      "noAccount": "Нет аккаунта?"
+    },
+    "register": {
+      "hasAccount": "Уже есть аккаунт?"
+    },
+    "otp": {
+      "missingEmailInvalid": "Email не найден или запрос некорректен",
+      "missingEmailRetry": "Email не найден. Повторите с предыдущего шага.",
+      "enterCode": "Введите 6-значный код",
+      "didNotReceive": "Не получили код?"
+    },
+    "newPassword": {
+      "invalidFlow": "Эта страница доступна только для сброса пароля.",
+      "missingEmail": "Email не найден. Вернитесь к шагу OTP.",
+      "hint": "Пароль должен содержать 8–12 символов."
+    }
+  },
+  "account": {
+    "logout": "Выйти",
+    "tabs": {
+      "info": {
+        "loadFailed": "Не удалось загрузить профиль. Повторите попытку.",
+        "nameMin": "Имя должно быть минимум 2 символа.",
+        "changeProfileImage": "Изменить фото профиля",
+        "fullName": "Имя, фамилия"
+      },
+      "security": {
+        "currentPasswordPlaceholder": "Введите текущий пароль",
+        "newPasswordPlaceholder": "Введите новый пароль",
+        "confirmPasswordPlaceholder": "Повторите пароль",
+        "updateButton": "Обновить пароль"
+      }
+    }
+  },
+  "company": {
+    "list": {
+      "title": "Мои компании",
+      "deleted": "Компания удалена",
+      "deleteFailed": "Не удалось удалить компанию",
+      "confirmDelete": "Вы уверены, что хотите удалить компанию?",
+      "menuAria": "Меню",
+      "edit": "Редактировать",
+      "delete": "Удалить компанию",
+      "viewDetails": "Подробнее",
+      "emptyTitle": "Компании пока не добавлены",
+      "emptyBody": "Начните сейчас, чтобы управлять компанией и использовать новые возможности.",
+      "loading": "Загрузка…",
+      "errorGeneric": "Произошла ошибка",
+      "status": {
+        "approved": "Одобрено",
+        "approvedTooltip": "Ваша компания одобрена и активна на платформе.",
+        "rejected": "Отклонено",
+        "rejectedTooltip": "Заявка отклонена. Вы можете обновить данные и отправить снова.",
+        "pending": "В ожидании",
+        "pendingTooltip": "Ваша компания находится на проверке. После одобрения станет активной."
+      }
+    },
+    "detail": {
+      "about": "О компании",
+      "contacts": "Способы связи"
+    },
+    "form": {
+      "addButton": "Добавить компанию",
+      "created": "Компания добавлена",
+      "createFailed": "Не удалось добавить компанию",
+      "saved": "Сохранено",
+      "saveFailed": "Не сохранено",
+      "invalidId": "Неверный ID компании",
+      "backAria": "Назад",
+      "titleCreate": "Добавить компанию",
+      "titleEdit": "Редактировать компанию",
+      "logoUpload": "Загрузить логотип",
+      "profileImageUpload": "Загрузить фото профиля",
+      "logoDescription": "Будет отображаться на странице компании",
+      "profileDescription": "Используется крупным размером в разделе участников",
+      "fileHint": "JPG, JPEG или PNG • Максимум 5 МБ",
+      "companyName": "Название компании",
+      "companyNamePlaceholder": "Введите название компании",
+      "voen": "ИНН компании",
+      "voenPlaceholder": "Введите ИНН компании",
+      "category": "Категория",
+      "categoryPlaceholder": "Выберите категорию",
+      "country": "Страна",
+      "countryPlaceholder": "Выберите страну",
+      "about": "О компании",
+      "contacts": "Способы связи",
+      "phone": "Номер телефона",
+      "phonePlaceholder": "Введите номер",
+      "email": "Email",
+      "emailPlaceholder": "Введите email",
+      "address": "Адрес",
+      "addressPlaceholder": "Введите адрес компании",
+      "socials": "Социальные сети",
+      "website": "Сайт",
+      "instagram": "Instagram",
+      "facebook": "Facebook",
+      "linkedin": "LinkedIn",
+      "submit": "Добавить",
+      "submitting": "Отправка...",
+      "validation": {
+        "logoRequired": "Загрузите логотип",
+        "categoryCountryRequired": "Выберите категорию и страну",
+        "nameVoenRequired": "Название и ИНН обязательны",
+        "aboutRequired": "Введите информацию о компании",
+        "phoneRequired": "Введите номер телефона",
+        "emailRequired": "Введите email",
+        "addressRequired": "Введите адрес",
+        "categoryRequired": "Выберите категорию",
+        "countryRequired": "Выберите страну"
+      }
+    }
+  },
+  "tender": {
+    "detailPage": {
+      "company": "Компания"
+    },
+    "detail": {
+      "title": "Информация о тендере",
+      "about": "О тендере",
+      "requiredDocuments": "Требуемые документы"
+    },
+    "list": {
+      "activeAds": "Активные объявления",
+      "allAds": "Все объявления",
+      "actions": "Действия",
+      "viewAria": "Открыть тендер",
+      "created": "Тендер создан",
+      "updated": "Тендер обновлён",
+      "deleted": "Тендер удалён",
+      "confirmDelete": "Вы уверены, что хотите удалить тендер?"
+    },
+    "form": {
+      "backAria": "Назад",
+      "titleCreate": "Добавить тендер",
+      "titleEdit": "Редактировать тендер",
+      "sectionInfo": "Данные тендера",
+      "title": "Название тендера",
+      "titlePlaceholder": "Введите название тендера",
+      "category": "Категория",
+      "categoryPlaceholder": "Выберите категорию",
+      "startAt": "Дата и время начала",
+      "endAt": "Дата и время окончания",
+      "datePlaceholder": "YYYY-MM-DD --:--",
+      "dateTimePlaceholder": "Выберите дату и время",
+      "country": "Страна",
+      "countryPlaceholder": "Выберите страну",
+      "company": "Компания",
+      "companyPlaceholder": "Выберите компанию",
+      "about": "О тендере",
+      "aboutPlaceholder": "Введите информацию о тендере",
+      "requiredDocuments": "Требуемые документы",
+      "requiredDocumentsPlaceholder": "Введите информацию о требуемых документах",
+      "contactInfo": "Контактная информация",
+      "fullName": "Имя, фамилия",
+      "fullNamePlaceholder": "Введите имя и фамилию",
+      "position": "Должность",
+      "positionPlaceholder": "Введите должность",
+      "email": "Email",
+      "emailPlaceholder": "Введите email",
+      "phone": "Номер телефона",
+      "phonePlaceholder": "Введите номер",
+      "instagram": "Instagram",
+      "instagramPlaceholder": "https://instagram.com/пример",
+      "facebook": "Facebook",
+      "facebookPlaceholder": "https://facebook.com/пример",
+      "linkedin": "LinkedIn",
+      "linkedinPlaceholder": "https://linkedin.com/пример",
+      "twitter": "X/Twitter",
+      "twitterPlaceholder": "https://x.com/пример",
+      "submit": "Добавить запрос по тендеру",
+      "adminNotice": "Ваш запрос будет проверен администратором перед публикацией. После одобрения он появится на платформе.",
+      "loading": "Загрузка…",
+      "retry": "Повторить",
+      "loadFailed": "Не удалось загрузить данные тендера",
+      "validation": {
+        "titleRequired": "Введите название тендера",
+        "startRequired": "Выберите дату и время начала",
+        "endRequired": "Выберите дату и время окончания",
+        "companyRequired": "Выберите компанию",
+        "aboutRequired": "Введите информацию о тендере",
+        "documentsRequired": "Введите информацию о документах",
+        "fullNameRequired": "Введите имя и фамилию",
+        "positionRequired": "Введите должность",
+        "emailRequired": "Введите email",
+        "phoneRequired": "Введите номер телефона"
+      }
+    }
+  },
+  "eventsPage": {
+    "publishedAt": "Опубликовано:",
+    "registrationLink": "Ссылка на регистрацию",
+    "selectedForYou": "Для вас",
+    "picks": "Мы рекомендуем"
+  },
+  "newsPage": {
+    "breadcrumb": "Новости",
+    "share": "Поделиться",
+    "sortNewest": "Сначала новые",
+    "sortOldest": "Сначала старые",
+    "relatedPrefix": "Для вас",
+    "relatedTitle": "Мы рекомендуем"
+  },
+  "successStoriesPage": {
+    "titlePrefix": "Успех",
+    "titleSuffix": "Слушайте"
+  },
+  "footer": {
+    "followUs": "Подписывайтесь",
+    "countrySelection": "Выбор страны",
+    "links": "Ссылки",
+    "contact": "Контакты",
+    "copyright": "Все права защищены"
+  },
+  "ui": {
+    "pagination": {
+      "previous": "Назад",
       "next": "Вперёд"
+    },
+    "contactForm": {
+      "invalidForm": "Форма заполнена неверно",
+      "topicRequired": "Тема обязательна",
+      "messageMin": "Сообщение должно содержать минимум 3 символа."
+    },
+    "eventsSection": {
+      "loading": "Загрузка...",
+      "loadFailed": "Не удалось загрузить события",
+      "empty": "События не найдены"
+    },
+    "newsSection": {
+      "loadFailed": "Не удалось загрузить блоги",
+      "empty": "Блоги не найдены"
+    }
+  },
+  "staticText": {
+    "events": {
+      "breadcrumb": "События и форумы",
+      "about": "О событии",
+      "readTime": "время чтения"
     }
   }
 }

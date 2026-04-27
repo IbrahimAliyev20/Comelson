@@ -219,13 +219,13 @@ export function UserMenuPanel({
             'w-full disabled:opacity-60 cursor-pointer',
             lightOnDark
               ? 'text-white/90 hover:bg-white/10'
-              : 'text-[#14171a] hover:bg-[#fde8e8]'
+              : 'text-[#ff3b30] hover:bg-[#fde8e8]'
           )}
         >
           <LogOut
             className={cn(
               'size-5 shrink-0 transition-colors',
-              lightOnDark ? 'text-white/70' : 'text-[#6b6e71] group-hover:text-[#0f477d]'
+              lightOnDark ? 'text-white/70' : 'text-[#ff3b30]'
             )}
             aria-hidden
           />

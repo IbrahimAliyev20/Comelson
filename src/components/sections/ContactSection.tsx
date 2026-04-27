@@ -48,6 +48,7 @@ function extractIframeSrc(raw: string | null | undefined): string | null {
 
 export default function ContactSection({ contact }: { contact: ContactResponse | undefined }) {
   const t = useTranslations('home')
+  const tUi = useTranslations('ui')
   const locale = useLocale()
   const [formError, setFormError] = useState<string | null>(null)
   const [formSuccess, setFormSuccess] = useState<string | null>(null)
@@ -64,14 +65,14 @@ export default function ContactSection({ contact }: { contact: ContactResponse |
         email: z.string().trim().email(),
         type: z
           .union([z.literal(''), z.enum(topicKeys)])
-          .refine((v) => v !== '', { message: 'Topic is required' }),
-        message: z.string().trim().min(3),
+          .refine((v) => v !== '', { message: tUi('contactForm.topicRequired') }),
+        message: z.string().trim().min(3, { message: tUi('contactForm.messageMin') }),
         locale: z.string().trim().min(2).optional(),
       }),
-    [topicKeys]
+    [topicKeys, tUi]
   )
 
-  const { control, register, watch, reset, handleSubmit } =
+  const { control, register, watch, reset, handleSubmit, formState } =
     useForm<ContactFormValues>({
       resolver: zodResolver(schema),
       defaultValues: {
@@ -138,7 +139,7 @@ export default function ContactSection({ contact }: { contact: ContactResponse |
   }
 
   const submitInvalid = () => {
-    setFormError('Invalid form')
+    setFormError(tUi('contactForm.invalidForm'))
     setFormSuccess(null)
   }
 
@@ -225,6 +226,11 @@ export default function ContactSection({ contact }: { contact: ContactResponse |
                       className={fieldClass}
                       placeholder={t('contact.namePlaceholder')}
                     />
+                    {formState.errors.name?.message ? (
+                      <p className="px-1 text-sm leading-6 text-red-600">
+                        {formState.errors.name.message}
+                      </p>
+                    ) : null}
                   </div>
 
                   <div className="flex flex-col gap-2">
@@ -238,6 +244,11 @@ export default function ContactSection({ contact }: { contact: ContactResponse |
                       className={fieldClass}
                       placeholder={t('contact.emailPlaceholder')}
                     />
+                    {formState.errors.email?.message ? (
+                      <p className="px-1 text-sm leading-6 text-red-600">
+                        {formState.errors.email.message}
+                      </p>
+                    ) : null}
                   </div>
 
                   <div className="flex flex-col gap-2">
@@ -275,6 +286,11 @@ export default function ContactSection({ contact }: { contact: ContactResponse |
                         </Select>
                       )}
                     />
+                    {formState.errors.type?.message ? (
+                      <p className="px-1 text-sm leading-6 text-red-600">
+                        {formState.errors.type.message}
+                      </p>
+                    ) : null}
                   </div>
 
                   <div className="flex flex-col gap-2">
@@ -287,6 +303,11 @@ export default function ContactSection({ contact }: { contact: ContactResponse |
                       className={fieldTextareaClass}
                       placeholder={t('contact.messagePlaceholder')}
                     />
+                    {formState.errors.message?.message ? (
+                      <p className="px-1 text-sm leading-6 text-red-600">
+                        {formState.errors.message.message}
+                      </p>
+                    ) : null}
                   </div>
 
                   {formError ? (
@@ -301,7 +322,7 @@ export default function ContactSection({ contact }: { contact: ContactResponse |
                     disabled={!canSubmit || isSubmitting}
                     className="mt-2 inline-flex h-12 w-full items-center justify-center rounded-2xl bg-[#0f477d] px-6 text-base font-medium leading-6 text-white disabled:cursor-not-allowed disabled:bg-[#889097] disabled:text-[#dadee2]"
                   >
-                    {isSubmitting ? 'Sending...' : t('contact.submit')}
+                    {isSubmitting ? t('contact.sending') : t('contact.submit')}
                   </button>
                 </form>
               </div>

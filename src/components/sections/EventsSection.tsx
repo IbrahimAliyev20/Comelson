@@ -1,7 +1,7 @@
  'use client'
 
 import Image from 'next/image'
-import { Calendar, ChevronDown, Clock } from 'lucide-react'
+import { Calendar, Calendar1, ChevronDown, Clock } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useLocale } from 'next-intl'
@@ -92,7 +92,7 @@ export default function EventsSection({
                         <span className="text-base leading-6">{item.read_time}  oxuma vaxtı</span>
                       </div>
                       <div className="flex items-center gap-[5px]">
-                        <Calendar className="size-5 shrink-0" aria-hidden />
+                        <Calendar1 className="size-5 shrink-0" aria-hidden />
                         <span className="text-base leading-6">{formatEventDate(item.created_at)}</span>
                       </div>
                     </div>

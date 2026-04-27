@@ -43,6 +43,8 @@ export default function NewsSection({
 }) {
   const locale = useLocale()
   const t = useTranslations('home')
+  const tNewsPage = useTranslations('newsPage')
+  const tUi = useTranslations('ui')
   const categories = useMemo(() => blogCategories ?? [], [blogCategories])
   const initialBlogs = useMemo(() => blogs ?? [], [blogs])
 
@@ -134,20 +136,26 @@ export default function NewsSection({
                   className="size-5 shrink-0 text-[#32393f]"
                   aria-hidden
                 />
-                <SelectValue placeholder="Ən yeni paylaşılanlar" />
+                <SelectValue
+                  placeholder={
+                    sort === 'desc'
+                      ? tNewsPage('sortNewest')
+                      : tNewsPage('sortOldest')
+                  }
+                />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
                 <SelectItem
                   value="desc"
                   className="data-[state=checked]:bg-[#e6eff6] data-[state=checked]:text-[#0f477d] data-[state=checked]:[&_svg]:!text-[#0f477d]"
                 >
-                  Ən yeni paylaşılanlar
+                  {tNewsPage('sortNewest')}
                 </SelectItem>
                 <SelectItem
                   value="asc"
                   className="data-[state=checked]:bg-[#e6eff6] data-[state=checked]:text-[#0f477d] data-[state=checked]:[&_svg]:!text-[#0f477d]"
                 >
-                  Ən köhnə paylaşılanlar
+                  {tNewsPage('sortOldest')}
                 </SelectItem>
               </SelectContent>
             </Select>
@@ -155,11 +163,17 @@ export default function NewsSection({
 
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {isLoading ? (
-              <div className="col-span-full py-10 text-center text-sm text-[#6b6e71]">Loading...</div>
+              <div className="col-span-full py-10 text-center text-sm text-[#6b6e71]">
+                {tUi('newsSection.loading')}
+              </div>
             ) : isError ? (
-              <div className="col-span-full py-10 text-center text-sm text-red-600">Failed to load blogs</div>
+              <div className="col-span-full py-10 text-center text-sm text-red-600">
+                {tUi('newsSection.loadFailed')}
+              </div>
             ) : shown.length === 0 ? (
-              <div className="col-span-full py-10 text-center text-sm text-[#6b6e71]">No blogs found</div>
+              <div className="col-span-full py-10 text-center text-sm text-[#6b6e71]">
+                {tUi('newsSection.empty')}
+              </div>
             ) : (
               shown.map((post) => (
                 <Link

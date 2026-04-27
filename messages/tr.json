@@ -3,8 +3,8 @@
     "heroTitle": "İşinizi Doğru İnsanlarla Buluşturun",
     "heroSubtitle": "Comelson, iş birliği, ortaklık ve yeni fırsatlar için güçlü bir iş ağı kurmak amacıyla şirketleri bir araya getirir.",
     "heroCta": "Bizimle iletişime geçin",
-    "partnersLabel": "Ortaklarımızla tanışın:",
-    "aboutCta": "Ətraflı bax",
+    "partnersLabel": "Formlarımızla tanışın:",
+    "aboutCta": "Daha fazla bilgi",
     "membersTitleMain": "Üyelerimizle",
     "membersTitleAccent": "tanışın",
     "membersCta": "Tümünü gör",
@@ -23,14 +23,14 @@
     "successStoriesSliderLabel": "Başarı hikayeleri sliderı",
     "pricePackages": {
       "titleLine1": "Planı Keşfedin",
-      "titleLine2": "Sizin İçin En Uygun ",
-      "headerCta": "Ortaklarımız",
+      "titleLine2": "Sizin İçin En Uygun",
+      "headerCta": "Üyelerimiz",
       "badge": "En çok tercih edilen",
       "button": "Üye ol"
     },
     "tenders": {
       "titleBlack": "İhalelerle",
-      "titleGray": " tanışın",
+      "titleGray": "tanışın",
       "cta": "Tümünü gör",
       "columns": {
         "no": "№",
@@ -39,7 +39,7 @@
         "start": "Başlangıç tarihi",
         "end": "Bitiş tarihi"
       },
-      "rowCta": "Detaylı bax"
+      "rowCta": "Detaylı incele"
     },
     "ctaBanner": {
       "titlePart1": "Bizimle ",
@@ -57,7 +57,7 @@
       "loadMore": "Daha fazla"
     },
     "contact": {
-      "methodsTitle": "İletişim araçları",
+      "methodsTitle": "İletişim yöntemleri",
       "phoneLabel": "Telefon numarası",
       "emailLabel": "E-posta",
       "addressLabel": "Adres",
@@ -75,7 +75,21 @@
         "tender": "İhale",
         "partnership": "Ortaklık",
         "support": "Destek"
-      }
+      },
+      "sending": "Gönderiliyor...",
+      "requestFailed": "İstek başarısız oldu"
+    },
+    "events": {
+      "loadFailed": "Etkinlikler yüklenemedi",
+      "empty": "Etkinlik bulunamadı"
+    },
+    "blogs": {
+      "loadFailed": "Bloglar yüklenemedi",
+      "empty": "Blog bulunamadı"
+    },
+    "members": {
+      "countries": "Ülkeler",
+      "activityArea": "Faaliyet alanı"
     }
   },
   "navigation": {
@@ -98,21 +112,313 @@
       "successStories": "Başarı hikayeleri",
       "partnership": "Ortaklık"
     },
-    "headerCta": "İhale sorgusu",
+    "headerCta": "Kayıt ol",
     "loginCta": "Giriş yap",
     "accountNav": "Hesabım",
     "userMenu": {
       "account": "Hesabım",
-      "company": "Şirketim",
+      "company": "Şirketlerim",
       "tenders": "İhalelerim",
       "logout": "Çıkış yap"
-    }
+    },
+    "authHomeAria": "Ana sayfa",
+    "desktopPrimaryAria": "Ana gezinme",
+    "mobilePrimaryAria": "Mobil ana menü",
+    "openMenu": "Menüyü aç",
+    "closeMenu": "Menüyü kapat"
   },
   "common": {
     "loading": "Yükleniyor...",
     "pagination": {
       "previous": "Önceki",
+      "next": "Sonraki",
+      "goPrevious": "Önceki sayfaya git",
+      "goNext": "Sonraki sayfaya git",
+      "morePages": "Daha fazla sayfa"
+    },
+    "actions": {
+      "close": "Kapat",
+      "cancel": "İptal",
+      "continue": "Devam et",
+      "confirm": "Onayla",
+      "share": "Paylaş",
+      "shareWithLabel": "Paylaş:",
+      "details": "Detaylar",
+      "view": "Görüntüle",
+      "save": "Kaydet",
+      "saveChanges": "Değişiklikleri kaydet",
+      "search": "Arayın..",
+      "loadingWait": "Lütfen bekleyin...",
+      "loadingWaitEllipsis": "Lütfen bekleyin…"
+    },
+    "status": {
+      "loadFailed": "Yükleme başarısız",
+      "changingCountry": "Ülke değiştiriliyor...",
+      "retry": "Tekrar dene",
+      "submitted": "Gönderildi"
+    },
+    "share": {
+      "title": "Paylaş",
+      "copyLink": "Bağlantıyı kopyala",
+      "copied": "Bağlantı kopyalandı",
+      "copyFailed": "Kopyalama başarısız",
+      "whatsappLabel": "WhatsApp",
+      "telegramLabel": "Telegram",
+      "facebookLabel": "Facebook",
+      "xLabel": "X",
+      "facebook": "Facebook'ta paylaş",
+      "instagram": "Instagram / sistem paylaşımı",
+      "x": "X'te paylaş",
+      "tiktok": "TikTok / sistem paylaşımı",
+      "whatsapp": "WhatsApp'ta paylaş"
+    },
+    "carousel": {
+      "previousSlide": "Önceki slayt",
+      "nextSlide": "Sonraki slayt"
+    },
+    "mapTitle": "Harita"
+  },
+  "auth": {
+    "login": {
+      "passwordPlaceholder": "Şifrenizi girin",
+      "noAccount": "Hesabınız yok mu?"
+    },
+    "register": {
+      "hasAccount": "Zaten hesabınız var mı?"
+    },
+    "otp": {
+      "missingEmailInvalid": "E-posta bulunamadı veya istek geçersiz",
+      "missingEmailRetry": "E-posta bulunamadı. Önceki adımdan tekrar deneyin.",
+      "enterCode": "6 haneli kodu girin",
+      "didNotReceive": "Kodu almadınız mı?"
+    },
+    "newPassword": {
+      "invalidFlow": "Bu sayfa yalnızca şifre sıfırlama akışı içindir.",
+      "missingEmail": "E-posta bulunamadı. OTP adımına geri dönün.",
+      "hint": "Şifreniz 8–12 karakter olmalıdır."
+    }
+  },
+  "account": {
+    "logout": "Çıkış yap",
+    "tabs": {
+      "info": {
+        "loadFailed": "Profil bilgileri yüklenemedi. Tekrar deneyin.",
+        "nameMin": "İsim en az 2 karakter olmalıdır.",
+        "changeProfileImage": "Profil fotoğrafını değiştir",
+        "fullName": "Ad, soyad"
+      },
+      "security": {
+        "currentPasswordPlaceholder": "Mevcut şifrenizi girin",
+        "newPasswordPlaceholder": "Yeni şifrenizi girin",
+        "confirmPasswordPlaceholder": "Şifreyi tekrar girin",
+        "updateButton": "Şifreyi güncelle"
+      }
+    }
+  },
+  "company": {
+    "list": {
+      "title": "Şirketlerim",
+      "deleted": "Şirket silindi",
+      "deleteFailed": "Şirket silinemedi",
+      "confirmDelete": "Şirketi silmek istediğinize emin misiniz?",
+      "menuAria": "Menü",
+      "edit": "Düzenle",
+      "delete": "Şirketi sil",
+      "viewDetails": "Detayları gör",
+      "emptyTitle": "Henüz şirket eklenmedi",
+      "emptyBody": "Şirketinizi yönetmek ve yeni fırsatlardan yararlanmak için hemen başlayın.",
+      "loading": "Yükleniyor…",
+      "errorGeneric": "Bir hata oluştu",
+      "status": {
+        "approved": "Onaylandı",
+        "approvedTooltip": "Şirketiniz onaylandı ve platformda aktiftir.",
+        "rejected": "Reddedildi",
+        "rejectedTooltip": "Şirket başvurunuz reddedildi. Bilgileri güncelleyip tekrar gönderebilirsiniz.",
+        "pending": "Beklemede",
+        "pendingTooltip": "Şirketiniz şu anda inceleniyor. Onaydan sonra aktif olacaktır."
+      }
+    },
+    "detail": {
+      "about": "Şirket hakkında",
+      "contacts": "İletişim yöntemleri"
+    },
+    "form": {
+      "addButton": "Şirket ekle",
+      "created": "Şirket eklendi",
+      "createFailed": "Şirket eklenemedi",
+      "saved": "Kaydedildi",
+      "saveFailed": "Kaydedilemedi",
+      "invalidId": "Şirket ID geçersiz",
+      "backAria": "Geri",
+      "titleCreate": "Şirket ekle",
+      "titleEdit": "Şirketi düzenle",
+      "logoUpload": "Logo yükle",
+      "profileImageUpload": "Profil görseli yükle",
+      "logoDescription": "Şirket sayfasında görünecek",
+      "profileDescription": "Üyeler bölümünde büyük boyut kullanılır",
+      "fileHint": "JPG, JPEG veya PNG • Maksimum 5 MB",
+      "companyName": "Şirket adı",
+      "companyNamePlaceholder": "Şirket adını girin",
+      "voen": "Şirket VKN",
+      "voenPlaceholder": "Şirket VKN girin",
+      "category": "Kategori",
+      "categoryPlaceholder": "Kategori seçin",
+      "country": "Ülke",
+      "countryPlaceholder": "Ülke seçin",
+      "about": "Şirket hakkında",
+      "contacts": "İletişim yöntemleri",
+      "phone": "Telefon numarası",
+      "phonePlaceholder": "Numaranızı girin",
+      "email": "E-posta",
+      "emailPlaceholder": "E-posta adresini girin",
+      "address": "Adres",
+      "addressPlaceholder": "Şirket adresini girin",
+      "socials": "Sosyal medya",
+      "website": "Web sitesi",
+      "instagram": "Instagram",
+      "facebook": "Facebook",
+      "linkedin": "LinkedIn",
+      "submit": "Ekle",
+      "submitting": "Gönderiliyor...",
+      "validation": {
+        "logoRequired": "Logo yükleyin",
+        "categoryCountryRequired": "Kategori ve ülke seçin",
+        "nameVoenRequired": "Şirket adı ve VKN zorunludur",
+        "aboutRequired": "Şirket bilgisi girin",
+        "phoneRequired": "Telefon numarası girin",
+        "emailRequired": "E-posta adresi girin",
+        "addressRequired": "Adres girin",
+        "categoryRequired": "Kategori seçin",
+        "countryRequired": "Ülke seçin"
+      }
+    }
+  },
+  "tender": {
+    "detailPage": {
+      "company": "Şirket"
+    },
+    "detail": {
+      "title": "İhale bilgileri",
+      "about": "İhale hakkında",
+      "requiredDocuments": "Gerekli belgeler"
+    },
+    "list": {
+      "activeAds": "Aktif ilanlar",
+      "allAds": "Tüm ilanlar",
+      "actions": "İşlemler",
+      "viewAria": "İhaleyi görüntüle",
+      "created": "İhale oluşturuldu",
+      "updated": "İhale güncellendi",
+      "deleted": "İhale silindi",
+      "confirmDelete": "İhaleyi silmek istediğinize emin misiniz?"
+    },
+    "form": {
+      "backAria": "Geri",
+      "titleCreate": "İhale ekle",
+      "titleEdit": "İhaleyi düzenle",
+      "sectionInfo": "İhale bilgileri",
+      "title": "İhale başlığı",
+      "titlePlaceholder": "İhale başlığını girin",
+      "category": "Kategori",
+      "categoryPlaceholder": "Kategori seçin",
+      "startAt": "Başlangıç tarihi ve saati",
+      "endAt": "Bitiş tarihi ve saati",
+      "datePlaceholder": "YYYY-MM-DD --:--",
+      "dateTimePlaceholder": "Tarih ve saat seçin",
+      "country": "Ülke",
+      "countryPlaceholder": "Ülke seçin",
+      "company": "Şirket",
+      "companyPlaceholder": "Şirket seçin",
+      "about": "İhale hakkında",
+      "aboutPlaceholder": "İhale hakkında bilgi girin",
+      "requiredDocuments": "Gerekli belgeler",
+      "requiredDocumentsPlaceholder": "Gerekli belgelere dair bilgi girin",
+      "contactInfo": "İletişim bilgileri",
+      "fullName": "Ad, soyad",
+      "fullNamePlaceholder": "Ad ve soyadınızı girin",
+      "position": "Pozisyon",
+      "positionPlaceholder": "Pozisyonunuzu girin",
+      "email": "E-posta",
+      "emailPlaceholder": "E-posta adresini girin",
+      "phone": "Telefon numarası",
+      "phonePlaceholder": "Numaranızı girin",
+      "instagram": "Instagram",
+      "instagramPlaceholder": "https://instagram.com/ornek",
+      "facebook": "Facebook",
+      "facebookPlaceholder": "https://facebook.com/ornek",
+      "linkedin": "LinkedIn",
+      "linkedinPlaceholder": "https://linkedin.com/ornek",
+      "twitter": "X/Twitter",
+      "twitterPlaceholder": "https://x.com/ornek",
+      "submit": "İhale talebini ekle",
+      "adminNotice": "İhale talebiniz paylaşılmadan önce yönetici tarafından incelenecek ve onaylandıktan sonra platformda yayınlanacaktır.",
+      "loading": "Yükleniyor…",
+      "retry": "Tekrar dene",
+      "loadFailed": "İhale bilgileri yüklenemedi",
+      "validation": {
+        "titleRequired": "İhale başlığını girin",
+        "startRequired": "Başlangıç tarihini ve saatini seçin",
+        "endRequired": "Bitiş tarihini ve saatini seçin",
+        "companyRequired": "Şirket seçin",
+        "aboutRequired": "İhale bilgisi girin",
+        "documentsRequired": "Gerekli belgeler bilgisini girin",
+        "fullNameRequired": "Ad ve soyadı girin",
+        "positionRequired": "Pozisyonu girin",
+        "emailRequired": "E-posta adresini girin",
+        "phoneRequired": "Telefon numarasını girin"
+      }
+    }
+  },
+  "eventsPage": {
+    "publishedAt": "Yayınlandı:",
+    "registrationLink": "Kayıt bağlantısı",
+    "selectedForYou": "Sizin için",
+    "picks": "Seçtiklerimiz"
+  },
+  "newsPage": {
+    "breadcrumb": "Haberler",
+    "share": "Paylaş",
+    "sortNewest": "En yeni",
+    "sortOldest": "En eski",
+    "relatedPrefix": "Sizin için",
+    "relatedTitle": "Seçtiklerimiz"
+  },
+  "successStoriesPage": {
+    "titlePrefix": "Başarı",
+    "titleSuffix": "Dinleyin"
+  },
+  "footer": {
+    "followUs": "Bizi takip edin",
+    "countrySelection": "Ülke seçimi",
+    "links": "Bağlantılar",
+    "contact": "İletişim",
+    "copyright": "Tüm hakları saklıdır"
+  },
+  "ui": {
+    "pagination": {
+      "previous": "Önceki",
       "next": "Sonraki"
+    },
+    "contactForm": {
+      "invalidForm": "Form geçersiz",
+      "topicRequired": "Konu zorunludur",
+      "messageMin": "Mesaj en az 3 karakter olmalıdır."
+    },
+    "eventsSection": {
+      "loading": "Yükleniyor...",
+      "loadFailed": "Etkinlikler yüklenemedi",
+      "empty": "Etkinlik bulunamadı"
+    },
+    "newsSection": {
+      "loadFailed": "Bloglar yüklenemedi",
+      "empty": "Blog bulunamadı"
+    }
+  },
+  "staticText": {
+    "events": {
+      "breadcrumb": "Etkinlikler ve Forumlar",
+      "about": "Etkinlik hakkında",
+      "readTime": "okuma süresi"
     }
   }
 }

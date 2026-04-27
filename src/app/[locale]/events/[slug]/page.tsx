@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
-import { Clock } from 'lucide-react'
+import { Calendar, Calendar1, Clock } from 'lucide-react'
+import { getTranslations } from 'next-intl/server'
 
 import EventShareLinks from '@/components/events/EventShareLinks'
 import Container from '@/components/shared/container'
@@ -47,6 +48,8 @@ export default async function EventDetailPage({
   params: Promise<{ locale: string; slug: string }>
 }) {
   const { locale, slug } = await params
+  const tStatic = await getTranslations({ locale, namespace: 'staticText' })
+  const tEventsPage = await getTranslations({ locale, namespace: 'eventsPage' })
 
   const payload = await getEventDetail(locale, slug)
 
@@ -64,7 +67,7 @@ export default async function EventDetailPage({
           <div className="mx-auto flex w-full max-w-[1000px] flex-col gap-10 sm:gap-12">
             <nav className="flex items-center gap-1 text-xs leading-4">
               <Link href="/events" className="text-[#6b6e71] hover:underline">
-                TÉ™dbirlər və Forumlar
+                {tStatic('events.breadcrumb')}
               </Link>
               <span className="text-[#6b6e71]">/</span>
               <span className="line-clamp-1 font-medium text-[#32393f]">
@@ -92,7 +95,7 @@ export default async function EventDetailPage({
                 <div className="flex flex-wrap items-center gap-3">
                   <div className="inline-flex items-center gap-2 rounded-lg border border-[#dadee2] bg-white px-2.5 py-2 text-sm leading-5 text-[#1d212a]">
                     <Image src="/icons/calendar-event.svg" alt="" width={20} height={20} aria-hidden />
-                    <span className="text-sm leading-5">Dərc edildi:</span>
+                    <span className="text-sm leading-5">{tEventsPage('publishedAt')}</span>
                     <span className="text-sm leading-5">{event.created_at}</span>
                   </div>
 
@@ -111,10 +114,10 @@ export default async function EventDetailPage({
                     href={event.join_link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    aria-label="Qeydiyyat linki"
+                    aria-label={tEventsPage('registrationLink')}
                     className="inline-flex items-center gap-2 rounded-lg border border-[#dadee2] bg-[#0c3a66] px-2.5 py-2 text-sm leading-5 text-white"
                   >
-                    <span>Qeydiyyat linki</span>
+                    <span>{tEventsPage('registrationLink')}</span>
                   </Link>
                 ) : null}
               </div>
@@ -122,7 +125,7 @@ export default async function EventDetailPage({
 
             <article className="flex flex-col gap-6">
               <h2 className="text-balance text-2xl font-semibold leading-tight text-[#14171a] sm:text-[40px] sm:leading-[56px]">
-                Tədbir haqqında
+                {tStatic('events.about')}
               </h2>
               <div className="flex flex-col gap-4 text-sm leading-6 text-[#6b6e71] sm:text-base">
                 <div
@@ -136,8 +139,8 @@ export default async function EventDetailPage({
             {picked.length > 0 ? (
               <div className="flex flex-col gap-6 pt-2">
                 <p className="text-balance text-2xl font-semibold leading-tight text-[#6b6e71] sm:text-[40px] sm:leading-[56px]">
-                  <span>Sizin üçün </span>
-                  <span className="text-[#14171a]">Seçdiklərimiz</span>
+                  <span>{tEventsPage('selectedForYou')} </span>
+                  <span className="text-[#14171a]">{tEventsPage('picks')}</span>
                 </p>
 
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
@@ -183,13 +186,7 @@ export default async function EventDetailPage({
                             ) : <div />}
 
                             <div className="flex items-center gap-[5px]">
-                              <Image
-                                src="/icons/calendar-event.svg"
-                                alt=""
-                                width={20}
-                                height={20}
-                                aria-hidden
-                              />
+                             <Calendar1 className="size-5 shrink-0" aria-hidden />
                               <p className="text-base font-normal leading-6 text-[#6b6e71]">
                                 {item.created_at}
                               </p>

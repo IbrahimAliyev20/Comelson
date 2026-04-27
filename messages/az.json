@@ -12,25 +12,25 @@
     "statsTitleAccent": "Biznes",
     "statsTitleSuffix": "Şəbəkəsi",
     "statsBody": "Comelson platformasında yüzlərlə üzv və tərəfdaş müxtəlif sektorlar üzrə bir araya gəlir. Bu göstəricilər platformanın aktiv və davamlı böyüyən biznes icmasını əks etdirir.",
-    "blogTitleBlack": "Comelson İcmasından ",
+    "blogTitleBlack": "Comelson İcmasından",
     "blogTitleGray": "Son Yeniliklər",
     "blogCta": "Hamısına bax",
     "blogReadTime": "{minutes} dəqiqəlik oxuma",
     "successStoriesTitleBlack": "Uğur",
-    "successStoriesTitleMid": " Hekayələrimizi ",
+    "successStoriesTitleMid": "Hekayələrimizi",
     "successStoriesTitleGray": "Dinləyin",
     "successStoriesCta": "Hamısına bax",
     "successStoriesSliderLabel": "Uğur hekayələri slayderi",
     "pricePackages": {
       "titleLine1": "Planı Kəşf Edin",
-      "titleLine2": "Sizin üçün Ən Uyğun ",
+      "titleLine2": "Sizin üçün Ən Uyğun",
       "headerCta": "Üzvlərimiz",
       "badge": "Ən çox seçilən",
       "button": "Üzv ol"
     },
     "tenders": {
       "titleBlack": "Tenderlərlə",
-      "titleGray": " tanış olun",
+      "titleGray": "tanış olun",
       "cta": "Hamısına bax",
       "columns": {
         "no": "№",
@@ -42,10 +42,10 @@
       "rowCta": "Ətraflı bax"
     },
     "ctaBanner": {
-      "titlePart1": "Bizimlə ",
-      "titlePart2": "Tərəfdaş Olmaq ",
-      "titlePart3": "İstəyirsiniz ?",
-      "body": "Comelson platformasında tərəfdaşlıq imkanlarından yararlanmaq və tenderlərə çıxış əldə etmək üçün müraciət edin",
+      "titlePart1": "Bizimlə",
+      "titlePart2": "Tərəfdaş Olmaq",
+      "titlePart3": "İstəyirsiniz?",
+      "body": "Comelson platformasında tərəfdaşlıq imkanlarından yararlanmaq və tenderlərə çıxış əldə etmək üçün müraciət edin.",
       "button": "Üzvlük üçün müraciət"
     },
     "news": {
@@ -62,7 +62,7 @@
       "emailLabel": "Email",
       "addressLabel": "Ünvan",
       "formTitle": "Sualınız var? Bizə yazın",
-      "nameLabel": "Ad,soyad",
+      "nameLabel": "Ad, soyad",
       "namePlaceholder": "Ad və soyadınızı daxil edin",
       "emailPlaceholder": "Email adresinizi daxil edin",
       "topicLabel": "Müraciət mövzusu",
@@ -75,7 +75,21 @@
         "tender": "Tender",
         "partnership": "Tərəfdaşlıq",
         "support": "Dəstək"
-      }
+      },
+      "sending": "Göndərilir...",
+      "requestFailed": "Sorğu uğursuz oldu"
+    },
+    "events": {
+      "loadFailed": "Tədbirləri yükləmək mümkün olmadı",
+      "empty": "Tədbir tapılmadı"
+    },
+    "blogs": {
+      "loadFailed": "Bloqları yükləmək mümkün olmadı",
+      "empty": "Bloq tapılmadı"
+    },
+    "members": {
+      "countries": "Ölkələr",
+      "activityArea": "Fəaliyyət sahəsi"
     }
   },
   "navigation": {
@@ -106,13 +120,439 @@
       "company": "Şirkətlərim",
       "tenders": "Tenderlərim",
       "logout": "Hesabdan çıxış"
-    }
+    },
+    "authHomeAria": "Ana səhifə",
+    "desktopPrimaryAria": "Əsas naviqasiya",
+    "mobilePrimaryAria": "Mobil əsas menyu",
+    "openMenu": "Menyunu aç",
+    "closeMenu": "Menyunu bağla"
   },
   "common": {
     "loading": "Yüklənir...",
     "pagination": {
       "previous": "Əvvəlki",
-      "next": "Sonrakı"
+      "next": "Sonrakı",
+      "goPrevious": "Əvvəlki səhifəyə keç",
+      "goNext": "Növbəti səhifəyə keç",
+      "morePages": "Daha çox səhifə"
+    },
+    "actions": {
+      "close": "Bağla",
+      "cancel": "Ləğv et",
+      "continue": "Davam et",
+      "confirm": "Təsdiq et",
+      "share": "Paylaş",
+      "shareWithLabel": "Paylaş:",
+      "details": "Ətraflı",
+      "view": "Bax",
+      "save": "Yadda saxla",
+      "saveChanges": "Dəyişiklikləri yadda saxla",
+      "search": "Axtarın..",
+      "loadingWait": "Gözləyin...",
+      "loadingWaitEllipsis": "Gözləyin…"
+    },
+    "status": {
+      "loadFailed": "Yükləmə alınmadı",
+      "changingCountry": "Ölkə dəyişdirilir...",
+      "retry": "Yenidən cəhd et",
+      "submitted": "Göndərildi"
+    },
+    "share": {
+      "title": "Paylaşın",
+      "copyLink": "Linki kopyala",
+      "copied": "Link kopyalandı",
+      "copyFailed": "Kopyalama alınmadı",
+      "whatsappLabel": "WhatsApp",
+      "telegramLabel": "Telegram",
+      "facebookLabel": "Facebook",
+      "xLabel": "X",
+      "facebook": "Facebook-da paylaş",
+      "instagram": "Instagram / sistem paylaşımı",
+      "x": "X-də paylaş",
+      "tiktok": "TikTok / sistem paylaşımı",
+      "whatsapp": "WhatsApp-da paylaş"
+    },
+    "carousel": {
+      "previousSlide": "Əvvəlki slayd",
+      "nextSlide": "Növbəti slayd"
+    },
+    "mapTitle": "Xəritə"
+  },
+  "auth": {
+    "login": {
+      "passwordPlaceholder": "Şifrənizi daxil edin",
+      "noAccount": "Hesabınız yoxdur?"
+    },
+    "register": {
+      "hasAccount": "Hesabınız var?"
+    },
+    "otp": {
+      "missingEmailInvalid": "Email tapılmadı və ya sorğu səhvdir",
+      "missingEmailRetry": "Email tapılmadı. Əvvəlki addımdan yenidən cəhd edin.",
+      "enterCode": "6 rəqəmli kodu daxil edin",
+      "didNotReceive": "Kodu əldə etmədiniz?"
+    },
+    "newPassword": {
+      "invalidFlow": "Bu səhifə yalnız şifrə bərpası axını üçündür.",
+      "missingEmail": "Email tapılmadı. OTP addımına qayıdın.",
+      "hint": "Şifrəniz 8-12 simvoldan ibarət olmalıdır."
+    }
+  },
+  "account": {
+    "logout": "Hesabdan çıxış",
+    "sidebar": {
+      "title": "Hesabım",
+      "account": "Hesab məlumatları",
+      "security": "Təhlükəsizlik",
+      "companies": "Şirkətlərim",
+      "tenders": "Tenderlərim",
+      "logoutConfirm": "Hesabdan çıxmaq istədiyinizə əminsiniz?",
+      "confirmYes": "Bəli",
+      "logoutPending": "Çıxılır…"
+    },
+    "tabs": {
+      "info": {
+        "loadFailed": "Profil məlumatları yüklənmədi. Yenidən cəhd edin.",
+        "nameMin": "Ad ən azı 2 simvol olmalıdır.",
+        "changeProfileImage": "Profil şəklini dəyişdirin",
+        "fullName": "Ad, soyad"
+      },
+      "security": {
+        "currentPasswordPlaceholder": "Cari şifrənizi daxil edin",
+        "newPasswordPlaceholder": "Yeni şifrənizi daxil edin",
+        "confirmPasswordPlaceholder": "Şifrənizi təkrar daxil edin",
+        "updateButton": "Şifrəni yenilə"
+      }
+    }
+  },
+  "company": {
+    "list": {
+      "title": "Şirkətlərim",
+      "deleted": "Şirkət silindi",
+      "deleteFailed": "Şirkət silinmədi",
+      "confirmDelete": "Şirkəti silmək istədiyinizə əminsiniz?",
+      "menuAria": "Menyu",
+      "edit": "Redaktə et",
+      "delete": "Şirkəti sil",
+      "viewDetails": "Ətraflı bax",
+      "emptyTitle": "Hazırda əlavə edilmiş şirkət yoxdur",
+      "emptyBody": "Şirkətinizi idarə etmək və yeni imkanlardan yararlanmaq üçün indi başlayın.",
+      "loading": "Yüklənir…",
+      "errorGeneric": "Xəta baş verdi",
+      "status": {
+        "approved": "Təsdiqləndi",
+        "approvedTooltip": "Şirkətiniz təsdiqləndi və platformada aktivdir.",
+        "rejected": "İmtina",
+        "rejectedTooltip": "Şirkət müraciətiniz rədd edildi. Məlumatları yeniləyib yenidən göndərə bilərsiniz.",
+        "pending": "Gözləmədə",
+        "pendingTooltip": "Şirkətiniz hal-hazırda yoxlanış mərhələsindədir. Təsdiqdən sonra aktiv olacaq."
+      }
+    },
+    "detail": {
+      "about": "Şirkət haqqında",
+      "contacts": "Əlaqə vasitələri"
+    },
+    "form": {
+      "addButton": "Şirkət əlavə et",
+      "created": "Şirkət əlavə olundu",
+      "createFailed": "Şirkət əlavə edilmədi",
+      "saved": "Yadda saxlanıldı",
+      "saveFailed": "Yadda saxlanılmadı",
+      "invalidId": "Şirkət ID düzgün deyil",
+      "backAria": "Geri",
+      "titleCreate": "Şirkət əlavə et",
+      "titleEdit": "Şirkəti redaktə et",
+      "logoUpload": "Logo yüklə",
+      "profileImageUpload": "Profil şəkli yüklə",
+      "logoDescription": "Şirkət səhifəsində görünəcək",
+      "profileDescription": "Üzvlük bölməsində böyük ölçüdə istifadə olunur",
+      "fileHint": "JPG, JPEG və ya PNG formatı • Maksimum 5 MB",
+      "companyName": "Şirkətin adı",
+      "companyNamePlaceholder": "Şirkət adını daxil edin",
+      "voen": "Şirkətin VÖEN-i",
+      "voenPlaceholder": "Şirkətin VÖEN-ni daxil edin",
+      "category": "Kateqoriya",
+      "categoryPlaceholder": "Kateqoriyanı seçin",
+      "country": "Ölkə",
+      "countryPlaceholder": "Ölkəni seçin",
+      "about": "Şirkət haqqında",
+      "contacts": "Əlaqə vasitələri",
+      "phone": "Telefon nömrəsi",
+      "phonePlaceholder": "Nömrənizi daxil edin",
+      "email": "Email",
+      "emailPlaceholder": "Email adresini daxil edin",
+      "address": "Ünvan",
+      "addressPlaceholder": "Şirkətin ünvanını daxil edin",
+      "socials": "Sosial media vasitələri",
+      "website": "Website",
+      "instagram": "Instagram",
+      "facebook": "Facebook",
+      "linkedin": "LinkedIn",
+      "submit": "Əlavə et",
+      "submitting": "Göndərilir...",
+      "validation": {
+        "logoRequired": "Logo yükləyin",
+        "categoryCountryRequired": "Kateqoriya və ölkə seçin",
+        "nameVoenRequired": "Şirkətin adı və VÖEN məcburidir",
+        "aboutRequired": "Şirkət haqqında məlumat daxil edin",
+        "phoneRequired": "Telefon nömrəsini daxil edin",
+        "emailRequired": "Email ünvanını daxil edin",
+        "addressRequired": "Ünvanı daxil edin",
+        "categoryRequired": "Kateqoriya seçin",
+        "countryRequired": "Ölkə seçin"
+      }
+    }
+  },
+  "tender": {
+    "detailPage": {
+      "breadcrumb": "Tender elanları",
+      "startAt": "Başlama tarixi və saatı",
+      "endAt": "Bitmə tarixi və saatı",
+      "category": "Kateqoriya",
+      "company": "Şirkət",
+      "about": "Tender haqqında",
+      "requiredDocuments": "Tələb olunan sənədlər",
+      "contactInfo": "Əlaqə məlumatları"
+    },
+    "detail": {
+      "titleShort": "Tender",
+      "title": "Tender məlumatları",
+      "about": "Tender haqqında",
+      "requiredDocuments": "Tələb olunan sənədlər",
+      "contacts": "Əlaqə vasitələri",
+      "contactName": "Əlaqə adı",
+      "position": "Vəzifə",
+      "phone": "Telefon",
+      "email": "Email",
+      "socials": "Sosial media vasitələri",
+      "companyId": "Şirkət ID",
+      "edit": "Redaktə et",
+      "notFound": "Məlumat tapılmadı"
+    },
+    "list": {
+      "activeAds": "Aktiv elanlar",
+      "allAds": "Bütün elanlar",
+      "inactiveAds": "Deaktiv elanlar",
+      "actions": "Əməliyyatlar",
+      "viewAria": "Tenderə bax",
+      "view": "Ətraflı bax",
+      "title": "Tenderlərim",
+      "menuAria": "Menyu",
+      "edit": "Redaktə et",
+      "delete": "Sil",
+      "created": "Tender yaradıldı",
+      "createFailed": "Tender yaradılmadı",
+      "updated": "Tender yeniləndi",
+      "updateFailed": "Tender yenilənmədi",
+      "deleted": "Tender silindi",
+      "deleteFailed": "Tender silinmədi",
+      "confirmDelete": "Tenderi silmək istədiyinizə əminsiniz?",
+      "searchPlaceholder": "Axtarın..",
+      "category": "Kateqoriya",
+      "date": "Tarix",
+      "number": "№",
+      "company": "Şirkət",
+      "status": "Status",
+      "titleColumn": "Tender başlığı",
+      "categoryColumn": "Tenderin kateqoriyası",
+      "startDateColumn": "Başlama tarixi",
+      "endDateColumn": "Bitmə tarixi",
+      "emptyTitle": "Hazırda əlavə edilmiş tender yoxdur",
+      "emptyBody": "İlk tenderinizi yaradın, təkliflər toplayın və doğru tərəfdaşları tapın",
+      "emptySearch": "Axtarışınıza uyğun nəticə tapılmadı",
+      "activeCompanyRequired": "Tender yaratmaq üçün aktiv şirkətiniz olmalıdır.",
+      "activeCompanyRequiredLong": "Tender yaratmaq üçün aktiv şirkətiniz olmalıdır. Zəhmət olmasa şirkətinizi təsdiqlədin.",
+      "statusActive": "Aktiv",
+      "statusPending": "Gözləmədə",
+      "statusActiveLong": "Aktiv tender"
+    },
+    "form": {
+      "backAria": "Geri",
+      "titleCreate": "Tender əlavə et",
+      "titleEdit": "Tenderi redaktə et",
+      "sectionInfo": "Tender məlumatları",
+      "title": "Tender başlığı",
+      "titlePlaceholder": "Tender başlığını daxil edin",
+      "titlePlaceholderShort": "Tender başlığı daxil edin",
+      "category": "Kateqoriya",
+      "categoryPlaceholder": "Kateqoriyanı seçin",
+      "startAt": "Başlama tarixi və saatı",
+      "endAt": "Bitmə tarixi və saatı",
+      "datePlaceholder": "YYYY-MM-DD --:--",
+      "dateTimePlaceholder": "Tarix və saat seçin",
+      "country": "Ölkə",
+      "countryPlaceholder": "Ölkə seçin",
+      "company": "Şirkət",
+      "companyPlaceholder": "Şirkəti seçin",
+      "about": "Tender haqqında",
+      "aboutPlaceholder": "Tender haqqında məlumat daxil edin",
+      "requiredDocuments": "Tələb olunan sənədlər",
+      "requiredDocumentsPlaceholder": "Tələb olunan sənədlər barədə məlumatları daxil edin",
+      "contactInfo": "Əlaqə məlumatları",
+      "fullName": "Ad, soyad",
+      "fullNameCompact": "Ad,soyad",
+      "fullNamePlaceholder": "Ad və soyadınızı daxil edin",
+      "position": "Vəzifə",
+      "positionPlaceholder": "Vəzifənizi daxil edin",
+      "email": "Email",
+      "emailPlaceholder": "Email adresinizi daxil edin",
+      "phone": "Telefon nömrəsi",
+      "phonePlaceholder": "Nömrənizi daxil edin",
+      "instagram": "Instagram",
+      "instagramPlaceholder": "https://instagram.com/nümunə",
+      "facebook": "Facebook",
+      "facebookPlaceholder": "https://facebook.com/nümunə",
+      "linkedin": "LinkedIn",
+      "linkedinPlaceholder": "https://linkedin.com/nümunə",
+      "twitter": "X/Twitter",
+      "twitterPlaceholder": "https://x.com/nümunə",
+      "submit": "Tender sorğusunu əlavə et",
+      "adminNotice": "Tender sorğunuz paylaşılmazdan əvvəl administrator tərəfindən yoxlanılacaq və təsdiqləndikdən sonra platformada yayımlanacaq.",
+      "loading": "Yüklənir…",
+      "retry": "Yenidən cəhd et",
+      "loadFailed": "Tender məlumatı yüklənmədi",
+      "socials": "Sosial media vasitələri",
+      "validation": {
+        "titleRequired": "Tender başlığını daxil edin",
+        "startRequired": "Başlama tarixini və saatı seçin",
+        "endRequired": "Bitmə tarixini və saatı seçin",
+        "companyRequired": "Şirkət seçin",
+        "aboutRequired": "Tender haqqında məlumat daxil edin",
+        "documentsRequired": "Tələb olunan sənədlər barədə məlumat daxil edin",
+        "fullNameRequired": "Ad və soyadı daxil edin",
+        "positionRequired": "Vəzifəni daxil edin",
+        "emailRequired": "Email ünvanını daxil edin",
+        "phoneRequired": "Telefon nömrəsini daxil edin"
+      }
+    }
+  },
+  "eventsPage": {
+    "publishedAt": "Dərc edildi:",
+    "registrationLink": "Qeydiyyat linki",
+    "selectedForYou": "Sizin üçün",
+    "picks": "Seçdiklərimiz",
+    "shareWithLabel": "Paylaş:"
+  },
+  "newsPage": {
+    "breadcrumb": "Xəbərlər",
+    "share": "Paylaş",
+    "sortNewest": "Ən yeni paylaşılanlar",
+    "sortOldest": "Ən köhnə paylaşılanlar",
+    "relatedPrefix": "Sizin üçün",
+    "relatedTitle": "Seçdiklərimiz",
+    "shareWithLabel": "Paylaş:"
+  },
+  "successStoriesPage": {
+    "titlePrefix": "Uğur",
+    "titleSuffix": "Dinləyin"
+  },
+  "footer": {
+    "followUs": "Bizi izləyin",
+    "countrySelection": "Ölkə seçimi",
+    "links": "Keçidlər",
+    "contact": "Əlaqə",
+    "copyright": "Müəllif hüquqları qorunur"
+  },
+  "ui": {
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next"
+    },
+    "contactForm": {
+      "invalidForm": "Forma düzgün deyil",
+      "topicRequired": "Mövzu mütləqdir",
+      "messageMin": "Mesaj ən azı 3 simvol olmalıdır"
+    },
+    "eventsSection": {
+      "loading": "Loading...",
+      "loadFailed": "Failed to load events",
+      "empty": "No events found"
+    },
+    "newsSection": {
+      "loadFailed": "Failed to load blogs",
+      "empty": "No blogs found"
+    },
+    "aboutHome": {
+      "imageAlt": "Comelson – Əlaqələrin İmkanlara Çevrildiyi Yer"
+    }
+  },
+  "staticText": {
+    "events": {
+      "breadcrumb": "Tədbirlər və Forumlar",
+      "about": "Tədbir haqqında",
+      "readTime": "oxuma vaxtı"
+    },
+    "account": {
+      "logoutConfirmPart1": "Hesabdan çıxmaq istədiyinizə",
+      "logoutConfirmPart2": "əminsiniz?",
+      "reload": "Yenidən yüklə",
+      "currentPassword": "Cari şifrə",
+      "newPassword": "Yeni şifrə",
+      "repeatNewPassword": "Yeni şifrənin təkrarı"
+    },
+    "company": {
+      "voenWithColon": "VÖEN:"
+    },
+    "auth": {
+      "forgotPasswordTitle": "Şifrəmi unutmuşam",
+      "forgotPasswordDescription": "Zəhmət olmasa qeydiyyatdan keçdiyiniz email adresini daxil edin, sizə təsdiq kodu göndəriləcək.",
+      "loginTitle": "Daxil olun",
+      "loginDescription": "Qeydiyyatdan keçmiş olduğunuz e-poçt ünvanı və şifrənizi daxil edin.",
+      "password": "Şifrə",
+      "forgotPasswordLink": "Şifrəmi unutdum?",
+      "registerTitle": "Qeydiyyatdan keçin",
+      "registerDescription": "Aşağıdakı məlumatları daxil edin, email adresinizə təsdiq kodu göndəriləcək.",
+      "passwordRuleHint": "Böyük və kiçik hərflər, rəqəmlər və xüsusi simvollardan istifadə edin.",
+      "repeatPassword": "Şifrənin təkrarı",
+      "passwordMismatchSentence": "Daxil etdiyiniz şifrələr üst-üstə düşmür.",
+      "otpTitle": "OTP təsdiq",
+      "otpDescriptionPrefix": "Zəhmət olmasa,",
+      "otpDescriptionSuffix": "email adresinə göndərilən OTP kodunu daxil edin.",
+      "resendCode": "Yenidən göndər"
+    },
+    "footer": {
+      "countrySelectionTitle": "Ölkə seçiminizi edin",
+      "countryFrom": "ölkəsindən",
+      "countryToPending": "ölkəsinə keçid hazırlanır.",
+      "copyrightAllRights": "Copyright | All Rights Reserved"
+    },
+    "navigation": {
+      "mobilePrimary": "Mobile primary"
+    },
+    "contact": {
+      "topicRequired": "Topic is required",
+      "requestFailed": "Request failed"
+    },
+    "tenders": {
+      "numberPrefix": "Tender #",
+      "notFound": "Tender tapılmadı",
+      "scrollHint": "Scroll edin (sağa) - cədvəl tam görünəcək."
+    },
+    "members": {
+      "profileLink": "Profilə keçid edin",
+      "empty": "Hazırda üzv yoxdur"
+    },
+    "share": {
+      "shareLink": "Linki paylaşın",
+      "socialLinks": "Sosial media linkləri"
+    },
+    "ui": {
+      "previousSlide": "Previous slide",
+      "nextSlide": "Next slide",
+      "goPreviousPage": "Go to previous page",
+      "goNextPage": "Go to next page",
+      "morePages": "More pages"
+    },
+    "validation": {
+      "passwordMin": "Şifrə ən azı 8 simvol olmalıdır",
+      "passwordMax": "Şifrə ən çox 12 simvol ola bilər",
+      "passwordUppercase": "Ən azı bir böyük hərf olmalıdır",
+      "passwordLowercase": "Ən azı bir kiçik hərf olmalıdır",
+      "passwordNumber": "Ən azı bir rəqəm olmalıdır",
+      "passwordSpecial": "Ən azı bir xüsusi simvol olmalıdır",
+      "passwordMismatch": "Şifrələr üst-üstə düşmür",
+      "newPasswordMismatch": "Yeni şifrələr üst-üstə düşmür",
+      "newPasswordDifferent": "Yeni şifrə cari şifrədən fərqli olmalıdır"
     }
   }
 }

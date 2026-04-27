@@ -2,11 +2,16 @@ import Image from 'next/image'
 import { Calendar, Clock } from 'lucide-react'
 import { notFound } from 'next/navigation'
 import { headers } from 'next/headers'
+import { getTranslations } from 'next-intl/server'
 
 import Container from '@/components/shared/container'
 import { Link } from '@/i18n/navigation'
 import { getServerQueryClient } from '@/providers/server'
 import { getBlogQuery, getBlogsQuery } from '@/services/blogs/queries'
+import { IconFacebook } from '@/../public/iconssvg/İconFacebook'
+import { IconTelegram } from '@/../public/iconssvg/IconTelegram'
+import { IconWhatsapp } from '@/../public/iconssvg/IconWhatsapp'
+import { IconX } from '@/../public/iconssvg/IconX'
 
 function formatBlogPostDate(value: string, locale: string) {
   const date = new Date(value)
@@ -24,6 +29,8 @@ export default async function NewsDetailPage({
   params: Promise<{ locale: string; slug: string }>
 }) {
   const { locale, slug } = await params
+  const tNewsPage = await getTranslations({ locale, namespace: 'newsPage' })
+  const tCommon = await getTranslations({ locale, namespace: 'common' })
   const queryClient = getServerQueryClient()
 
   const blogsResponse = await queryClient.fetchQuery(
@@ -93,7 +100,7 @@ export default async function NewsDetailPage({
         <div className="mx-auto flex w-full max-w-[1000px] flex-col gap-8 sm:gap-10">
           <nav className="flex items-center gap-1 text-xs leading-4">
             <Link href={`/${locale}/news`} className="text-[#6b6e71] hover:underline">
-              News
+              {tNewsPage('breadcrumb')}
             </Link>
             <span className="text-[#6b6e71]">/</span>
             <span className="line-clamp-1 font-medium text-[#32393f]">{title}</span>
@@ -171,43 +178,43 @@ export default async function NewsDetailPage({
               ) : null}
 
               <div className="inline-flex items-center gap-2 rounded-lg border border-[#dadee2] bg-white px-2.5 py-2 text-sm leading-5 text-[#1d212a]">
-                <span >Paylaş</span>
+                <span>{tNewsPage('share')}</span>
                 <div className="flex items-center gap-1.5 text-[#1d212a]">
                   <a
                     className="hover:opacity-70"
                     href={shareUrls.whatsapp}
                     target="_blank"
                     rel="noopener noreferrer"
-                    aria-label="WhatsApp"
+                    aria-label={tCommon('share.whatsappLabel')}
                   >
-                    <Image src="/icons/brand-whatsapp.svg" alt="WhatsApp" width={20} height={20} />
+                    <IconWhatsapp width={20} height={20} aria-hidden />
                   </a>
                   <a
                     className="hover:opacity-70"
                     href={shareUrls.telegram}
                     target="_blank"
                     rel="noopener noreferrer"
-                    aria-label="Telegram"
+                    aria-label={tCommon('share.telegramLabel')}
                   >
-                    <Image src="/icons/brand-telegram.svg" alt="Telegram" width={20} height={20} />
+                    <IconTelegram width={20} height={20} aria-hidden />
                   </a>
                   <a
                     className="hover:opacity-70"
                     href={shareUrls.facebook}
                     target="_blank"
                     rel="noopener noreferrer"
-                    aria-label="Facebook"
+                    aria-label={tCommon('share.facebookLabel')}
                   >
-                    <Image src="/icons/brand-facebook.svg" alt="Facebook" width={20} height={20} />
+                    <IconFacebook width={20} height={20} aria-hidden />
                   </a>
                   <a
                     className="hover:opacity-70"
                     href={shareUrls.x}
                     target="_blank"
                     rel="noopener noreferrer"
-                    aria-label="X"
+                    aria-label={tCommon('share.xLabel')}
                   >
-                    <Image src="/icons/brand-x.svg" alt="X" width={20} height={20} />
+                    <IconX width={20} height={20} aria-hidden />
                   </a>
                 </div>
               </div>
@@ -223,8 +230,8 @@ export default async function NewsDetailPage({
           {related.length > 0 ? (
             <div className="flex flex-col gap-6 sm:gap-9">
               <p className="text-balance text-2xl font-semibold leading-tight text-[#6b6e71] sm:text-[40px] sm:leading-[56px]">
-                <span className="text-[#6b6e71]">Sizin üçün </span> 
-                <span className="text-[#14171a]"  >Seçdiklərimiz</span>
+                <span className="text-[#6b6e71]">{tNewsPage('relatedPrefix')} </span>
+                <span className="text-[#14171a]">{tNewsPage('relatedTitle')}</span>
               </p>
 
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
