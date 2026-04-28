@@ -133,7 +133,7 @@ export default async function MemberDetailPage({
                   {others.map((item) => (
                     <div
                       key={item.slug}
-                      className="flex w-full flex-col gap-6 rounded-xl border border-[#eaf1fa] bg-[#fafdff] px-5 py-6"
+                      className="flex w-full flex-col gap-6 justify-between rounded-xl border border-[#eaf1fa] bg-[#fafdff] px-5 py-6"
                     >
                       <div className="flex flex-col gap-4">
                         <div className="flex items-center gap-4">
@@ -146,12 +146,15 @@ export default async function MemberDetailPage({
                               sizes="80px"
                             />
                           </div>
-                          <div className="flex min-w-0 flex-1 flex-col gap-2">
+                          <div className="flex min-w-0 flex-1 flex-col ">
                             <p className="truncate text-xl font-medium leading-7 text-[#1d212a]">
                               {getMemberName(item)}
                             </p>
                             <p className="text-sm leading-5 text-[#6b6e71]">
                               {item.activity?.name ?? ''}
+                            </p>
+                            <p className="text-sm leading-5 text-[#6b6e71]">
+                              {item.category?.name ?? ''}
                             </p>
                           </div>
                         </div>

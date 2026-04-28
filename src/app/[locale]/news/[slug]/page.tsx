@@ -99,7 +99,7 @@ export default async function NewsDetailPage({
       <Container className="rounded-2xl bg-white p-6">
         <div className="mx-auto flex w-full max-w-[1000px] flex-col gap-8 sm:gap-10">
           <nav className="flex items-center gap-1 text-xs leading-4">
-            <Link href={`/${locale}/news`} className="text-[#6b6e71] hover:underline">
+            <Link href="/news" className="text-[#6b6e71] hover:underline">
               {tNewsPage('breadcrumb')}
             </Link>
             <span className="text-[#6b6e71]">/</span>
@@ -238,7 +238,7 @@ export default async function NewsDetailPage({
                 {related.map((p) => (
                   <Link
                     key={p.slug}
-                    href={`/${locale}/news/${p.slug}`}
+                    href={`/news/${p.slug}`}
                     className="group flex flex-col gap-4 rounded-2xl border border-[#eaf1fa] bg-[#fafdff] px-2 pb-5 pt-2"
                   >
                     <div className="relative h-[220px] w-full overflow-hidden rounded-xl sm:h-[320px]">

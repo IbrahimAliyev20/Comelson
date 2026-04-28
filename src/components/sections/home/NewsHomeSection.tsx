@@ -39,7 +39,7 @@ export default async function NewsHomeSection({ blogs }: { blogs: BlogResponse[]
             </h2>
 
             <Link
-              href={`/${locale}/news`}
+              href="/news"
               className="hidden h-12 shrink-0 items-center justify-center gap-3 rounded-2xl px-6 py-3 text-base font-medium leading-6 text-black transition-opacity hover:opacity-80 lg:inline-flex"
             >
               {t('blogCta')}
@@ -51,7 +51,7 @@ export default async function NewsHomeSection({ blogs }: { blogs: BlogResponse[]
             {list.map((post) => (
               <Link
                 key={post.slug}
-                href={`/${locale}/news/${post.slug}`}
+                href={`/news/${post.slug}`}
                 className="group flex w-full max-w-none flex-col gap-4 rounded-2xl border border-[#e5e6e5] bg-white p-2 pb-5 transition-shadow hover:shadow-md"
               >
                 <div className="relative h-[320px] w-full overflow-hidden rounded-xl">
@@ -95,7 +95,7 @@ export default async function NewsHomeSection({ blogs }: { blogs: BlogResponse[]
 
           <div className="flex justify-center lg:hidden">
             <Link
-              href={`/${locale}/news`}
+              href="/news"
               className="inline-flex h-12 items-center justify-center gap-3 rounded-2xl px-6 py-3 text-base font-medium leading-6 text-black transition-opacity hover:opacity-80"
             >
               {t('blogCta')}

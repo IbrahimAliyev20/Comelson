@@ -42,7 +42,7 @@ export default async function MembersHomeSection({
             </h2>
 
             <Link
-              href={`/${locale}/members`}
+              href="/members"
               className="hidden h-11 w-full shrink-0 items-center justify-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-medium leading-5 text-[#0f477d] transition-opacity hover:opacity-80 min-[400px]:h-12 min-[400px]:w-auto min-[400px]:gap-3 min-[400px]:px-6 min-[400px]:py-3 min-[400px]:text-base min-[400px]:leading-6 lg:inline-flex"
             >
               {t('membersCta')}
@@ -54,7 +54,7 @@ export default async function MembersHomeSection({
           <div className="md:hidden">
             {list.length === 1 ? (
               <Link
-                href={`/${locale}/members/${list[0]!.slug}`}
+                href={`/members/${list[0]!.slug}`}
                 className="group flex w-full items-center justify-center overflow-hidden rounded-[10px] border border-[#e8eaed] bg-white p-6 transition-shadow hover:shadow-[0_14px_40px_rgba(15,71,125,0.10)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0f477d]/40"
               >
                 <div className="flex h-[188px] w-full items-center justify-center overflow-hidden rounded-[10px] bg-white">
@@ -69,7 +69,7 @@ export default async function MembersHomeSection({
                 </div>
               </Link>
             ) : (
-              <MembersCarousel members={list} locale={locale} />
+              <MembersCarousel members={list} />
             )}
           </div>
 
@@ -78,7 +78,7 @@ export default async function MembersHomeSection({
             {list.map((member, idx) => (
               <Link
                 key={`${member.slug || member.company}-${member.country?.id ?? 'na'}-${idx}`}
-                href={`/${locale}/members/${member.slug}`}
+                href={`/members/${member.slug}`}
                 className="group flex h-[160px] items-center justify-center overflow-hidden rounded-[10px] border border-[#e8eaed] bg-white p-2 transition-shadow hover:shadow-[0_14px_40px_rgba(15,71,125,0.10)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0f477d]/40 md:h-[180px] lg:h-[160px]"
               >
                 <Image
@@ -95,7 +95,7 @@ export default async function MembersHomeSection({
 
           <div className="flex justify-center lg:hidden">
             <Link
-              href={`/${locale}/members`}
+              href="/members"
               className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-medium leading-5 text-[#0f477d] transition-opacity hover:opacity-80 min-[400px]:h-12 min-[400px]:w-auto min-[400px]:gap-3 min-[400px]:px-6 min-[400px]:py-3 min-[400px]:text-base min-[400px]:leading-6"
             >
               {t('membersCta')}

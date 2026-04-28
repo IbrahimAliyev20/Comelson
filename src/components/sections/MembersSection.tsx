@@ -160,7 +160,7 @@ export default function MembersSection({
               {shown.map((company, idx) => (
                 <div
                   key={company.id ?? company.slug ?? idx}
-                  className="flex w-full flex-col items-center gap-6 overflow-hidden rounded-xl border border-[#eaf1fa] bg-white px-5 py-6"
+                  className="flex w-full flex-col items-center gap-6 overflow-hidden rounded-xl justify-between border border-[#eaf1fa] bg-white px-5 py-6"
                 >
                   <div className="flex w-full flex-col gap-4">
                     <div className="flex w-full items-center gap-4">
@@ -173,12 +173,15 @@ export default function MembersSection({
                           sizes="64px"
                         />
                       </div>
-                      <div className="flex min-w-0 flex-1 flex-col gap-2">
+                      <div className="flex min-w-0 flex-1 flex-col ">
                         <p className="truncate text-xl font-medium leading-7 text-[#1d212a]">
                           {company.name ?? company.company}
                         </p>
                         <p className="text-sm leading-5 text-[#6b6e71]">
                           {company.activity?.name}
+                        </p>
+                        <p className="text-sm leading-5 text-[#6b6e71]">
+                          {company.category?.name}
                         </p>
                       </div>
                     </div>

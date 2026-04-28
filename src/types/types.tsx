@@ -65,6 +65,7 @@ export interface SliderResponse {
 export interface AboutResponse {
       title: string, 
       description: string,
+      short_description_2: string,
       short_desciption: string,
       image_1: string,
       thumb_image_1: string,
@@ -184,6 +185,10 @@ export interface MemberResponse {
     image?: string;
     thumb_image?: string;
     company?: string;
+    category: {
+        id: number;
+        name: string;
+    };
     logo_url?: string;
     profil?: string;
     name?: string;

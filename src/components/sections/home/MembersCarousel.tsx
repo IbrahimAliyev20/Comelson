@@ -18,10 +18,8 @@ function getMemberImage(member: MemberResponse): string {
 
 export default function MembersCarousel({
   members,
-  locale
 }: {
   members: MemberResponse[]
-  locale: string
 }) {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const items = useMemo(() => members.slice(0, 8), [members])
@@ -63,7 +61,7 @@ export default function MembersCarousel({
       {items.map((member, idx) => (
         <Link
           key={member.id ?? member.slug ?? idx}
-          href={`/${locale}/members/${member.slug}`}
+          href={`/members/${member.slug}`}
           data-carousel-item
           className="group w-[82%] shrink-0 overflow-hidden rounded-[10px] border border-[#e8eaed] bg-white p-6 transition-shadow hover:shadow-[0_14px_40px_rgba(15,71,125,0.10)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0f477d]/40 min-[420px]:w-[70%] sm:w-[46%] md:w-[32%]"
           style={{ scrollSnapAlign: 'start' }}

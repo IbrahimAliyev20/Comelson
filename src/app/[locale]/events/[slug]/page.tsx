@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
-import { Calendar, Calendar1, Clock } from 'lucide-react'
+import { Calendar1, Clock } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
 
 import EventShareLinks from '@/components/events/EventShareLinks'
@@ -56,6 +56,7 @@ export default async function EventDetailPage({
   if (!payload?.event) notFound()
 
   const event = payload.event
+  const joinLink = event.join_link?.trim() || null
   const picked = (payload.other_events ?? [])
     .filter((item) => item.slug !== slug)
     .slice(0, 2)
@@ -109,9 +110,9 @@ export default async function EventDetailPage({
                   <EventShareLinks locale={locale} slug={event.slug} title={event.name} />
                 </div>
 
-                {event.join_link ? (
+                {joinLink ? (
                   <Link
-                    href={event.join_link}
+                    href={joinLink}
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={tEventsPage('registrationLink')}
