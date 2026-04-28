@@ -23,7 +23,7 @@ export default async function HeroHomeSection({ sliders, formLogo }: { sliders: 
       id="home-hero"
       className="relative min-h-[560px] w-full overflow-hidden md:min-h-[720px] lg:min-h-screen"
     >
-      <Container className="relative z-10 flex min-h-[560px] flex-col pb-18 pt-[90px] md:min-h-[720px] md:pb-6 md:pt-[116px] lg:min-h-screen lg:pb-8 lg:pt-[148px]">
+      <Container className="relative z-10 flex min-h-[560px] flex-col pb-8 pt-[90px] md:min-h-[720px] md:pb-6 md:pt-[116px] lg:min-h-screen lg:pb-8 lg:pt-[148px]">
         <HeroSlider
           slides={sliders ?? []}
           fallback={{

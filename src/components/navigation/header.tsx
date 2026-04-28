@@ -771,7 +771,7 @@ export function Header() {
                       <span className="truncate">{t('loginCta')}</span>
                     </Link>
                     <Link
-                      href="/contact"
+                      href="/register"
                       className={cn(
                         primaryCtaClass,
                         'w-full text-sm sm:text-base'

@@ -81,6 +81,9 @@ export default function TendersSection() {
   const [status, setStatus] = useState<StatusFilter>('active')
   const [categoryId, setCategoryId] = useState<number | null>(null)
   const [page, setPage] = useState(1)
+  const [categoryLabelsById, setCategoryLabelsById] = useState<Map<number, string>>(
+    () => new Map()
+  )
 
   const perPage = 6
 
@@ -105,16 +108,29 @@ export default function TendersSection() {
 
   const rows = useMemo<PublicTenderResponse[]>(() => data?.data ?? [], [data])
 
-  const categories = useMemo<CategoryOption[]>(() => {
-    const map = new Map<number, string>()
-    for (const row of rows) {
-      const id = row.category?.id
-      if (typeof id !== 'number') continue
-      if (map.has(id)) continue
-      map.set(id, getLocalizedLabel(row.category?.name, locale))
-    }
-    return Array.from(map.entries()).map(([id, label]) => ({ id, label }))
+  useEffect(() => {
+    setCategoryLabelsById(new Map())
+  }, [locale])
+
+  useEffect(() => {
+    setCategoryLabelsById((prev) => {
+      if (rows.length === 0) return prev
+
+      const next = new Map(prev)
+      for (const row of rows) {
+        const id = row.category?.id
+        if (typeof id !== 'number') continue
+        next.set(id, getLocalizedLabel(row.category?.name, locale))
+      }
+      return next
+    })
   }, [locale, rows])
+
+  const categories = useMemo<CategoryOption[]>(() => {
+    return Array.from(categoryLabelsById.entries())
+      .map(([id, label]) => ({ id, label }))
+      .sort((a, b) => a.label.localeCompare(b.label))
+  }, [categoryLabelsById])
 
   useEffect(() => {
     setPage(1)

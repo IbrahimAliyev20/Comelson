@@ -27,9 +27,9 @@ export function AuthSplitLayout({ children, mainClassName }: AuthSplitLayoutProp
   const mobileLogoSrc = settingsResponse?.siteLogo ?? AUTH_LOGO_SRC
 
   return (
-    <section className="min-h-screen w-full bg-white">
-      <div className="grid min-h-screen w-full grid-cols-1 xl:grid-cols-[minmax(0,720px)_minmax(0,1fr)]">
-        <aside className="relative hidden min-h-screen overflow-hidden xl:block">
+    <section className="min-h-[100dvh] w-full bg-white">
+      <div className="grid min-h-[100dvh] w-full grid-cols-1 xl:grid-cols-[minmax(0,720px)_minmax(0,1fr)]">
+        <aside className="relative hidden min-h-[100dvh] overflow-hidden xl:block">
           <Image
             src={AUTH_HERO_IMAGE_SRC}
             alt=""
@@ -63,7 +63,7 @@ export function AuthSplitLayout({ children, mainClassName }: AuthSplitLayoutProp
 
         <main
           className={cn(
-            'flex min-h-screen items-center justify-center px-4 py-12 sm:px-6 md:px-10 lg:px-12',
+            'flex min-h-[100dvh] items-center justify-center px-4 py-6 sm:px-6 md:min-h-[100dvh] md:px-10 md:py-12 lg:px-12',
             mainClassName
           )}
         >

@@ -49,7 +49,7 @@ export default function EventShareLinks({
 
   return (
     <div className="inline-flex items-center gap-2 rounded-lg border border-[#dadee2] bg-white px-2.5 py-2 text-sm leading-5 text-[#1d212a]">
-      <span className="text-sm leading-5">{t('share.shareWithLabel')}</span>
+      <span className="text-sm leading-5">{t('actions.shareWithLabel')}</span>
       <div className="flex items-center gap-1.5">
         <a
           className="hover:opacity-70"
@@ -67,7 +67,7 @@ export default function EventShareLinks({
           rel="noopener noreferrer"
           aria-label={t('share.telegramLabel')}
         >
-          <IconTelegram width={16} height={16} aria-hidden />
+          <IconTelegram width={16} height={16} aria-hidden  />
         </a>
         <a
           className="hover:opacity-70"

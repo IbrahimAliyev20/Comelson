@@ -469,6 +469,7 @@
       "empty": "No events found"
     },
     "newsSection": {
+      "loading": "Yüklənir...",
       "loadFailed": "Failed to load blogs",
       "empty": "No blogs found"
     },

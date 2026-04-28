@@ -51,11 +51,11 @@ export default function HeroSlider({
   const ctaClassName = useMemo(
     () =>
       cn(
-        'mt-5 flex  items-center justify-center rounded-2xl bg-white font-medium text-[#0f477d] transition-opacity hover:opacity-90',
-        'h-[47px] w-[55%] gap-3 px-6 text-base ',
-        'sm:h-[44px] sm:w-fit',
-        'md:h-14 md:min-w-[220px] md:gap-4 md:px-8 md:text-[17px]',
-        'lg:h-12 lg:min-w-0 lg:px-6'
+        'mt-5 inline-flex items-center justify-center rounded-2xl bg-white font-medium text-[#0f477d] transition-opacity hover:opacity-90',
+        'min-h-[52px] w-[55%] gap-3 px-6 py-3 text-base leading-none',
+        'sm:w-fit',
+        'md:min-h-14 md:min-w-[220px] md:gap-4 md:px-8 md:text-[17px]',
+        'lg:min-h-12 lg:min-w-0 lg:px-6'
       ),
     []
   )
@@ -149,10 +149,7 @@ export default function HeroSlider({
         {children}
 
         {/* Dots — mobile */}
-        <div
-          className="mt-10   flex justify-center gap-2  md:hidden"
-          aria-hidden
-        >
+        <div className="mt-6 flex justify-center gap-2 pb-2 md:hidden" aria-hidden>
           {normalizedSlides.map((slide, index) => (
             <button
               key={`${slide.thumb_image}-${index}-mobile`}
