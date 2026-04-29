@@ -21,6 +21,7 @@ export default async  function PartnershipPage() {
   const title = hero?.title || 'Tərəfdaşlıq Paketlərimiz';
   const description = hero?.desciption || 'Comelson şirkətləri bir araya gətirərək əməkdaşlıq, tərəfdaşlıq və yeni imkanlar üçün güclü bir biznes şəbəkəsi yaradır.';
   const image = hero?.image || '/images/genericherobg.png';
+  
   return (
     <div>
         <GenericPageHeroSection

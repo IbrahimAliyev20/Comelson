@@ -6,19 +6,23 @@ import { Link } from '@/i18n/navigation'
 import { PartnershipsResponse } from '@/types/types'
 import { PricingCheckIcon, PricingManatIcon } from './home/pricing-icons'
 
+function stripHtml(value?: string | null): string {
+  if (!value) return ''
+  return value
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
 function extractListItems(description: string) {
   if (!description) return []
 
-  const matches = Array.from(description.matchAll(/<li[^>]*>(.*?)<\/li>/g))
+  // Be tolerant to: newlines inside <li>, attributes, and casing differences.
+  const matches = Array.from(description.matchAll(/<li\b[^>]*>([\s\S]*?)<\/li>/gi))
 
   return matches
-    .map((match) =>
-      match[1]
-        .replace(/<[^>]+>/g, ' ')
-        .replace(/&nbsp;/gi, ' ')
-        .replace(/\s+/g, ' ')
-        .trim()
-    )
+    .map((match) => stripHtml(match[1]))
     .filter(Boolean)
 }
 
@@ -162,26 +166,38 @@ export default async function PricePackagesSection({
                     </div>
 
                     <ul className="flex flex-col gap-4">
-                      {features.map((feature, i) => (
-                        <li key={`${pkg.plan}-${i}`} className="flex gap-2.5">
-                          <PricingCheckIcon
+                      {features.length > 0 ? (
+                        features.map((feature, i) => (
+                          <li key={`${pkg.plan}-${i}`} className="flex gap-2.5">
+                            <PricingCheckIcon
+                              className={
+                                isFeatured
+                                  ? 'mt-0.5 size-6 shrink-0 text-[#3bbae9]'
+                                  : 'mt-0.5 size-6 shrink-0 text-[#1577d5]'
+                              }
+                            />
+                            <span
+                              className={
+                                isFeatured
+                                  ? 'text-base leading-6 text-[#eaf1fa]'
+                                  : 'text-base leading-6 text-[#6b6e71]'
+                              }
+                            >
+                              {feature}
+                            </span>
+                          </li>
+                        ))
+                      ) : (
+                        <li className="text-base leading-6">
+                          <p
                             className={
-                              isFeatured
-                                ? 'mt-0.5 size-6 shrink-0 text-[#3bbae9]'
-                                : 'mt-0.5 size-6 shrink-0 text-[#1577d5]'
-                            }
-                          />
-                          <span
-                            className={
-                              isFeatured
-                                ? 'text-base leading-6 text-[#eaf1fa]'
-                                : 'text-base leading-6 text-[#6b6e71]'
+                              isFeatured ? 'text-[#eaf1fa]' : 'text-[#6b6e71]'
                             }
                           >
-                            {feature}
-                          </span>
+                            {stripHtml(pkg.description)}
+                          </p>
                         </li>
-                      ))}
+                      )}
                     </ul>
                   </div>
                 </article>
