@@ -44,38 +44,6 @@ const FOOTER_NAV_ITEMS = getFooterNavItems()
 
 const COUNTRY_ID_COOKIE = 'country_id'
 
-function matchesAzerbaijan(country: CountryResponse) {
-  const value = country.name.trim().toLowerCase()
-  return value.includes('azərbaycan') || value.includes('azerbaijan')
-}
-
-function matchesTurkey(country: CountryResponse) {
-  const value = country.name.trim().toLowerCase()
-  return (
-    value.includes('türkiyə') ||
-    value.includes('turkiye') ||
-    value.includes('türkiye') ||
-    value.includes('turkey')
-  )
-}
-
-function matchesRussia(country: CountryResponse) {
-  const value = country.name.trim().toLowerCase()
-  return value.includes('rusiya') || value.includes('russia') || value.includes('россия')
-}
-
-function pickDefaultCountry(
-  countries: CountryResponse[],
-  locale: string
-): CountryResponse | null {
-  if (!countries.length) return null
-
-  if (locale === 'az') return countries.find(matchesAzerbaijan) ?? countries[0] ?? null
-  if (locale === 'tr') return countries.find(matchesTurkey) ?? countries[0] ?? null
-  if (locale === 'ru') return countries.find(matchesRussia) ?? countries[0] ?? null
-
-  return countries[0] ?? null
-}
 
 function CountryModal({
   countries,
@@ -271,23 +239,19 @@ export function Footer() {
     if (selectedCountryId !== null) return
     const raw = Cookies.get(COUNTRY_ID_COOKIE)
     const parsed = raw ? Number(raw) : NaN
-    if (!Number.isFinite(parsed) || parsed <= 0) return
+    if (!Number.isFinite(parsed) || parsed <= 0) {
+      setIsCountryModalOpen(true)
+      return
+    }
     setSelectedCountryId(parsed)
   }, [selectedCountryId])
 
   useEffect(() => {
-    if (!countries.length || selectedCountryId !== null) return
-    const defaultCountry = pickDefaultCountry(countries, locale)
-    if (!defaultCountry) return
-    setSelectedCountryId(defaultCountry.id)
-
-    if (!Cookies.get(COUNTRY_ID_COOKIE)) {
-      Cookies.set(COUNTRY_ID_COOKIE, String(defaultCountry.id), {
-        path: '/',
-        expires: 365,
-        sameSite: 'lax',
-        secure: process.env.NODE_ENV === 'production',
-      })
+    if (!countries.length) return
+    const raw = Cookies.get(COUNTRY_ID_COOKIE)
+    const parsed = raw ? Number(raw) : NaN
+    if (!Number.isFinite(parsed) || parsed <= 0) {
+      setIsCountryModalOpen(true)
     }
   }, [countries, selectedCountryId, locale])
 

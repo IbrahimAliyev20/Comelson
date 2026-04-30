@@ -6,6 +6,10 @@ import Container from "@/components/shared/container";
 import { Link } from "@/i18n/navigation";
 import { AboutResponse } from "@/types/types";
 
+function stripHtmlToText(html: string) {
+  return html.replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
+}
+
 function ImageSlot({
   src,
   alt,
@@ -20,7 +24,7 @@ function ImageSlot({
   sizes: string;
 }) {
   if (!src) {
-    return <div className="h-full w-full bg-[#eef2f6]" />
+    return <div className="h-full w-full bg-[#eef2f6]" />;
   }
 
   return (
@@ -32,18 +36,21 @@ function ImageSlot({
       className="h-full w-full object-cover"
       sizes={sizes}
     />
-  )
+  );
 }
 
 export default async function AboutHomeSection({ about }: { about: AboutResponse | undefined }) {
   const t = await getTranslations("home");
+  const titleText = stripHtmlToText(about?.title ?? "");
 
   return (
     <section className="bg-[#F8FAFC] py-8 md:py-[60px]">
       <Container>
         <div className="flex flex-col items-start justify-between gap-10 md:gap-12 lg:flex-row lg:gap-8 xl:gap-16">
           <div className="flex w-full flex-col gap-6 md:gap-8 lg:max-w-[585px]">
-            <h2 className="text-balance text-[32px] font-semibold leading-[1.1] tracking-[-0.03em] text-[#14171a] md:text-[40px] md:leading-[48px] lg:leading-[56px]" dangerouslySetInnerHTML={{ __html: about?.title ?? '' }} />
+            <h2 className="text-balance text-[32px] font-semibold leading-[1.1] tracking-[-0.03em] text-[#14171a] md:text-[40px] md:leading-[48px] lg:leading-[56px]">
+              {titleText}
+            </h2>
             <div className="flex flex-col gap-4">
               <p className="text-sm font-normal leading-6 text-[#64717c] md:text-base">
                 {about?.short_desciption}
