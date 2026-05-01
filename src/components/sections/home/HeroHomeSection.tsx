@@ -1,22 +1,55 @@
 import { getTranslations } from "next-intl/server";
+import Image from "next/image";
 
 import Container from "@/components/shared/container";
 import LogoLoop from "@/components/LogoLoop";
-import { FormLogoResponse, SliderResponse } from "@/types/types";
+import { MemberResponse, SliderResponse } from "@/types/types";
 import HeroSlider from "@/components/sections/home/HeroSlider";
 import type { LogoItem } from "@/components/LogoLoop";
+import { Link } from "@/i18n/navigation";
 
-export default async function HeroHomeSection({ sliders, formLogo }: { sliders: SliderResponse[] | undefined, formLogo: FormLogoResponse[] | undefined }) {
+function isRemoteImage(src: string): boolean {
+  return src.startsWith("http://") || src.startsWith("https://");
+}
+
+export default async function HeroHomeSection({
+  sliders,
+  members,
+}: {
+  sliders: SliderResponse[] | undefined;
+  members: MemberResponse[] | undefined;
+}) {
   const t = await getTranslations("home");
-  const partnerLogos: LogoItem[] = (formLogo ?? []).map((item, index) => ({
-    src: item.image,
-    alt: `Partner logo ${index + 1}`,
-    href: item.link.startsWith("http://") || item.link.startsWith("https://")
-      ? item.link
-      : `https://${item.link}`,
-    width: 160,
-    height: 48,
-  }));
+  const partnerLogos: LogoItem[] = (members ?? [])
+    .flatMap((member, index) => {
+      const src = member.logo_url?.trim() || "";
+      if (!src) return [];
+      const alt = member.company?.trim() || member.name?.trim() || `Partner logo ${index + 1}`;
+      const href = `/members/${member.slug}`;
+
+      return [
+        {
+          node: (
+            <Link
+              href={href}
+              aria-label={alt}
+              className="inline-flex items-center rounded focus-visible:outline focus-visible:outline-current focus-visible:outline-offset-2"
+            >
+              <Image
+                src={src}
+                alt={alt}
+                width={160}
+                height={48}
+                draggable={false}
+                unoptimized={isRemoteImage(src)}
+                className="block h-(--logoloop-logoHeight) w-auto object-contain [-webkit-user-drag:none] pointer-events-none [image-rendering:-webkit-optimize-contrast]"
+              />
+            </Link>
+          ),
+          title: alt,
+        } satisfies LogoItem,
+      ];
+    });
 
   return (
     <section
@@ -39,16 +72,15 @@ export default async function HeroHomeSection({ sliders, formLogo }: { sliders: 
                 {t("partnersLabel")}
               </p>
               {partnerLogos.length > 0 ? (
-                <div className="min-w-0 flex-1 overflow-hidden [&_img]:brightness-0 [&_img]:invert [&_img]:opacity-90">
+                <div className="min-w-0 flex-1 overflow-hidden  [&_img]:opacity-90">
                   <LogoLoop
                     logos={partnerLogos}
                     speed={90}
                     gap={32}
-                    logoHeight={28}
+                    logoHeight={48}
                     fadeOut
                     fadeOutColor="rgb(6, 28, 52)"
                     ariaLabel={t("partnersLabel")}
-                    className="[--logoloop-fadeColor:rgb(6,28,52)] md:[&_img]:max-h-10 lg:[&_img]:max-h-10"
                   />
                 </div>
               ) : null}

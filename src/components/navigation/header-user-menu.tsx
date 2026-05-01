@@ -30,7 +30,12 @@ function initialsFromName(name: string): string {
   if (parts.length >= 2) {
     return `${parts[0]![0] ?? ''}${parts[1]![0] ?? ''}`.toUpperCase()
   }
-  return name.slice(0, 2).toUpperCase() || '?'
+  return name.replace(/\s+/g, '').slice(0, 2).toUpperCase()
+}
+
+function avatarTextOrNull(name: string): string | null {
+  const initials = initialsFromName(name)
+  return initials.length >= 1 ? initials : null
 }
 
 function useAccountTabActive() {
@@ -69,11 +74,17 @@ export function UserMenuPanel({
   const queryClient = useQueryClient()
   const tabActive = useAccountTabActive()
   const [logoutPending, startLogout] = useTransition()
+  const [avatarLoadFailed, setAvatarLoadFailed] = useState(false)
 
   const avatarUrl = useMemo(
     () => resolveAuthMediaUrl(user.image),
     [user.image]
   )
+  const shouldShowAvatar = Boolean(avatarUrl) && !avatarLoadFailed
+
+  useEffect(() => {
+    setAvatarLoadFailed(false)
+  }, [avatarUrl])
 
   function handleLogout() {
     startLogout(async () => {
@@ -105,16 +116,23 @@ export function UserMenuPanel({
             lightOnDark ? 'border-white/20' : 'border-[#eaf1fa]'
           )}
         >
-          {avatarUrl ? (
+          {shouldShowAvatar ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              src={avatarUrl}
+              src={avatarUrl ?? ''}
               alt=""
               className="size-full object-cover"
+              onError={() => setAvatarLoadFailed(true)}
             />
           ) : (
-            <span className="flex size-full items-center justify-center text-xs font-semibold text-[#0f477d]">
-              {initialsFromName(user.name)}
+            <span className="flex size-full items-center justify-center">
+              {avatarTextOrNull(user.name) ? (
+                <span className="text-xs font-semibold text-[#0f477d]">
+                  {avatarTextOrNull(user.name)}
+                </span>
+              ) : (
+                <CircleUser className="size-5 text-[#889097]" aria-hidden />
+              )}
             </span>
           )}
         </div>
@@ -249,6 +267,7 @@ export function HeaderUserMenu({
   const [open, setOpen] = useState(false)
   const [isNarrow, setIsNarrow] = useState(false)
   const [popoverTop, setPopoverTop] = useState(0)
+  const [avatarLoadFailed, setAvatarLoadFailed] = useState(false)
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
@@ -256,6 +275,11 @@ export function HeaderUserMenu({
     () => resolveAuthMediaUrl(user.image),
     [user.image]
   )
+  const shouldShowAvatar = Boolean(avatarUrl) && !avatarLoadFailed
+
+  useEffect(() => {
+    setAvatarLoadFailed(false)
+  }, [avatarUrl])
 
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 767px)')
@@ -328,19 +352,22 @@ export function HeaderUserMenu({
             : 'border-[#e6eff6] focus-visible:ring-[#e6eff6]'
         )}
       >
-        {avatarUrl ? (
+        {shouldShowAvatar ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={avatarUrl}
+            src={avatarUrl ?? ''}
             alt=""
             className="size-full rounded-full object-cover"
+            onError={() => setAvatarLoadFailed(true)}
           />
         ) : (
           <span
             className="flex size-full items-center justify-center rounded-full bg-[#e6eff6] text-sm font-semibold text-[#0f477d]"
             aria-hidden
           >
-            {initialsFromName(user.name)}
+            {avatarTextOrNull(user.name) ?? (
+              <CircleUser className="size-5 text-[#889097]" aria-hidden />
+            )}
           </span>
         )}
       </button>
@@ -349,7 +376,7 @@ export function HeaderUserMenu({
         <div
           role="menu"
           className={cn(
-            'z-[60] animate-in fade-in-0 slide-in-from-top-1 duration-200',
+            'z-60 animate-in fade-in-0 slide-in-from-top-1 duration-200',
             isNarrow
               ? 'fixed left-4 right-4 max-h-[min(70vh,calc(100dvh-96px))] overflow-y-auto'
               : 'absolute right-0 top-full pt-2'

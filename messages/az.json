@@ -3,7 +3,7 @@
     "heroTitle": "Biznesinizi Doğru İnsanlarla Birləşdirin",
     "heroSubtitle": "Comelson şirkətləri bir araya gətirərək əməkdaşlıq, tərəfdaşlıq və yeni imkanlar üçün güclü bir biznes şəbəkəsi yaradır.",
     "heroCta": "Bizimlə əlaqə",
-    "partnersLabel": "Formlarımızla tanış olun:",
+    "partnersLabel": "Üzvlərimizlə tanış olun:",
     "aboutCta": "Ətraflı bax",
     "membersTitleMain": "Üzvlərimizlə",
     "membersTitleAccent": "tanış olun",
@@ -451,6 +451,7 @@
     "countrySelection": "Ölkə seçimi",
     "links": "Keçidlər",
     "contact": "Əlaqə",
+    "logoAlt": "Comelson",
     "copyright": "Müəllif hüquqları qorunur"
   },
   "ui": {

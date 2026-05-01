@@ -1,7 +1,7 @@
 'use client'
 
 import { useQueryClient } from '@tanstack/react-query'
-import { Loader2, Pencil } from 'lucide-react'
+import { CircleUser, Loader2, Pencil } from 'lucide-react'
 import {
   useEffect,
   useMemo,
@@ -29,7 +29,7 @@ function initialsFromName(name: string): string {
   if (parts.length >= 2) {
     return `${parts[0]![0] ?? ''}${parts[1]![0] ?? ''}`.toUpperCase()
   }
-  return name.slice(0, 2).toUpperCase() || '?'
+  return name.replace(/\s+/g, '').slice(0, 2).toUpperCase()
 }
 
 /** Hesab məlumatları — GET /auth/profile; POST /auth/profile/update (multipart) */
@@ -42,6 +42,7 @@ export default function InfoAccount({
   const queryClient = useQueryClient()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [isPending, startTransition] = useTransition()
+  const [avatarLoadFailed, setAvatarLoadFailed] = useState(false)
 
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
@@ -71,6 +72,11 @@ export default function InfoAccount({
   }, [localPreviewUrl])
 
   const displayAvatarUrl = localPreviewUrl ?? serverAvatarUrl
+  const shouldShowImage = Boolean(displayAvatarUrl) && !avatarLoadFailed
+
+  useEffect(() => {
+    setAvatarLoadFailed(false)
+  }, [displayAvatarUrl])
 
   const canSave =
     fullName.trim().length >= 2 &&
@@ -155,19 +161,24 @@ export default function InfoAccount({
       />
 
       <div className="relative size-[120px] shrink-0">
-        {displayAvatarUrl ? (
+        {shouldShowImage ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={displayAvatarUrl}
+            src={displayAvatarUrl ?? ''}
             alt=""
             className="size-full rounded-full border border-[#eaf1fa] object-cover"
+            onError={() => setAvatarLoadFailed(true)}
           />
         ) : (
           <div
             className="flex size-full items-center justify-center rounded-full border border-[#eaf1fa] bg-[#e6eff6] text-[32px] font-medium leading-10 text-[#6b6e71]"
             aria-hidden
           >
-            {initialsFromName(fullName || user.name)}
+            {initialsFromName(fullName || user.name) ? (
+              initialsFromName(fullName || user.name)
+            ) : (
+              <CircleUser className="size-10 text-[#889097]" aria-hidden />
+            )}
           </div>
         )}
         <button

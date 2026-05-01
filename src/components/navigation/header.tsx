@@ -14,6 +14,7 @@ import { getSettingsQuery } from '@/services/settings/queries'
 import { heroNavigationItems } from '@/utils/static'
 
 import Container from '../shared/container'
+import CountrySelector from './country-selector'
 import LanguageSelector from '../shared/language-selector'
 import { HeaderUserMenu } from './header-user-menu'
 
@@ -520,7 +521,12 @@ export function Header() {
             </div>
 
             <div className="flex min-w-0 shrink-0 items-center gap-2 sm:gap-3 md:gap-4 lg:gap-5">
-              <div className="flex min-w-0 shrink-0 items-center ">
+              <div className="flex min-w-0 shrink-0 items-center gap-1">
+                <div className={cn(showUserMenu ? 'hidden lg:block' : 'block')}>
+                  <CountrySelector
+                    variant={showHeroGlass ? 'onDark' : 'default'}
+                  />
+                </div>
                 <LanguageSelector
                   variant={showHeroGlass ? 'onDark' : 'default'}
                 />
@@ -621,6 +627,19 @@ export function Header() {
           >
             <Container className="px-4 py-4">
               <div className="flex flex-col gap-6">
+                {showUserMenu ? (
+                  <div className="flex items-center justify-between">
+                    <span
+                      className={cn(
+                        'text-sm leading-5',
+                        showHeroGlass ? 'text-white/80' : 'text-[#14171A]/70'
+                      )}
+                    >
+                      Ölkə seçimi
+                    </span>
+                    <CountrySelector variant={showHeroGlass ? 'onDark' : 'default'} />
+                  </div>
+                ) : null}
                 <nav className="flex flex-col gap-2" aria-label="Mobile primary">
                   {heroNavigationItems.map((item) => {
                     const label = t(`heroNav.${item.key}`)

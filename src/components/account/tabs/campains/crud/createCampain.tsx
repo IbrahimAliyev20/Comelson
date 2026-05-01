@@ -25,6 +25,7 @@ import { cn } from '@/lib/utils'
 import { postCompanyMutation } from '@/services/companies/mutations'
 import { getCompanyCategoriesQuery } from '@/services/company-categories/queries'
 import { getCountriesQuery } from '@/services/members/queries'
+import { getProfileQuery } from '@/services/auth/queries'
 
 const inputClass =
   'h-12 w-full rounded-lg border border-[#ebeff4] bg-[#f4fafd] px-4 text-sm text-[#1d212a] outline-none placeholder:text-[#889097] focus:border-[#0f477d]/40 focus:ring-4 focus:ring-[#0f477d]/10'
@@ -75,6 +76,7 @@ export default function CreateCampain({
   onSuccess,
 }: CreateCampainProps) {
   const locale = useLocale()
+  const { data: profile } = useQuery(getProfileQuery())
   const { data: countries = [], isLoading: countriesLoading } = useQuery(
     getCountriesQuery(locale)
   )
@@ -101,10 +103,18 @@ export default function CreateCampain({
       },
     })
 
+  const selectedCountryId = watch('countryId')
   const logoFile = watch('logo')
   const profilFile = watch('profil')
   const logoPreviewUrl = logoFile ? URL.createObjectURL(logoFile) : ''
   const profilPreviewUrl = profilFile ? URL.createObjectURL(profilFile) : ''
+
+  useEffect(() => {
+    if (selectedCountryId) return
+    const cId = profile?.user?.country_id
+    if (!Number.isFinite(cId) || !cId || cId <= 0) return
+    setValue('countryId', String(cId), { shouldDirty: false })
+  }, [profile?.user?.country_id, selectedCountryId, setValue])
 
   useEffect(() => {
     return () => {

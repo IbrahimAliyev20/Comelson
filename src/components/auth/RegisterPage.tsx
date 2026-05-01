@@ -1,9 +1,12 @@
 'use client'
 
 import { Eye, EyeOff, Loader2 } from 'lucide-react'
+import Cookies from 'js-cookie'
 import { useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import { useQuery } from '@tanstack/react-query'
+import { useLocale } from 'next-intl'
 
 import {
   authFormFlexGrow,
@@ -14,36 +17,53 @@ import {
 } from '@/components/auth/auth-layout-classes'
 import { AuthSplitLayout } from '@/components/auth/AuthSplitLayout'
 import { Link, useRouter } from '@/i18n/navigation'
+import { COUNTRY_ID_COOKIE } from '@/lib/auth/cookies'
 import { OTP_FLOW_REGISTER, buildOtpSearchParams } from '@/lib/auth/otp-flow'
 import { cn } from '@/lib/utils'
 import { registerAction } from '@/services/auth/serveractions'
+import { getCountriesQuery } from '@/services/members/queries'
 
 type RegisterFormValues = {
   fullName: string
   email: string
   password: string
+  countryId: string
 }
 
 export default function RegisterPage() {
   const router = useRouter()
+  const locale = useLocale()
   const [isPending, startTransition] = useTransition()
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
+
+  const { data: countries = [] } = useQuery(getCountriesQuery(locale))
+
+  const cookieCountryId = (() => {
+    const raw = Cookies.get(COUNTRY_ID_COOKIE)
+    const parsed = raw ? Number(raw) : Number.NaN
+    return Number.isFinite(parsed) && parsed > 0 ? String(parsed) : ''
+  })()
+
   const { register, watch, handleSubmit } = useForm<RegisterFormValues>({
     defaultValues: {
       fullName: '',
       email: '',
       password: '',
+      countryId: cookieCountryId,
     },
   })
 
   const fullName = watch('fullName')
   const email = watch('email')
   const password = watch('password')
+  const countryId = watch('countryId')
   const canSubmit =
     fullName.trim().length > 0 &&
     email.trim().length > 0 &&
-    password.trim().length >= 8
+    password.trim().length >= 8 &&
+    Number.isFinite(Number(countryId)) &&
+    Number(countryId) > 0
 
   function submit(values: RegisterFormValues) {
     if (!canSubmit || isPending) return
@@ -54,6 +74,7 @@ export default function RegisterPage() {
         name: values.fullName.trim(),
         email: values.email.trim(),
         password: values.password,
+        country_id: Number(values.countryId),
       })
 
       if (result.ok) {
@@ -106,6 +127,25 @@ export default function RegisterPage() {
               ) : null}
 
               <div className="flex flex-col gap-4">
+                <label className="flex flex-col gap-2">
+                  <span className="px-1 text-sm leading-6 text-[#1d212a]">
+                    Ölkə
+                  </span>
+                  <select
+                    {...register('countryId')}
+                    className="h-12 w-full rounded-lg border border-[#ebeff4] bg-[#f4fafd] px-4 text-sm text-[#1d212a] outline-none placeholder:text-[#6b7277] focus:border-[#0f477d]/40 focus:ring-4 focus:ring-[#0f477d]/10"
+                  >
+                    <option value="" disabled>
+                      Ölkə seçin
+                    </option>
+                    {countries.map((c) => (
+                      <option key={c.id} value={String(c.id)}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
                 <label className="flex flex-col gap-2">
                   <span className="px-1 text-sm leading-6 text-[#1d212a]">
                     Ad, soyad

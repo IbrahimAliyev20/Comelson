@@ -12,6 +12,7 @@ export type LoginResponse = {
 export type AuthUser = {
   id: number
   name: string
+  country_id: number
   email: string
   image?: string | null
 }
@@ -22,6 +23,7 @@ export type AuthProfileUser = {
   name: string
   email: string
   image: string | null
+  country_id: number
 }
 
 export type AuthProfileResponse = {
@@ -46,6 +48,7 @@ export type RegisterRequest = {
   name: string
   email: string
   password: string
+  country_id: number
 }
 
 /** POST /auth/register — cavab 201 */
@@ -155,6 +158,7 @@ export const registerRequestSchema = z.object({
   name: z.string().trim().min(2),
   email: emailSchema,
   password: strongPasswordSchema,
+  country_id: z.number().int().positive(),
 })
 
 export const verifyOtpRequestSchema = z.object({

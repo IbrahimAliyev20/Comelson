@@ -2,7 +2,7 @@
 
 import { ChevronLeft } from 'lucide-react'
 import type { ReactNode } from 'react'
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import PhoneInput from 'react-phone-input-2'
 import 'react-phone-input-2/lib/style.css'
 import { Controller, useForm } from 'react-hook-form'
@@ -18,6 +18,7 @@ import {
 import { getCompanyCategoriesQuery } from '@/services/company-categories/queries'
 import { getCompaniesQuery } from '@/services/companies/queries'
 import { getCountriesQuery } from '@/services/members/queries'
+import { getProfileQuery } from '@/services/auth/queries'
 import { cn } from '@/lib/utils'
 import type {
   CompanyCategoryResponse,
@@ -175,15 +176,24 @@ export default function CreateTender({
   onSubmit,
 }: CreateTenderProps) {
   const locale = useLocale()
+  const { data: profile } = useQuery(getProfileQuery())
   const { data: categories = [] } = useQuery(getCompanyCategoriesQuery(locale))
   const { data: countries = [] } = useQuery(getCountriesQuery(locale))
   const { data: companiesResponse } = useQuery(
     getCompaniesQuery({ locale, per_page: 100 })
   )
   const companies = (companiesResponse?.data ?? []) as CompanyResponse[]
-  const { register, control, handleSubmit } = useForm<CreateTenderForm>({
+  const { register, control, handleSubmit, setValue, watch } = useForm<CreateTenderForm>({
     defaultValues: DEFAULT_FORM_VALUES,
   })
+
+  const selectedCountryId = watch('countryId')
+  useEffect(() => {
+    if (selectedCountryId) return
+    const cId = profile?.user?.country_id
+    if (!Number.isFinite(cId) || !cId || cId <= 0) return
+    setValue('countryId', String(cId), { shouldDirty: false })
+  }, [profile?.user?.country_id, selectedCountryId, setValue])
 
   const handleCancel = () => {
     onCancel?.()

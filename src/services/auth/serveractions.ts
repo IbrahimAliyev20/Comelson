@@ -268,6 +268,7 @@ export async function updateProfileAction(
         name?: string
         email?: string
         image?: string | null
+        country_id?: number | string
       }
     }>('/auth/profile/update', fd)
 
@@ -276,10 +277,15 @@ export async function updateProfileAction(
       u && (typeof u.id === 'number' || typeof u.id === 'string')
         ? Number(u.id)
         : NaN
+    const countryIdNum =
+      u && (typeof u.country_id === 'number' || typeof u.country_id === 'string')
+        ? Number(u.country_id)
+        : NaN
 
     const user =
       u &&
       Number.isFinite(idNum) &&
+      Number.isFinite(countryIdNum) &&
       typeof u.name === 'string' &&
       typeof u.email === 'string'
         ? {
@@ -290,6 +296,7 @@ export async function updateProfileAction(
               u.image === undefined || u.image === null
                 ? null
                 : String(u.image),
+            country_id: countryIdNum,
           }
         : undefined
 

@@ -10,7 +10,6 @@ import { getServerLocale } from "@/lib/utils";
 import { getServerQueryClient } from "@/providers/server";
 import { getAboutQuery } from "@/services/about/queries";
 import { getBlogsQuery } from "@/services/blogs/queries";
-import { getFormLogoQuery } from "@/services/form-logo/queries";
 import { getMembersQuery } from "@/services/members/queries";
 import { getSlidersQuery } from "@/services/sliders/queries";
 import { getSuccessStoriesQuery } from "@/services/success-stories/queries";
@@ -26,7 +25,6 @@ export default async function Home() {
 
      queryClient.prefetchQuery(getAboutQuery(locale)),
      queryClient.prefetchQuery(getSlidersQuery(locale)),
-     queryClient.prefetchQuery(getFormLogoQuery(locale)),
      queryClient.prefetchQuery(getSuccessStoriesQuery(locale)),
      queryClient.prefetchQuery(getMembersQuery(locale)),
      queryClient.prefetchQuery(getBlogsQuery(locale, null, '', 'desc')),
@@ -43,7 +41,6 @@ export default async function Home() {
     
   const blogs = queryClient.getQueryData(getBlogsQuery(locale, null, '', 'desc').queryKey)?.data;
   const members = queryClient.getQueryData(getMembersQuery(locale).queryKey)?.data;
-  const formLogo = queryClient.getQueryData(getFormLogoQuery(locale).queryKey)?.data;
   const sliders = queryClient.getQueryData(getSlidersQuery(locale).queryKey)?.data;
   const about = queryClient.getQueryData(getAboutQuery(locale).queryKey)?.data;
   const successStories = queryClient.getQueryData(getSuccessStoriesQuery(locale).queryKey)?.data;
@@ -57,7 +54,7 @@ export default async function Home() {
   )?.data;
   return (
     <div className="flex flex-col ">
-      <HeroHomeSection sliders={sliders} formLogo={formLogo} />
+      <HeroHomeSection sliders={sliders} members={members} />
       <AboutHomeSection about={about} />
       <MembersHomeSection members={members} />
       {/* <StatisticsSection statistics={statistics} /> */}

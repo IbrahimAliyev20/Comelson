@@ -20,11 +20,7 @@ import type {
   VerifyOtpResponse,
 } from './types'
 
-/**
- * Baza URL — env-dən (`NEXT_PUBLIC_API_BASE_URL`).
- * Axios instance `@/lib/api/client.ts`-də yaradılır; interceptor token üçün
- * `access_token` cookie oxuyur.
- */
+
 export function getAuthApiBaseUrl(): string {
   const base = process.env.NEXT_PUBLIC_API_BASE_URL
   if (!base || typeof base !== 'string') {
