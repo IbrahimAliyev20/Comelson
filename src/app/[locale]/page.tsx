@@ -20,6 +20,8 @@ export default async function Home() {
   const queryClient = getServerQueryClient();
   const t = await getTranslations('home')
 
+  
+
 
   await Promise.all([
 
