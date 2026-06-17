@@ -1,4 +1,4 @@
-import DOMPurify from 'isomorphic-dompurify'
+import sanitizeHtml from 'sanitize-html'
 
 /**
  * Mətn redaktorundan (CKEditor) gələn məzmun bəzən HTML entity kimi kodlaşdırılmış
@@ -81,10 +81,27 @@ export function toRenderableHtml(value: string | null | undefined): string {
   if (!value) return ''
   // Artıq real teqlər varsa olduğu kimi, yoxsa entity-ləri açıb real HTML alırıq.
   const html = REAL_TAG_RE.test(value) ? value : decodeHtmlEntities(value)
-  // Hər halda DOMPurify ilə təmizləyirik — istifadəçi məzmunundan (məs. tender
+  // Hər halda `sanitize-html` ilə təmizləyirik — istifadəçi məzmunundan (məs. tender
   // təsviri) gələ biləcək `<script>`, `onerror=` və s. zərərli kodları silir.
-  return DOMPurify.sanitize(html, {
-    ADD_ATTR: ['target', 'rel'],
+  // `sanitize-html` təmiz JS-dir (jsdom yoxdur), ona görə Vercel serverless runtime-da
+  // da problemsiz işləyir.
+  return sanitizeHtml(html, {
+    allowedTags: [
+      'p', 'br', 'span', 'div',
+      'strong', 'b', 'em', 'i', 'u', 's', 'sub', 'sup', 'mark', 'small',
+      'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+      'ul', 'ol', 'li',
+      'a', 'img',
+      'blockquote', 'pre', 'code',
+      'table', 'thead', 'tbody', 'tr', 'th', 'td',
+      'hr',
+    ],
+    allowedAttributes: {
+      a: ['href', 'target', 'rel'],
+      img: ['src', 'alt', 'width', 'height'],
+      '*': ['style'],
+    },
+    allowedSchemes: ['http', 'https', 'mailto', 'tel'],
   })
 }
 
