@@ -3,6 +3,7 @@
 import { ChevronLeft, PencilIcon } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 
+import { toRenderableHtml } from '@/lib/html'
 import { cn } from '@/lib/utils'
 import { getTenderQuery } from '@/services/tenders/queries'
 import type { ApiResponse, TenderResponse } from '@/types/types'
@@ -82,7 +83,7 @@ function FieldRow({
 }
 
 function htmlOrFallback(html?: string | null): string {
-  const v = html?.trim()
+  const v = toRenderableHtml(html).trim()
   if (!v) return '<p>—</p>'
   return v
 }

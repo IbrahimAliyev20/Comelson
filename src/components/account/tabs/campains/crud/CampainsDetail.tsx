@@ -3,6 +3,7 @@
 import { ChevronLeft, PencilIcon } from 'lucide-react'
 import { useState } from 'react'
 
+import { toRenderableHtml } from '@/lib/html'
 import { cn } from '@/lib/utils'
 
 import type { CompanyCard } from '@/types/types'
@@ -128,7 +129,7 @@ export default function CampainsDetail({
             )}
             // create/edit-də CKEditor HTML saxlayırıq — demo üçün burada render edirik
             dangerouslySetInnerHTML={{
-              __html: company.description || '<p>—</p>',
+              __html: toRenderableHtml(company.description) || '<p>—</p>',
             }}
           />
         </div>

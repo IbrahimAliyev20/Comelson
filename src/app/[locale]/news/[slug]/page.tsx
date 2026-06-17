@@ -6,6 +6,7 @@ import { getTranslations } from 'next-intl/server'
 
 import Container from '@/components/shared/container'
 import { Link } from '@/i18n/navigation'
+import { stripHtmlToText, toRenderableHtml } from '@/lib/html'
 import { getServerQueryClient } from '@/providers/server'
 import { getBlogQuery, getBlogsQuery } from '@/services/blogs/queries'
 import { IconFacebook } from '@/../public/iconssvg/İconFacebook'
@@ -17,10 +18,6 @@ function formatBlogPostDate(value: string, locale: string) {
   const date = new Date(value)
   if (Number.isNaN(date.getTime())) return value
   return new Intl.DateTimeFormat(locale, { year: 'numeric', month: '2-digit', day: '2-digit' }).format(date)
-}
-
-function stripHtml(value: string) {
-  return value.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
 }
 
 export default async function NewsDetailPage({
@@ -75,7 +72,7 @@ export default async function NewsDetailPage({
       : []
 
   const title = post.title
-  const excerpt = stripHtml(post.description ?? '')
+  const excerpt = stripHtmlToText(post.description)
 
   const h = await headers()
   const forwardedProto = h.get('x-forwarded-proto')
@@ -224,7 +221,7 @@ export default async function NewsDetailPage({
           </div>
 
           <article className="prose prose-slate max-w-none">
-            <div dangerouslySetInnerHTML={{ __html: post.description ?? '' }} />
+            <div dangerouslySetInnerHTML={{ __html: toRenderableHtml(post.description) }} />
           </article>
 
           {related.length > 0 ? (
@@ -254,7 +251,7 @@ export default async function NewsDetailPage({
                       <div className="flex flex-col gap-3">
                         <p className="line-clamp-1 text-xl font-semibold leading-7 text-[#14171a]">{p.title}</p>
                         <p className="line-clamp-2 text-base leading-6 text-[#6b6e71]">
-                          {stripHtml(p.description ?? '')}
+                          {stripHtmlToText(p.description)}
                         </p>
                       </div>
                       <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">

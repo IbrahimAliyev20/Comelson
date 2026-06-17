@@ -4,11 +4,8 @@ import { getTranslations } from "next-intl/server";
 
 import Container from "@/components/shared/container";
 import { Link } from "@/i18n/navigation";
+import { stripHtmlToText } from "@/lib/html";
 import { AboutResponse } from "@/types/types";
-
-function stripHtmlToText(html: string) {
-  return html.replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
-}
 
 function ImageSlot({
   src,

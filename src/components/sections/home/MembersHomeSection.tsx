@@ -4,17 +4,10 @@ import { getTranslations } from 'next-intl/server'
 
 import Container from '@/components/shared/container'
 import { Link } from '@/i18n/navigation'
+import { getMemberLogoSrc } from '@/lib/media'
 import { getServerLocale } from '@/lib/utils'
 import { MemberResponse } from '@/types/types'
 import MembersCarousel from './MembersCarousel'
-
-function getMemberLogoUrl(member: MemberResponse): string {
-  const logo = member.profil?.trim()
-  if (logo) return logo
-  const img = member.image?.trim()
-  if (img) return img
-  return '/images/Logo.svg'
-}
 
 function getMemberName(member: MemberResponse): string {
   return member.name?.trim() || member.company?.trim() || 'Company'
@@ -59,7 +52,7 @@ export default async function MembersHomeSection({
               >
                 <div className="flex h-[188px] w-full items-center justify-center overflow-hidden rounded-[10px] bg-white">
                   <Image
-                    src={getMemberLogoUrl(list[0]!)}
+                    src={getMemberLogoSrc(list[0]!)}
                     alt={getMemberName(list[0]!)}
                     width={720}
                     height={480}
@@ -82,7 +75,7 @@ export default async function MembersHomeSection({
                 className="group flex h-[160px] items-center justify-center overflow-hidden rounded-[10px] border border-[#e8eaed] bg-white p-2 transition-shadow hover:shadow-[0_14px_40px_rgba(15,71,125,0.10)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0f477d]/40 md:h-[180px] lg:h-[160px]"
               >
                 <Image
-                  src={getMemberLogoUrl(member)}
+                  src={getMemberLogoSrc(member)}
                   alt={getMemberName(member)}
                   width={360}
                   height={240}

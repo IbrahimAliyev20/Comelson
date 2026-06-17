@@ -43,9 +43,15 @@ const getActivities = async (locale: string) => {
   return response
 }
 
-const getMembers = async (locale: string, ) => {
+export type GetMembersParams = {
+  country_id?: number
+  category_id?: number
+  search?: string
+}
+
+const getMembers = async (locale: string, params?: GetMembersParams) => {
   const response = await get<ApiResponse<MemberResponse[]>>('/members', {
-    params: { locale }
+    params: { locale, ...params }
   })
   return response
 }

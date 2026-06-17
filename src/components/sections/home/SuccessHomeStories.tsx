@@ -98,8 +98,8 @@ export default function SuccessHomeStories({
         <div className="flex flex-col gap-8">
           <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-end">
             <h2 className="max-w-[720px] text-balance text-3xl font-semibold leading-tight text-[#14171a] md:text-[40px] md:leading-[56px]">
-              <span className="text-[#14171a]">{labels.successStoriesTitleBlack}</span>
-              <span className="text-[#14171a]">{labels.successStoriesTitleMid}</span>
+              <span className="text-[#14171a]">{labels.successStoriesTitleBlack}</span>{' '}
+              <span className="text-[#14171a]">{labels.successStoriesTitleMid}</span>{' '}
               <span className="text-[#6b6e71]">{labels.successStoriesTitleGray}</span>
             </h2>
 

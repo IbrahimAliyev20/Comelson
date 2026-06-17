@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 
 import Container from '@/components/shared/container'
 import { Link } from '@/i18n/navigation'
+import { toRenderableHtml } from '@/lib/html'
 import { getServerLocale } from '@/lib/utils'
 import { getPublicTender } from '@/services/tenders/api'
 
@@ -155,7 +156,7 @@ export default async function TenderDetailPage({
                 </h2>
                 <div
                   className="prose max-w-none text-[#32393f] prose-p:leading-6"
-                  dangerouslySetInnerHTML={{ __html: tender.description }}
+                  dangerouslySetInnerHTML={{ __html: toRenderableHtml(tender.description) }}
                 />
               </section>
 
@@ -165,7 +166,7 @@ export default async function TenderDetailPage({
                 </h2>
                 <div
                   className="prose max-w-none text-[#32393f] prose-p:leading-6"
-                  dangerouslySetInnerHTML={{ __html: tender.required_documents }}
+                  dangerouslySetInnerHTML={{ __html: toRenderableHtml(tender.required_documents) }}
                 />
               </section>
 

@@ -6,14 +6,10 @@ import { getTranslations } from 'next-intl/server'
 import EventShareLinks from '@/components/events/EventShareLinks'
 import Container from '@/components/shared/container'
 import { Link } from '@/i18n/navigation'
+import { stripHtmlToText, toRenderableHtml } from '@/lib/html'
 import { getServerQueryClient } from '@/providers/server'
 import { getEventQuery } from '@/services/events/queries'
 import type { ApiResponse, EventResponse } from '@/types/types'
-
-function toPlainText(value?: string | null): string {
-  if (!value) return ''
-  return value.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
-}
 
 type EventDetail = EventResponse & {
   join_link?: string | null
@@ -132,7 +128,7 @@ export default async function EventDetailPage({
                 <div
                   // API returns HTML (e.g. <div>...</div>).
                   // Rendering it preserves formatting from the backend CMS.
-                  dangerouslySetInnerHTML={{ __html: event.description }}
+                  dangerouslySetInnerHTML={{ __html: toRenderableHtml(event.description) }}
                 />
               </div>
             </article>
@@ -146,7 +142,7 @@ export default async function EventDetailPage({
 
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   {picked.map((item) => {
-                    const plain = toPlainText(item.description)
+                    const plain = stripHtmlToText(item.description)
 
                     return (
                       <Link

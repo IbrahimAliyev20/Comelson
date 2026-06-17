@@ -1,24 +1,18 @@
 import Image from 'next/image'
 import { Mail, Phone } from 'lucide-react'
 import { notFound } from 'next/navigation'
+import { getTranslations } from 'next-intl/server'
 
 import Container from '@/components/shared/container'
 import { Link } from '@/i18n/navigation'
+import { stripHtmlToText, toRenderableHtml } from '@/lib/html'
+import { getMemberLogoSrc } from '@/lib/media'
 import { cn } from '@/lib/utils'
 import { getServerQueryClient } from '@/providers/server'
 import { getMemberQuery, getMembersQuery } from '@/services/members/queries'
 
-function stripHtml(value?: string | null) {
-  if (!value) return ''
-  return value.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
-}
-
 function getMemberName(member: { name?: string | null; company?: string | null }) {
   return member.name || member.company || '—'
-}
-
-function getMemberLogo(member: { logo_url?: string | null; image?: string | null }) {
-  return member.logo_url || member.image || '/images/Logo.svg'
 }
 
 export default async function MemberDetailPage({
@@ -27,6 +21,8 @@ export default async function MemberDetailPage({
   params: Promise<{ locale: string; slug: string }>
 }) {
   const { locale, slug } = await params
+  const t = await getTranslations('membersPage.detail')
+  const tMembers = await getTranslations('membersPage')
   const queryClient = getServerQueryClient()
 
   const membersResponse = await queryClient.fetchQuery(getMembersQuery(locale))
@@ -43,7 +39,7 @@ export default async function MemberDetailPage({
 
   if (!company) notFound()
 
-  const about = stripHtml(company.description)
+  const aboutHtml = toRenderableHtml(company.description)
   const others = members.filter((item) => item.slug !== slug).slice(0, 2)
   const companyName = getMemberName(company)
 
@@ -54,7 +50,7 @@ export default async function MemberDetailPage({
           <div className="mx-auto flex max-w-[1150px] flex-col gap-8 sm:gap-10">
             <nav className="flex items-center gap-1 text-xs leading-4">
               <Link href="/members" className="text-[#6b6e71] hover:underline">
-                {'\u00DCzvl\u0259r'}
+                {t('breadcrumb')}
               </Link>
               <span className="text-[#6b6e71]">/</span>
               <span className="line-clamp-1 font-medium text-[#32393f]">
@@ -66,7 +62,7 @@ export default async function MemberDetailPage({
               <div className="flex items-center gap-6">
                 <div className="relative aspect-square size-[96px] shrink-0 overflow-hidden rounded-full border border-[#f1f2f6] sm:size-[120px]">
                   <Image
-                    src={getMemberLogo(company)}
+                    src={getMemberLogoSrc(company)}
                     alt={companyName}
                     fill
                     className="object-cover"
@@ -86,7 +82,7 @@ export default async function MemberDetailPage({
 
               <div className="flex flex-col gap-4 lg:pt-3">
                 <p className="text-lg font-semibold leading-7 text-[#14171a]">
-                  {'\u018Flaq\u0259 vasit\u0259l\u0259ri'}
+                  {t('contactInfo')}
                 </p>
                 <div className="flex flex-col gap-3 text-sm leading-5 text-[#32393f]">
                   {company.phone ? (
@@ -115,18 +111,22 @@ export default async function MemberDetailPage({
 
             <div className="flex flex-col gap-4">
               <h2 className="text-2xl font-semibold leading-8 text-[#14171a] sm:text-[32px] sm:leading-[44px]">
-                {'\u015Eirk\u0259t haqq\u0131nda'}
+                {t('about')}
               </h2>
 
-              <div className="flex flex-col gap-4 text-sm leading-6 text-[#6b6e71] sm:text-base">
-                <p className={cn('text-[#64717c]')}>{about}</p>
-              </div>
+              <div
+                className={cn(
+                  'flex flex-col gap-4 text-sm leading-6 text-[#64717c] sm:text-base',
+                  '[&_a]:text-[#0f477d] [&_a]:underline [&_h1]:font-semibold [&_h2]:font-semibold [&_h3]:font-semibold [&_li]:list-disc [&_ol]:list-decimal [&_ol]:pl-5 [&_strong]:font-semibold [&_ul]:list-disc [&_ul]:pl-5'
+                )}
+                dangerouslySetInnerHTML={{ __html: aboutHtml }}
+              />
             </div>
 
             {others.length > 0 ? (
               <div className="flex flex-col gap-6">
                 <h3 className="text-2xl font-semibold leading-8 text-[#1d212a] sm:text-[32px] sm:leading-10">
-                  {'Dig\u0259r \u015Eirk\u0259tl\u0259r'}
+                  {t('otherCompanies')}
                 </h3>
 
                 <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
@@ -139,7 +139,7 @@ export default async function MemberDetailPage({
                         <div className="flex items-center gap-4">
                           <div className="relative size-20 shrink-0 overflow-hidden rounded-[56px] border border-[#f1f2f6]">
                             <Image
-                              src={getMemberLogo(item)}
+                              src={getMemberLogoSrc(item)}
                               alt={getMemberName(item)}
                               fill
                               className="object-cover"
@@ -160,7 +160,7 @@ export default async function MemberDetailPage({
                         </div>
 
                         <p className="line-clamp-3 text-sm leading-5 text-[#64717c]">
-                          {stripHtml(item.description)}
+                          {stripHtmlToText(item.description)}
                         </p>
                       </div>
 
@@ -168,7 +168,7 @@ export default async function MemberDetailPage({
                         href={`/members/${item.slug}`}
                         className="inline-flex h-12 w-full items-center justify-center rounded-2xl bg-[#e6eff6] px-6 text-base font-medium leading-6 text-[#0f477d] transition-colors hover:bg-[#dce9f3]"
                       >
-                        {'Profil\u0259 ke\u00E7id edin'}
+                        {tMembers('viewProfile')}
                       </Link>
                     </div>
                   ))}

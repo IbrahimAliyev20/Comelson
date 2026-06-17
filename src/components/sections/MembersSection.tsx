@@ -2,7 +2,10 @@
 
 import Image from 'next/image'
 import { ChevronDown, Search } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { useLocale, useTranslations } from 'next-intl'
+import { useEffect, useMemo, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 
 import Container from '@/components/shared/container'
 import { Input } from '@/components/ui/input'
@@ -13,50 +16,99 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
-import { Link } from '@/i18n/navigation'
+import { Link, usePathname, useRouter } from '@/i18n/navigation'
+import { stripHtmlToText } from '@/lib/html'
+import { getMemberLogoSrc } from '@/lib/media'
 import { cn } from '@/lib/utils'
-import { ActivityResponse, CountryResponse, MemberResponse } from '@/types/types'
+import type { GetMembersParams } from '@/services/members/api'
+import { getMembersQuery } from '@/services/members/queries'
+import { CompanyCategoryResponse, CountryResponse, MemberResponse } from '@/types/types'
 
-function stripHtml(value?: string | null) {
-  if (!value) return ''
-  return value.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ')
-}
+const SEARCH_DEBOUNCE_MS = 400
 
 export default function MembersSection({
   members,
-  activities,
-  countries
+  categories,
+  countries,
+  initialFilters
 }: {
   members: MemberResponse[] | undefined
-  activities: ActivityResponse[] | undefined
+  categories: CompanyCategoryResponse[] | undefined
   countries: CountryResponse[] | undefined
+  initialFilters?: GetMembersParams
 }) {
-  const [query, setQuery] = useState('')
-  const [country, setCountry] = useState<string | null>(null)
-  const [industry, setIndustry] = useState<string | null>(null)
+  const locale = useLocale()
+  const t = useTranslations('membersPage')
+  const tc = useTranslations('common')
+  const pathname = usePathname()
+  const router = useRouter()
+  const searchParams = useSearchParams()
+
+  const initialCountryId = initialFilters?.country_id ?? null
+  const initialCategoryId = initialFilters?.category_id ?? null
+  const initialSearch = initialFilters?.search ?? ''
+
+  const [countryId, setCountryId] = useState<number | null>(initialCountryId)
+  const [categoryId, setCategoryId] = useState<number | null>(initialCategoryId)
+  const [searchInput, setSearchInput] = useState(initialSearch)
+  const [search, setSearch] = useState(initialSearch)
   const [visible, setVisible] = useState(9)
 
-  const membersList = useMemo(() => members ?? [], [members])
   const countryOptions = useMemo(() => countries ?? [], [countries])
-  const industryOptions = useMemo(() => activities ?? [], [activities])
+  const categoryOptions = useMemo(() => categories ?? [], [categories])
+  const initialMembers = useMemo(() => members ?? [], [members])
 
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase()
+  // Axtarış mətnini debounce edirik ki, hər hərfdə API çağırışı olmasın.
+  useEffect(() => {
+    const id = window.setTimeout(() => {
+      setSearch(searchInput.trim())
+      setVisible(9)
+    }, SEARCH_DEBOUNCE_MS)
+    return () => window.clearTimeout(id)
+  }, [searchInput])
 
-    return membersList
-      .filter((x) => (country ? x.country?.name === country : true))
-      .filter((x) => (industry ? x.activity?.name === industry : true))
-      .filter((x) => {
-        if (!q) return true
-        const name = (x.name ?? x.company ?? '').toLowerCase()
-        const activityName = (x.activity?.name ?? '').toLowerCase()
-        const description = stripHtml(x.description).toLowerCase()
-        return name.includes(q) || activityName.includes(q) || description.includes(q)
-      })
-  }, [country, industry, membersList, query])
+  const queryParams: GetMembersParams = useMemo(
+    () => ({
+      ...(countryId ? { country_id: countryId } : {}),
+      ...(categoryId ? { category_id: categoryId } : {}),
+      ...(search ? { search } : {}),
+    }),
+    [countryId, categoryId, search]
+  )
 
-  const shown = filtered.slice(0, visible)
-  const canLoadMore = visible < filtered.length
+  const isInitial =
+    countryId === initialCountryId &&
+    categoryId === initialCategoryId &&
+    search === initialSearch
+
+  // Filtrləri URL-ə yazırıq (paylaşıla bilən: /members?category_id=3&country_id=1&search=markup)
+  useEffect(() => {
+    const sameUrl =
+      (searchParams.get('country_id') ?? '') === (countryId ? String(countryId) : '') &&
+      (searchParams.get('category_id') ?? '') === (categoryId ? String(categoryId) : '') &&
+      (searchParams.get('search') ?? '') === search
+    if (sameUrl) return
+
+    const query: Record<string, string> = {}
+    if (countryId) query.country_id = String(countryId)
+    if (categoryId) query.category_id = String(categoryId)
+    if (search) query.search = search
+
+    router.replace({ pathname, query }, { scroll: false })
+  }, [countryId, categoryId, search, pathname, router, searchParams])
+
+  const membersQuery = useQuery({
+    ...getMembersQuery(locale, queryParams),
+    initialData: isInitial
+      ? { status: true, message: '', data: initialMembers }
+      : undefined,
+  })
+
+  const list = membersQuery.data?.data ?? []
+  const shown = list.slice(0, visible)
+  const canLoadMore = visible < list.length
+  const isLoading = membersQuery.isLoading
+  const isError = membersQuery.isError
   const filterControlClass =
     '!h-12 rounded-xl border-[#dadee2] bg-white text-[#32393f] focus-visible:ring-0'
 
@@ -71,12 +123,9 @@ export default function MembersSection({
                 aria-hidden
               />
               <Input
-                value={query}
-                onChange={(e) => {
-                  setQuery(e.target.value)
-                  setVisible(9)
-                }}
-                placeholder="Axtarın.."
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                placeholder={tc('actions.search')}
                 className={cn(
                   filterControlClass,
                   'pl-10 pr-3 text-sm placeholder:text-[#889097]'
@@ -86,9 +135,9 @@ export default function MembersSection({
 
             <div className="grid w-full grid-cols-2 gap-3 md:w-auto md:min-w-[380px] lg:gap-4">
               <Select
-                value={country ?? 'all'}
+                value={countryId == null ? 'all' : String(countryId)}
                 onValueChange={(v) => {
-                  setCountry(v === 'all' ? null : v)
+                  setCountryId(v === 'all' ? null : Number(v))
                   setVisible(9)
                 }}
               >
@@ -98,19 +147,19 @@ export default function MembersSection({
                     'w-full px-3.5 text-base leading-6'
                   )}
                 >
-                  <SelectValue placeholder="Ölkələr" />
+                  <SelectValue placeholder={t('countriesFilter')} />
                 </SelectTrigger>
                 <SelectContent className="rounded-xl">
                   <SelectItem
                     value="all"
                     className="data-[state=checked]:bg-[#e6eff6] data-[state=checked]:text-[#0f477d] data-[state=checked]:[&_svg]:!text-[#0f477d]"
                   >
-                    Ölkələr
+                    {t('countriesFilter')}
                   </SelectItem>
                   {countryOptions.map((item) => (
                     <SelectItem
-                      key={item.name}
-                      value={item.name}
+                      key={item.id}
+                      value={String(item.id)}
                       className="data-[state=checked]:bg-[#e6eff6] data-[state=checked]:text-[#0f477d] data-[state=checked]:[&_svg]:!text-[#0f477d]"
                     >
                       {item.name}
@@ -120,9 +169,9 @@ export default function MembersSection({
               </Select>
 
               <Select
-                value={industry ?? 'all'}
+                value={categoryId == null ? 'all' : String(categoryId)}
                 onValueChange={(v) => {
-                  setIndustry(v === 'all' ? null : v)
+                  setCategoryId(v === 'all' ? null : Number(v))
                   setVisible(9)
                 }}
               >
@@ -132,19 +181,19 @@ export default function MembersSection({
                     'w-full px-3.5 text-base leading-6'
                   )}
                 >
-                  <SelectValue placeholder="Fəaliyyət sahəsi" />
+                  <SelectValue placeholder={t('categoryFilter')} />
                 </SelectTrigger>
                 <SelectContent className="rounded-xl">
                   <SelectItem
                     value="all"
                     className="data-[state=checked]:bg-[#e6eff6] data-[state=checked]:text-[#0f477d] data-[state=checked]:[&_svg]:!text-[#0f477d]"
                   >
-                    Fəaliyyət sahəsi
+                    {t('categoryFilter')}
                   </SelectItem>
-                  {industryOptions.map((item) => (
+                  {categoryOptions.map((item) => (
                     <SelectItem
-                      key={item.name}
-                      value={item.name}
+                      key={item.id}
+                      value={String(item.id)}
                       className="data-[state=checked]:bg-[#e6eff6] data-[state=checked]:text-[#0f477d] data-[state=checked]:[&_svg]:!text-[#0f477d]"
                     >
                       {item.name}
@@ -166,7 +215,7 @@ export default function MembersSection({
                     <div className="flex w-full items-center gap-4">
                       <div className="relative size-16 shrink-0 overflow-hidden rounded-[56px] border border-[#f1f2f6]">
                         <Image
-                          src={company.logo_url ?? company.image ?? '/images/Logo.svg'}
+                          src={getMemberLogoSrc(company)}
                           alt={company.name ?? company.company ?? 'Company'}
                           fill
                           className="object-cover"
@@ -187,7 +236,7 @@ export default function MembersSection({
                     </div>
 
                     <p className="line-clamp-3 text-sm leading-5 text-[#64717c]">
-                      {stripHtml(company.description)}
+                      {stripHtmlToText(company.description)}
                     </p>
                   </div>
 
@@ -196,16 +245,24 @@ export default function MembersSection({
                     className="inline-flex h-12 w-full items-center justify-center gap-4 rounded-2xl bg-[#e6eff6] px-6 py-3 text-base font-medium leading-6 text-[#0f477d] transition-opacity hover:opacity-90"
                   >
                     <span className={cn('inline-flex items-center gap-2')}>
-                      Profilə keçid edin
+                      {t('viewProfile')}
                     </span>
                   </Link>
                 </div>
               ))}
             </div>
 
-            {filtered.length === 0 ? (
+            {isLoading ? (
               <div className="w-full rounded-xl border border-[#eaf1fa] bg-white px-6 py-10 text-center text-sm text-[#64717c]">
-                Hazırda üzv yoxdur
+                {tc('loading')}
+              </div>
+            ) : isError ? (
+              <div className="w-full rounded-xl border border-[#eaf1fa] bg-white px-6 py-10 text-center text-sm text-red-600">
+                {tc('status.loadFailed')}
+              </div>
+            ) : list.length === 0 ? (
+              <div className="w-full rounded-xl border border-[#eaf1fa] bg-white px-6 py-10 text-center text-sm text-[#64717c]">
+                {t('empty')}
               </div>
             ) : canLoadMore ? (
               <button
@@ -213,7 +270,7 @@ export default function MembersSection({
                 onClick={() => setVisible((v) => v + 9)}
                 className="inline-flex items-center justify-center gap-1 text-base font-medium leading-6 text-[#64717c] transition-opacity hover:opacity-80"
               >
-                Daha çox
+                {tc('actions.loadMore')}
                 <ChevronDown className="size-6" aria-hidden />
               </button>
             ) : null}

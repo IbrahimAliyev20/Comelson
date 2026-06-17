@@ -34,6 +34,8 @@ export default async function TendersHomeSection({
   tenders,
 }: TendersHomeSectionProps) {
   const t = await getTranslations('home')
+  const tt = await getTranslations('tendersPage')
+  const tc = await getTranslations('common')
 
   return (
     <section className="bg-[#f4f6fa] py-12 sm:py-16 md:py-[72px]">
@@ -41,7 +43,7 @@ export default async function TendersHomeSection({
         <div className="flex flex-col gap-6 sm:gap-10">
           <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end sm:gap-6">
             <h2 className="min-w-0 text-balance text-2xl font-semibold leading-tight text-black min-[360px]:text-3xl md:text-[40px] md:leading-[56px]">
-              <span>{t('tenders.titleBlack')}</span>
+              <span>{t('tenders.titleBlack')}</span>{" "}
               <span className="text-[#6b6e71]">{t('tenders.titleGray')}</span>
             </h2>
 
@@ -60,22 +62,22 @@ export default async function TendersHomeSection({
                 <thead>
                   <tr className="border-b border-[#eaf1fa]">
                     <th className="w-16 px-6 py-4 text-left text-sm font-medium leading-5 text-[#64717c]">
-                      №
+                      {tt('colNumber')}
                     </th>
                     <th className="min-w-[236px] px-6 py-4 text-left text-sm font-medium leading-5 text-[#64717c]">
-                      Tender başlığı
+                      {tt('colTitle')}
                     </th>
                     <th className="min-w-[212px] px-6 py-4 text-left text-sm font-medium leading-5 text-[#64717c]">
-                      Şirkət
+                      {tt('colCompany')}
                     </th>
                     <th className="min-w-[208px] px-6 py-4 text-left text-sm font-medium leading-5 text-[#64717c]">
-                      Tenderin kateqoriyası
+                      {tt('colCategory')}
                     </th>
                     <th className="min-w-[178px] px-6 py-4 text-left text-sm font-medium leading-5 text-[#64717c]">
-                      Başlama tarixi
+                      {tt('colStartDate')}
                     </th>
                     <th className="min-w-[178px] px-6 py-4 text-left text-sm font-medium leading-5 text-[#64717c]">
-                      Bitmə tarixi
+                      {tt('colEndDate')}
                     </th>
                     <th className="min-w-[120px] px-6 py-4" />
                     <th className="px-6 py-4" />
@@ -123,7 +125,7 @@ export default async function TendersHomeSection({
                           href={`/tenders/${row.slug}`}
                           className="inline-flex items-center gap-2 text-sm font-normal leading-5 text-[#0f477d] transition-opacity hover:opacity-80"
                         >
-                          Ətraflı
+                          {tc('actions.details')}
                           <ChevronRight className="size-6 shrink-0" aria-hidden />
                         </Link>
                       </td>
@@ -143,14 +145,14 @@ export default async function TendersHomeSection({
 
             {!tenders.length ? (
               <div className="border-t border-[#f2f9ff] px-4 py-6 text-center text-sm text-[#64717c]">
-                Tender tapılmadı
+                {tt('empty')}
               </div>
             ) : null}
 
             <div className="border-t border-[#f2f9ff] bg-white px-4 py-3 text-xs text-[#64717c] sm:hidden">
               <span className="inline-flex items-center gap-2">
                 <ArrowUpRight className="size-4" aria-hidden />
-                Scroll edin (sağa) - cədvəl tam görünəcək.
+                {tt('scrollHint')}
               </span>
             </div>
           </div>

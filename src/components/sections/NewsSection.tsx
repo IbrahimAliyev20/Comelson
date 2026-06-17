@@ -16,6 +16,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Link } from '@/i18n/navigation'
+import { stripHtmlToText } from '@/lib/html'
 import { getBlogsQuery } from '@/services/blogs/queries'
 import { BlogCategoryResponse, BlogResponse } from '@/types/types'
 
@@ -197,7 +198,7 @@ export default function NewsSection({
                         {post.title}
                       </p>
                       <p className="line-clamp-2 text-base leading-6 text-[#6b6e71]">
-                        {post.description.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()}
+                        {stripHtmlToText(post.description)}
                       </p>
                     </div>
 

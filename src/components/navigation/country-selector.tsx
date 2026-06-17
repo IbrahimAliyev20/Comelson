@@ -237,6 +237,35 @@ export default function CountrySelector({ variant = 'default' }: CountrySelector
     return countries.find((item) => item.id === selectedCountryId) ?? null
   }, [countries, selectedCountryId])
 
+  /**
+   * Dil dəyişdikdə (məs. dil seçicisindən) bayraq/ölkə əvvəlki dəyərdə qalmamalıdır.
+   * Seçilmiş ölkə aktiv dilə uyğun gəlmirsə, həmin dilə map olunan ilk ölkəyə keçirik.
+   * - Yalnız artıq ölkə seçilibsə işləyir (ilk ziyarətdə modal öz işini görür).
+   * - Ölkə dəyişmə animasiyası gedərkən qarışmırıq.
+   */
+  useEffect(() => {
+    if (!countries.length) return
+    if (selectedCountryId === null) return
+    if (switchingCountry) return
+
+    const current = countries.find((item) => item.id === selectedCountryId) ?? null
+    if (current && getLocaleForCountry(current.name, current.flag) === locale) return
+
+    const match = countries.find(
+      (item) => getLocaleForCountry(item.name, item.flag) === locale
+    )
+    if (!match || match.id === selectedCountryId) return
+
+    Cookies.set(COUNTRY_ID_COOKIE, String(match.id), {
+      path: '/',
+      expires: 365,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+    })
+    setSelectedCountryId(match.id)
+    void queryClient.invalidateQueries()
+  }, [locale, countries, selectedCountryId, switchingCountry, queryClient])
+
   async function handleCountrySelect(country: CountryResponse) {
     if (switchingCountry) return
 
@@ -265,6 +294,9 @@ export default function CountrySelector({ variant = 'default' }: CountrySelector
       const query = Object.fromEntries(searchParams.entries())
 
       if (nextLocale !== locale) {
+        // Pin the explicitly chosen country so the locale→country sync effect
+        // doesn't override it after navigation.
+        setSelectedCountryId(country.id)
         startTransition(() => {
           router.replace({ pathname, query }, { locale: nextLocale })
         })

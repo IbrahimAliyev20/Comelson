@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { Calendar, Calendar1, ChevronDown, Clock } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 import Container from '@/components/shared/container'
 import { Link } from '@/i18n/navigation'
@@ -36,6 +36,7 @@ export default function EventsSection({
   events: EventResponse[] | undefined
 }) {
   const locale = useLocale()
+  const tc = useTranslations('common')
   const initialEvents = useMemo(() => events ?? [], [events])
   const [visible, setVisible] = useState(9)
 
@@ -108,7 +109,7 @@ export default function EventsSection({
               onClick={() => setVisible((v) => v + 9)}
               className="inline-flex items-center justify-center gap-1 text-base font-medium leading-6 text-[#64717c] transition-opacity hover:opacity-80"
             >
-              Daha çox
+              {tc('actions.loadMore')}
               <ChevronDown className="size-6" aria-hidden />
             </button>
           ) : null}

@@ -12,12 +12,12 @@
     "statsTitleAccent": "Business",
     "statsTitleSuffix": "Network",
     "statsBody": "On the Comelson platform, hundreds of members and partners come together across different sectors. These indicators reflect an active and steadily growing business community.",
-    "blogTitleBlack": "Latest from the ",
+    "blogTitleBlack": "Latest from the",
     "blogTitleGray": "Comelson community",
     "blogCta": "View all",
     "blogReadTime": "{minutes} min read",
-    "successStoriesTitleBlack": "Listen to ",
-    "successStoriesTitleMid": "Our ",
+    "successStoriesTitleBlack": "Listen to",
+    "successStoriesTitleMid": "Our",
     "successStoriesTitleGray": "Success Stories",
     "successStoriesCta": "View all",
     "successStoriesSliderLabel": "Success story slides",
@@ -148,6 +148,7 @@
       "save": "Save",
       "saveChanges": "Save changes",
       "search": "Search..",
+      "loadMore": "Load more",
       "loadingWait": "Please wait...",
       "loadingWaitEllipsis": "Please wait…"
     },
@@ -386,6 +387,37 @@
   "successStoriesPage": {
     "titlePrefix": "Success",
     "titleSuffix": "Listen"
+  },
+  "membersPage": {
+    "countriesFilter": "Countries",
+    "activityFilter": "Field of activity",
+    "categoryFilter": "Category",
+    "viewProfile": "View profile",
+    "empty": "No members yet",
+    "defaultTitle": "Our members",
+    "defaultDescription": "Comelson brings companies together to build a strong business network for collaboration, partnership, and new opportunities.",
+    "detail": {
+      "breadcrumb": "Members",
+      "contactInfo": "Contact details",
+      "about": "About the company",
+      "otherCompanies": "Other companies"
+    }
+  },
+  "tendersPage": {
+    "title": "Tender Announcements",
+    "statusActive": "Active announcements",
+    "statusInactive": "Inactive announcements",
+    "statusAll": "All",
+    "categoryPlaceholder": "Category",
+    "colNumber": "№",
+    "colTitle": "Tender title",
+    "colCompany": "Company",
+    "colCategory": "Tender category",
+    "colStartDate": "Start date",
+    "colEndDate": "End date",
+    "emptySearch": "No results match your search",
+    "empty": "No tenders found",
+    "scrollHint": "Scroll right to see the full table."
   },
   "footer": {
     "followUs": "Follow us",

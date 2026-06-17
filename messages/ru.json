@@ -12,12 +12,12 @@
     "statsTitleAccent": "деловая",
     "statsTitleSuffix": "сеть Comelson",
     "statsBody": "На платформе Comelson сотни участников и партнеров объединяются из разных отраслей. Эти показатели отражают активное и устойчиво растущее бизнес-сообщество.",
-    "blogTitleBlack": "Последние новости ",
+    "blogTitleBlack": "Последние новости",
     "blogTitleGray": "сообщества Comelson",
     "blogCta": "Посмотреть все",
     "blogReadTime": "{minutes} мин чтения",
     "successStoriesTitleBlack": "Слушайте",
-    "successStoriesTitleMid": " наши ",
+    "successStoriesTitleMid": "наши",
     "successStoriesTitleGray": "истории успеха",
     "successStoriesCta": "Посмотреть все",
     "successStoriesSliderLabel": "Слайдер историй успеха",
@@ -148,6 +148,7 @@
       "save": "Сохранить",
       "saveChanges": "Сохранить изменения",
       "search": "Поиск..",
+      "loadMore": "Показать ещё",
       "loadingWait": "Пожалуйста, подождите...",
       "loadingWaitEllipsis": "Пожалуйста, подождите…"
     },
@@ -386,6 +387,37 @@
   "successStoriesPage": {
     "titlePrefix": "Успех",
     "titleSuffix": "Слушайте"
+  },
+  "membersPage": {
+    "countriesFilter": "Страны",
+    "activityFilter": "Сфера деятельности",
+    "categoryFilter": "Категория",
+    "viewProfile": "Перейти к профилю",
+    "empty": "Пока нет участников",
+    "defaultTitle": "Наши участники",
+    "defaultDescription": "Comelson объединяет компании, создавая прочную бизнес-сеть для сотрудничества, партнёрства и новых возможностей.",
+    "detail": {
+      "breadcrumb": "Участники",
+      "contactInfo": "Контактная информация",
+      "about": "О компании",
+      "otherCompanies": "Другие компании"
+    }
+  },
+  "tendersPage": {
+    "title": "Тендерные объявления",
+    "statusActive": "Активные объявления",
+    "statusInactive": "Неактивные объявления",
+    "statusAll": "Все",
+    "categoryPlaceholder": "Категория",
+    "colNumber": "№",
+    "colTitle": "Название тендера",
+    "colCompany": "Компания",
+    "colCategory": "Категория тендера",
+    "colStartDate": "Дата начала",
+    "colEndDate": "Дата окончания",
+    "emptySearch": "По вашему запросу ничего не найдено",
+    "empty": "Тендеры не найдены",
+    "scrollHint": "Прокрутите вправо, чтобы увидеть всю таблицу."
   },
   "footer": {
     "followUs": "Подписывайтесь",

@@ -5,11 +5,8 @@ import { getTranslations } from 'next-intl/server'
 import Container from '@/components/shared/container'
 import { Link } from '@/i18n/navigation'
 import { BlogResponse } from '@/types/types'
+import { stripHtmlToText } from '@/lib/html'
 import { getServerLocale } from '@/lib/utils'
-
-function stripHtml(value: string) {
-  return value.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
-}
 
 function formatDate(value: string, locale: string) {
   const d = new Date(value)
@@ -34,7 +31,7 @@ export default async function NewsHomeSection({ blogs }: { blogs: BlogResponse[]
         <div className="flex flex-col gap-8">
           <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-end">
             <h2 className="max-w-[498px] text-balance text-3xl font-semibold leading-tight md:text-[40px] md:leading-[56px]">
-              <span className="text-black">{t('blogTitleBlack')}</span>
+              <span className="text-black">{t('blogTitleBlack')}</span>{' '}
               <span className="text-[#6b6e71]">{t('blogTitleGray')}</span>
             </h2>
 
@@ -68,7 +65,7 @@ export default async function NewsHomeSection({ blogs }: { blogs: BlogResponse[]
                   <div className="flex flex-col gap-3">
                     <p className="line-clamp-1 text-xl font-semibold leading-7 text-[#161e17]">{post.title}</p>
                     <p className="line-clamp-3 text-base leading-6 tracking-[0.16px] text-[#494f4a]">
-                      {stripHtml(post.description ?? '')}
+                      {stripHtmlToText(post.description)}
                     </p>
                   </div>
 

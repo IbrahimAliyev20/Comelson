@@ -77,6 +77,7 @@ function getPaginationWindow(
 export default function TendersSection() {
   const locale = useLocale()
   const t = useTranslations('common')
+  const tt = useTranslations('tendersPage')
   const [query, setQuery] = useState('')
   const [status, setStatus] = useState<StatusFilter>('active')
   const [categoryId, setCategoryId] = useState<number | null>(null)
@@ -152,7 +153,7 @@ export default function TendersSection() {
       <Container>
         <div className="flex flex-col gap-8 sm:gap-10">
           <h1 className="text-balance text-3xl font-semibold leading-tight text-[#14171a] sm:text-[40px] sm:leading-[56px]">
-            Tender Elanları
+            {tt('title')}
           </h1>
 
           <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between lg:items-center">
@@ -164,7 +165,7 @@ export default function TendersSection() {
               <Input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Axtarın.."
+                placeholder={t('actions.search')}
                 className={cn(
                   filterControlClass,
                   'pl-10 pr-3 text-sm placeholder:text-[#889097]'
@@ -183,26 +184,26 @@ export default function TendersSection() {
                     'w-full px-3.5 text-base leading-6 sm:w-[180px]'
                   )}
                 >
-                  <SelectValue placeholder="Aktiv elanlar" />
+                  <SelectValue placeholder={tt('statusActive')} />
                 </SelectTrigger>
                 <SelectContent className="rounded-xl">
                   <SelectItem
                     value="active"
                     className="data-[state=checked]:bg-[#e6eff6] data-[state=checked]:text-[#0f477d] data-[state=checked]:[&_svg]:!text-[#0f477d]"
                   >
-                    Aktiv elanlar
+                    {tt('statusActive')}
                   </SelectItem>
                   <SelectItem
                     value="closed"
                     className="data-[state=checked]:bg-[#e6eff6] data-[state=checked]:text-[#0f477d] data-[state=checked]:[&_svg]:!text-[#0f477d]"
                   >
-                    Deaktiv elanlar
+                    {tt('statusInactive')}
                   </SelectItem>
                   <SelectItem
                     value="all"
                     className="data-[state=checked]:bg-[#e6eff6] data-[state=checked]:text-[#0f477d] data-[state=checked]:[&_svg]:!text-[#0f477d]"
                   >
-                    Hamısı
+                    {tt('statusAll')}
                   </SelectItem>
                 </SelectContent>
               </Select>
@@ -217,14 +218,14 @@ export default function TendersSection() {
                     'w-full px-3.5 text-base leading-6 sm:w-[180px]'
                   )}
                 >
-                  <SelectValue placeholder="Kateqoriya" />
+                  <SelectValue placeholder={tt('categoryPlaceholder')} />
                 </SelectTrigger>
                 <SelectContent className="rounded-xl">
                   <SelectItem
                     value="all"
                     className="data-[state=checked]:bg-[#e6eff6] data-[state=checked]:text-[#0f477d] data-[state=checked]:[&_svg]:!text-[#0f477d]"
                   >
-                    Kateqoriya
+                    {tt('categoryPlaceholder')}
                   </SelectItem>
                   {categories.map((x) => (
                     <SelectItem
@@ -244,11 +245,11 @@ export default function TendersSection() {
           <div className="overflow-hidden rounded-lg border border-[#f2f9ff] bg-white px-6 py-8">
             {isLoading ? (
               <div className="py-10 text-center text-sm text-[#6b6e71]">
-                Yüklənir…
+                {t('loading')}
               </div>
             ) : isError ? (
               <div className="py-10 text-center text-sm text-[#6b6e71]">
-                Yükləmə alınmadı
+                {t('status.loadFailed')}
               </div>
             ) : null}
             <div className="w-full overflow-x-auto">
@@ -256,22 +257,22 @@ export default function TendersSection() {
                 <thead>
                   <tr className="border-b border-[#eaf1fa]">
                     <th className="w-16 px-6 py-4 text-left text-sm font-medium leading-5 text-[#64717c]">
-                      №
+                      {tt('colNumber')}
                     </th>
                     <th className="min-w-[236px] px-6 py-4 text-left text-sm font-medium leading-5 text-[#64717c]">
-                      Tender başlığı
+                      {tt('colTitle')}
                     </th>
                     <th className="min-w-[212px] px-6 py-4 text-left text-sm font-medium leading-5 text-[#64717c]">
-                      Şirkət
+                      {tt('colCompany')}
                     </th>
                     <th className="min-w-[208px] px-6 py-4 text-left text-sm font-medium leading-5 text-[#64717c]">
-                      Tenderin kateqoriyası
+                      {tt('colCategory')}
                     </th>
                     <th className="min-w-[178px] px-6 py-4 text-left text-sm font-medium leading-5 text-[#64717c]">
-                      Başlama tarixi
+                      {tt('colStartDate')}
                     </th>
                     <th className="min-w-[178px] px-6 py-4 text-left text-sm font-medium leading-5 text-[#64717c]">
-                      Bitmə tarixi
+                      {tt('colEndDate')}
                     </th>
                     <th className="min-w-[120px] px-6 py-4" />
                     <th className="px-6 py-4" />
@@ -319,7 +320,7 @@ export default function TendersSection() {
                           href={`/tenders/${row.slug}`}
                           className="inline-flex items-center gap-2 text-sm font-normal leading-5 text-[#0f477d] transition-opacity hover:opacity-80"
                         >
-                          Ətraflı
+                          {t('actions.details')}
                           <ChevronRight className="size-6 shrink-0" aria-hidden />
                         </Link>
                       </td>
@@ -339,7 +340,7 @@ export default function TendersSection() {
 
             {!isLoading && !isError && rows.length === 0 ? (
               <div className="border-t border-[#f2f9ff] px-4 py-6 text-center text-sm text-[#64717c]">
-                Axtarışınıza uyğun nəticə tapılmadı
+                {tt('emptySearch')}
               </div>
             ) : null}
           </div>

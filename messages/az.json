@@ -148,6 +148,7 @@
       "save": "Yadda saxla",
       "saveChanges": "Dəyişiklikləri yadda saxla",
       "search": "Axtarın..",
+      "loadMore": "Daha çox",
       "loadingWait": "Gözləyin...",
       "loadingWaitEllipsis": "Gözləyin…"
     },
@@ -445,6 +446,37 @@
   "successStoriesPage": {
     "titlePrefix": "Uğur",
     "titleSuffix": "Dinləyin"
+  },
+  "membersPage": {
+    "countriesFilter": "Ölkələr",
+    "activityFilter": "Fəaliyyət sahəsi",
+    "categoryFilter": "Kateqoriya",
+    "viewProfile": "Profilə keçid edin",
+    "empty": "Hazırda üzv yoxdur",
+    "defaultTitle": "Üzvlərimiz",
+    "defaultDescription": "Comelson şirkətləri bir araya gətirərək əməkdaşlıq, tərəfdaşlıq və yeni imkanlar üçün güclü bir biznes şəbəkəsi yaradır.",
+    "detail": {
+      "breadcrumb": "Üzvlər",
+      "contactInfo": "Əlaqə vasitələri",
+      "about": "Şirkət haqqında",
+      "otherCompanies": "Digər Şirkətlər"
+    }
+  },
+  "tendersPage": {
+    "title": "Tender Elanları",
+    "statusActive": "Aktiv elanlar",
+    "statusInactive": "Deaktiv elanlar",
+    "statusAll": "Hamısı",
+    "categoryPlaceholder": "Kateqoriya",
+    "colNumber": "№",
+    "colTitle": "Tender başlığı",
+    "colCompany": "Şirkət",
+    "colCategory": "Tenderin kateqoriyası",
+    "colStartDate": "Başlama tarixi",
+    "colEndDate": "Bitmə tarixi",
+    "emptySearch": "Axtarışınıza uyğun nəticə tapılmadı",
+    "empty": "Tender tapılmadı",
+    "scrollHint": "Scroll edin (sağa) - cədvəl tam görünəcək."
   },
   "footer": {
     "followUs": "Bizi izləyin",

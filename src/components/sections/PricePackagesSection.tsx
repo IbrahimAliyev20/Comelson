@@ -3,26 +3,21 @@ import { getTranslations } from 'next-intl/server'
 
 import Container from '@/components/shared/container'
 import { Link } from '@/i18n/navigation'
+import { decodeHtmlEntities, stripHtmlToText } from '@/lib/html'
 import { PartnershipsResponse } from '@/types/types'
 import { PricingCheckIcon, PricingManatIcon } from './home/pricing-icons'
-
-function stripHtml(value?: string | null): string {
-  if (!value) return ''
-  return value
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/&nbsp;/gi, ' ')
-    .replace(/\s+/g, ' ')
-    .trim()
-}
 
 function extractListItems(description: string) {
   if (!description) return []
 
+  // Redaktordan entity kimi gələ bilən teqləri əvvəlcə açırıq ki, `<li>` tutulsun.
+  const html = decodeHtmlEntities(description)
+
   // Be tolerant to: newlines inside <li>, attributes, and casing differences.
-  const matches = Array.from(description.matchAll(/<li\b[^>]*>([\s\S]*?)<\/li>/gi))
+  const matches = Array.from(html.matchAll(/<li\b[^>]*>([\s\S]*?)<\/li>/gi))
 
   return matches
-    .map((match) => stripHtml(match[1]))
+    .map((match) => stripHtmlToText(match[1]))
     .filter(Boolean)
 }
 
@@ -194,7 +189,7 @@ export default async function PricePackagesSection({
                               isFeatured ? 'text-[#eaf1fa]' : 'text-[#6b6e71]'
                             }
                           >
-                            {stripHtml(pkg.description)}
+                            {stripHtmlToText(pkg.description)}
                           </p>
                         </li>
                       )}

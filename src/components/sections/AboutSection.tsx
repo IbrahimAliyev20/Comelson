@@ -1,4 +1,5 @@
 import Container from '@/components/shared/container'
+import { toRenderableHtml } from '@/lib/html'
 import type { AboutResponse } from '@/types/types'
 import Image from 'next/image'
 
@@ -20,7 +21,7 @@ export default function AboutSection({ about }: { about: AboutResponse | undefin
          
               <div
                 className="text-base font-normal leading-6 text-[#6b6e71] [&_p]:mb-6 [&_p:last-child]:mb-0 [&_p:empty]:hidden"
-                dangerouslySetInnerHTML={{ __html: about.description }}
+                dangerouslySetInnerHTML={{ __html: toRenderableHtml(about.description) }}
               />
             </div>
           </div>
@@ -45,7 +46,7 @@ export default function AboutSection({ about }: { about: AboutResponse | undefin
          
               <div
                 className="text-base font-normal leading-6 text-[#6b6e71] [&_p]:mb-6 [&_p:last-child]:mb-0 [&_p:empty]:hidden"
-                dangerouslySetInnerHTML={{ __html: about.short_description_2 ?? '' }}
+                dangerouslySetInnerHTML={{ __html: toRenderableHtml(about.short_description_2) }}
               />
             </div>
           </div>

@@ -12,12 +12,12 @@
     "statsTitleAccent": "İş",
     "statsTitleSuffix": "Ağı",
     "statsBody": "Comelson platformasında yüzlerce üye ve ortak farklı sektörler üzrə bir araya geliyor. Bu göstergeler platformanın aktif ve sürekli büyüyen iş topluluğunu yansıtıyor.",
-    "blogTitleBlack": "Comelson Topluluğundan ",
+    "blogTitleBlack": "Comelson Topluluğundan",
     "blogTitleGray": "Son Yenilikler",
     "blogCta": "Tümünü gör",
     "blogReadTime": "{minutes} dakikalık okuma",
     "successStoriesTitleBlack": "Başarı",
-    "successStoriesTitleMid": " Hikayelerimizi ",
+    "successStoriesTitleMid": "Hikayelerimizi",
     "successStoriesTitleGray": "Dinleyin",
     "successStoriesCta": "Tümünü gör",
     "successStoriesSliderLabel": "Başarı hikayeleri sliderı",
@@ -148,6 +148,7 @@
       "save": "Kaydet",
       "saveChanges": "Değişiklikleri kaydet",
       "search": "Arayın..",
+      "loadMore": "Daha fazla",
       "loadingWait": "Lütfen bekleyin...",
       "loadingWaitEllipsis": "Lütfen bekleyin…"
     },
@@ -386,6 +387,37 @@
   "successStoriesPage": {
     "titlePrefix": "Başarı",
     "titleSuffix": "Dinleyin"
+  },
+  "membersPage": {
+    "countriesFilter": "Ülkeler",
+    "activityFilter": "Faaliyet alanı",
+    "categoryFilter": "Kategori",
+    "viewProfile": "Profili görüntüle",
+    "empty": "Henüz üye yok",
+    "defaultTitle": "Üyelerimiz",
+    "defaultDescription": "Comelson, şirketleri bir araya getirerek iş birliği, ortaklık ve yeni fırsatlar için güçlü bir iş ağı oluşturur.",
+    "detail": {
+      "breadcrumb": "Üyeler",
+      "contactInfo": "İletişim bilgileri",
+      "about": "Şirket hakkında",
+      "otherCompanies": "Diğer şirketler"
+    }
+  },
+  "tendersPage": {
+    "title": "İhale İlanları",
+    "statusActive": "Aktif ilanlar",
+    "statusInactive": "Pasif ilanlar",
+    "statusAll": "Tümü",
+    "categoryPlaceholder": "Kategori",
+    "colNumber": "№",
+    "colTitle": "İhale başlığı",
+    "colCompany": "Şirket",
+    "colCategory": "İhale kategorisi",
+    "colStartDate": "Başlangıç tarihi",
+    "colEndDate": "Bitiş tarihi",
+    "emptySearch": "Aramanıza uygun sonuç bulunamadı",
+    "empty": "İhale bulunamadı",
+    "scrollHint": "Tabloyu tam görmek için sağa kaydırın."
   },
   "footer": {
     "followUs": "Bizi takip edin",

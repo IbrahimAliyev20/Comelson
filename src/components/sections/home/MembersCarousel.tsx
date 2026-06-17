@@ -4,16 +4,13 @@ import Image from 'next/image'
 import { useEffect, useMemo, useRef } from 'react'
 
 import { Link } from '@/i18n/navigation'
+import { getMemberLogoSrc } from '@/lib/media'
 import type { MemberResponse } from '@/types/types'
 
 const AUTOPLAY_MS = 2600
 
 function getMemberName(member: MemberResponse): string {
   return member.name ?? member.company ?? 'Company'
-}
-
-function getMemberImage(member: MemberResponse): string {
-  return member.logo_url ?? member.image ?? '/images/Logo.svg'
 }
 
 export default function MembersCarousel({
@@ -68,7 +65,7 @@ export default function MembersCarousel({
         >
           <div className="flex h-[188px] items-center justify-center overflow-hidden rounded-[10px] bg-white">
             <Image
-              src={getMemberImage(member)}
+              src={getMemberLogoSrc(member)}
               alt={getMemberName(member)}
               width={360}
               height={240}
