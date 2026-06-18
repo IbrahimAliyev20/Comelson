@@ -420,7 +420,8 @@
     "scrollHint": "Tabloyu tam görmek için sağa kaydırın."
   },
   "footer": {
-    "followUs": "Bizi takip edin",
+    "description": "Comelson, şirketleri bir araya getirerek yeni fırsatlar için güçlü bir iş ağı oluşturur.",
+    "followUs": "Bizi sosyal medyada takip edin",
     "countrySelection": "Ülke seçimi",
     "links": "Bağlantılar",
     "contact": "İletişim",

@@ -479,7 +479,8 @@
     "scrollHint": "Scroll edin (sağa) - cədvəl tam görünəcək."
   },
   "footer": {
-    "followUs": "Bizi izləyin",
+    "description": "Comelson şirkətləri bir araya gətirərək yeni imkanlar üçün güclü bir biznes şəbəkəsi yaradır.",
+    "followUs": "Bizi sosial şəbəkələrimizdən izləyin",
     "countrySelection": "Ölkə seçimi",
     "links": "Keçidlər",
     "contact": "Əlaqə",

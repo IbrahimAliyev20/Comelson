@@ -420,7 +420,8 @@
     "scrollHint": "Scroll right to see the full table."
   },
   "footer": {
-    "followUs": "Follow us",
+    "description": "By bringing companies together, Comelson builds a powerful business network for new opportunities.",
+    "followUs": "Follow us on social media",
     "countrySelection": "Country selection",
     "links": "Links",
     "contact": "Contact",
