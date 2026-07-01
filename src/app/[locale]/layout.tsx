@@ -8,10 +8,23 @@ import { QueryProvider } from '@/providers/QueryProvider'
 import { Toaster } from 'sonner'
 import { RouteTransitionBoundary } from '@/components/navigation/RouteTransitionBoundary'
 import ClientLayout from '@/components/navigation/clientLayout'
+import { resolveAuthMediaUrl } from '@/lib/auth/resolve-media-url'
+import { getSettings } from '@/services/settings/api'
 
-export const metadata: Metadata = {
-  title: 'Comelson',
-  description: 'Comelson',
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}): Promise<Metadata> {
+  const { locale } = await params
+  const settings = await getSettings(locale).catch(() => null)
+  const favicon = resolveAuthMediaUrl(settings?.favicon)
+
+  return {
+    title: 'Comelson',
+    description: 'Comelson',
+    ...(favicon ? { icons: { icon: favicon } } : {}),
+  }
 }
 
 

@@ -79,7 +79,7 @@ export default async function MembersHomeSection({
                   alt={getMemberName(member)}
                   width={360}
                   height={240}
-                  className="h-full w-full rounded-lg object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+                  className="h-full w-full rounded-lg object-contain  transition-transform duration-300 group-hover:scale-[1.02]"
                   sizes="(max-width: 1024px) 100vw, 360px"
                 />
               </Link>

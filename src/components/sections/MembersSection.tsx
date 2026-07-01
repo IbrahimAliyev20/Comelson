@@ -218,7 +218,7 @@ export default function MembersSection({
                           src={getMemberLogoSrc(company)}
                           alt={company.name ?? company.company ?? 'Company'}
                           fill
-                          className="object-cover"
+                          className="object-contain"
                           sizes="64px"
                         />
                       </div>
